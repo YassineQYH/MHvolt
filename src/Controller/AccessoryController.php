@@ -3,50 +3,63 @@
 namespace App\Controller;
 
 use App\Entity\Accessory;
-use App\Entity\Illustrationaccess;
-use App\Repository\AccessoryRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Knp\Component\Pager\PaginatorInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class AccessoryController extends AbstractController
 {
-    private $entityManager;
-    private $repository;
+    private EntityManagerInterface $entityManager;
 
-    public function __construct(EntityManagerInterface $entityManager, AccessoryRepository $repository)
+    public function __construct(EntityManagerInterface $entityManager)
     {
         $this->entityManager = $entityManager;
-        $this->repository = $repository;
     }
 
-    #[Route('/nos-accessoires', name: 'app_accessoires')]
-    public function index(Request $request, PaginatorInterface $paginator): Response
+    #[Route('/accessoires', name: 'app_accessoires')]
+    public function index(): Response
     {
-        $articles = $this->repository->findAll();
-        $accessories = $paginator->paginate($articles, $request->query->getInt('page', 1), 9);
+        $accessories = $this->entityManager->getRepository(Accessory::class)->findAll();
 
-        return $this->render('accessoires/index.html.twig', [
+        return $this->render('access/show.html.twig', [
             'accessories' => $accessories
         ]);
     }
 
-    #[Route('/accessoire/{slug}', name: 'app_accessoire_show')]
+    #[Route('/accessoire/{slug}', name: 'accessoire')]
     public function show(string $slug): Response
     {
-        $accessory = $this->repository->findOneBySlug($slug);
+        $accessory = $this->entityManager->getRepository(Accessory::class)
+            ->findOneBy(['slug' => $slug]);
+
         if (!$accessory) {
-            return $this->redirectToRoute('app_accessoires');
+            throw $this->createNotFoundException('Cet accessoire n’existe pas.');
         }
 
-        $illustrations = $this->entityManager->getRepository(Illustrationaccess::class)->findBy(['accessory' => $accessory]);
+        $illustrations = $accessory->getIllustrationaccess();
 
-        return $this->render('accessoires/show.html.twig', [
+        return $this->render('access/single_access.html.twig', [
             'accessory' => $accessory,
             'illustrations' => $illustrations
+        ]);
+    }
+
+    #[Route('/accessoire/{slug}/trottinettes', name: 'app_accessoire_trottinettes')]
+    public function showTrottinettes(string $slug): Response
+    {
+        $accessory = $this->entityManager->getRepository(Accessory::class)
+            ->findOneBy(['slug' => $slug]);
+
+        if (!$accessory) {
+            throw $this->createNotFoundException('Cet accessoire n’existe pas.');
+        }
+
+        $trottinettes = $accessory->getTrottinettes(); // relation ManyToMany
+
+        return $this->render('access/show-all-trott.html.twig', [
+            'accessory' => $accessory,
+            'trottinettes' => $trottinettes
         ]);
     }
 }

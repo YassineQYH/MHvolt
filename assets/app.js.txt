@@ -1,0 +1,105 @@
+// -----------------------------
+// jQuery global
+// -----------------------------
+import $ from 'jquery';
+window.$ = $;
+window.jQuery = $;
+
+// -----------------------------
+// Bootstrap bundle
+// -----------------------------
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+
+// -----------------------------
+// CSS globaux
+// -----------------------------
+import './css/main.css';
+import './css/nav.css';
+import './css/carrousel.css';
+import './css/section.css';
+import './css/product-is-best.css';
+import './css/lightslider.css';
+import './css/contact-form.css';
+import './css/footer.css';
+
+// -----------------------------
+// Scripts personnalisés
+// -----------------------------
+import './js/Jquery.js';
+import './js/lightslider.js';
+import './js/slide-product.js';
+import './js/slider-show-product.js';
+import './js/slide-img-product-show-swiper.min.js';
+import './js/slide-img-product-show.js';
+import './js/slide-img.js';
+import './js/login.js';
+
+// -----------------------------
+// Menu déroulant
+// -----------------------------
+$(document).ready(function() {
+    $('ul li').click(function() {
+        $(this).siblings().removeClass('active'); // retire active des frères
+        $(this).toggleClass('active'); // toggle active
+    });
+});
+
+// -----------------------------
+// AOS animations
+// -----------------------------
+import AOS from 'aos';
+import 'aos/dist/aos.css';
+AOS.init({
+    duration: 1200,
+    once: true
+});
+
+// -----------------------------
+// Glide.js sliders
+// -----------------------------
+import Glide from '@glidejs/glide';
+
+// Slider "meilleurs ventes" (Glide)
+const bestSlider = document.querySelector('.glide-best');
+if (bestSlider) {
+    new Glide(bestSlider, {
+        type: 'carousel',
+        perView: 4,
+        gap: 20,
+        autoplay: 4000,
+        breakpoints: {
+            1200: { perView: 3 },
+            768: { perView: 2 },
+            567: { perView: 1 }
+        }
+    }).mount();
+}
+
+// Slider produit individuel (Glide)
+const productSlider = document.querySelector('.glide-product');
+if (productSlider) {
+    new Glide(productSlider, {
+        type: 'carousel',
+        perView: 1,
+        gap: 0,
+        autoplay: false,
+        animationDuration: 600
+    }).mount();
+}
+
+// -----------------------------
+// Lightslider pour "isBest" sliders Twig
+// -----------------------------
+$(document).ready(function() {
+    if ($('#autoWidth').length) {
+        $('#autoWidth').lightSlider({
+            autoWidth: true,
+            loop: true,
+            onSliderLoad: function() {
+                $('#autoWidth').removeClass('cs-hidden');
+            }
+        });
+    }
+});
+
+console.log('Assets loaded correctly');

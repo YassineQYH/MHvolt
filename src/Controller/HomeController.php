@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use App\Classe\Mail;
 use App\Entity\Header;
-use App\Entity\Trotinette;
+use App\Entity\Trottinette;
 use App\Entity\Accessory;
 use App\Form\ContactType;
 use Doctrine\ORM\EntityManagerInterface;
@@ -59,19 +59,19 @@ class HomeController extends AbstractController
         // Récupération des données
         $headers = $this->entityManager->getRepository(Header::class)->findAll();
 
-        // Récupération de toutes les trotinettes pour le menu
-        $trotinettesMenu = $this->entityManager->getRepository(Trotinette::class)->findAll();
+        // Récupération de toutes les trottinettes pour le menu
+        $trottinettesMenu = $this->entityManager->getRepository(Trottinette::class)->findAll();
 
-        // Récupération des trotinettes et accessoires "best" pour les sliders
-        $trotinettes = $this->entityManager->getRepository(Trotinette::class)->findBy(['isBest' => 1]);
+        // Récupération des trottinettes et accessoires "best" pour les sliders
+        $trottinettes = $this->entityManager->getRepository(Trottinette::class)->findBy(['isBest' => 1]);
         $accessories = $this->entityManager->getRepository(Accessory::class)->findBy(['isBest' => 1]);
 
         return $this->render('home/index.html.twig', [
             'headers' => $headers,
-            'trotinettes' => $trotinettes,       // Slider "best" trotinettes
+            'trottinettes' => $trottinettes,       // Slider "best" trottinettes
             'accessories' => $accessories,       // Slider "best" accessoires
             'form' => $form->createView(),
-            'trotinettes_menu' => $trotinettesMenu // Menu principal
+            'trottinettes_menu' => $trottinettesMenu // Menu principal
         ]);
     }
 }

@@ -1,7 +1,7 @@
 <nav class="menu-nav">
     <!-- logo -->
-    <a href="/" class="logo">
-        <img src="{{ asset('assets/img/logo-pergolazur-nav.png') }}" alt="Logo Pergolazur" />
+    <a href="{{ path('app_home') }}" class="logo">
+        <img src="{{ asset('/img/logo-pergolazur-nav.png') }}" alt="Logo Hich" />
     </a>
 
     {% for message in app.flashes('notice') %}
@@ -16,15 +16,33 @@
         <span class="nav-icon"></span>
     </label>
 
-    <!-- menu -->
+    <!-- menu principal -->
     <ul class="menu">
-        <li><a href="/">Accueil</a></li>
+        <li><a href="{{ path('app_home') }}">Accueil</a></li>
 
-        {% for trotinette in trotinettes_menu %}
-            <li><a href="/trotinette/{{ trotinette.slug }}">{{ trotinette.name }}</a></li>
-        {% endfor %}
+        <li>
+            <a href="#">Nos trottinettes <span><i class="fas fa-chevron-down"></i></span></a>
+            <div class="dropdown-menu-right">
+                <ul class="sous-menu-nom">
+                    {% for trottinette in trottinettes_menu %}
+                        <li>
+                            <a href="{{ path('app_trottinette_show', {'slug': trottinette.slug}) }}">
+                                {{ trottinette.name }}
+                            </a>
+                            {% set accessoires = trottinette.accessories %}
+                            {% if accessoires|length > 0 %}
+                                <ul class="sous-menu-accessoires">
+                                    <li><a href="{{ path('app_trottinette_accessoires', {'slug': trottinette.slug}) }}">
+                                        Accessoires
+                                    </a></li>
+                                </ul>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </li>
 
-        <li><a href="/#contact">Contact</a></li>
-        <li><a href="/login">Connexion</a></li>
+        <li><a href="/#contact">Nous contacter</a></li>
     </ul>
 </nav>

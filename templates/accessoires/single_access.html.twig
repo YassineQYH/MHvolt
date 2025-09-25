@@ -1,0 +1,34 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ accessory.name }}{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('assets/css/nav.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/show-product-slider.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/footer.css') }}">
+{% endblock %}
+
+{% block content %}
+    <section class="cart__slide" id="slider-show">
+        <div class="arrival__slide container">
+            <h1>{{ accessory.name }}</h1>
+            <p>{{ accessory.description }}</p>
+
+            <div class="glide" id="glide1">
+                <div class="glide__track" data-glide-el="track">
+                    <ul class="glide__slides">
+                        {% for img in illustrations %}
+                            <li class="glide__slide">
+                                <div class="arrival">
+                                    <div class="image__holder">
+                                        <img src="/uploads/{{ img.image }}" alt="{{ accessory.name }}">
+                                    </div>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

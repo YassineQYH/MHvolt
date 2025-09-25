@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ trotinette.name }}{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('assets/css/nav.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/show-product-slider.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/footer.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/lightslider.css') }}">
+{% endblock %}
+
+{% block content %}
+    <section class="cart__slide" id="slider-show">
+        <div class="arrival__slide container">
+            <h1>{{ trotinette.name }}</h1>
+            <p>{{ trotinette.description }}</p>
+
+            <div class="glide" id="glide1">
+                <div class="glide__track" data-glide-el="track">
+                    <ul class="glide__slides">
+                        {% for img in trotinette.illustration %}
+                            <li class="glide__slide">
+                                <div class="arrival">
+                                    <div class="image__holder">
+                                        <img src="/uploads/{{ img.image }}" alt="{{ trotinette.name }}">
+                                    </div>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

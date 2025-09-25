@@ -4,26 +4,26 @@
     <p class="text-center">Découvrez nos derniers articles</p>
     <ul id="autoWidth" class="cs-hidden">
       <!-- n°1 -->
-      {% for trotinette in trotinettes %}
+      {% for trottinette in trottinettes %}
         <li class="item-a">
           <!-- box-slider -->
           <div class="box">
             <!-- img-box -->
             <div class="slide-img">
-              <img src="/uploads/{{ trotinette.image }}" alt="trottinette isBest"/>
+              <img src="/uploads/{{ trottinette.image }}" alt="trottinette isBest"/>
               <!-- overlayer -->
               <div class="overlay">
                 <!-- buy-btn -->
-                <a href="{{ path('app_trotinette_show', { 'slug' : trotinette.slug } ) }}" class="buy-btn">Voir</a>
+                <a href="{{ path('app_trottinette_show', { 'slug' : trottinette.slug } ) }}" class="buy-btn">Voir</a>
               </div>
             </div>
             <!-- detail-box -->
             <div class="detail-box">
               <!-- type -->
               <div class="type">
-                <a href="{{ path('app_trotinette_show', { 'slug' : trotinette.slug } ) }}">{{ trotinette.name }}</a>
+                <a href="{{ path('app_trottinette_show', { 'slug' : trottinette.slug } ) }}">{{ trottinette.name }}</a>
               </div>
-              <a href="{{ path('app_trotinette_show', { 'slug' : trotinette.slug } ) }}" class="buy-btn">Voir</a>
+              <a href="{{ path('app_trottinette_show', { 'slug' : trottinette.slug } ) }}" class="buy-btn">Voir</a>
             </div>
           </div>
         </li>

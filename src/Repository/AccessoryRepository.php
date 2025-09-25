@@ -3,7 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Accessory;
-use App\Entity\ModelTrotinette;
+use App\Entity\ModelTrottinette;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -21,13 +21,13 @@ class AccessoryRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return Accessory[] Returns an array of Accessory objects for a given ModelTrotinette
+     * @return Accessory[] Returns an array of Accessory objects for a given ModelTrottinette
      */
-    public function findAllByModelTrotinette(ModelTrotinette $modelTrotinette)
+    public function findAllByModelTrottinette(ModelTrottinette $modelTrottinette)
     {
         return $this->createQueryBuilder('a')
-            ->andWhere('a.modelTrotinette = :model')
-            ->setParameter('model', $modelTrotinette)
+            ->andWhere('a.modelTrottinette = :model')
+            ->setParameter('model', $modelTrottinette)
             ->orderBy('a.id', 'ASC')
             ->getQuery()
             ->getResult();

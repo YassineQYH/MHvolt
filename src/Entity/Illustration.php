@@ -4,7 +4,7 @@ namespace App\Entity;
 
 use App\Repository\IllustrationRepository;
 use Doctrine\ORM\Mapping as ORM;
-use App\Entity\Trotinette;
+use App\Entity\Trottinette;
 
 #[ORM\Entity(repositoryClass: IllustrationRepository::class)]
 class Illustration
@@ -15,9 +15,9 @@ class Illustration
     #[ORM\Column(type:"string", length:255)]
     private ?string $image = null;
 
-    #[ORM\ManyToOne(targetEntity: Trotinette::class, inversedBy: "illustration")]
+    #[ORM\ManyToOne(targetEntity: Trottinette::class, inversedBy: "illustration")]
     #[ORM\JoinColumn(nullable:false)]
-    private ?Trotinette $trotinette = null;
+    private ?Trottinette $trotinette = null;
 
     public function __toString(): string
     {
@@ -40,12 +40,12 @@ class Illustration
         return $this;
     }
 
-    public function getTrotinette(): ?Trotinette
+    public function getTrotinette(): ?Trottinette
     {
         return $this->trotinette;
     }
 
-    public function setTrotinette(?Trotinette $trotinette): self
+    public function setTrotinette(?Trottinette $trotinette): self
     {
         $this->trotinette = $trotinette;
         return $this;

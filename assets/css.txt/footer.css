@@ -1,26 +1,10 @@
-/* @import url('https://fonts.googleapis.com/css?family=Poppins:200,300,400,500,600,700,800,900&display=swap');
-* 
-{
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Poppins', sans-serif;
-} */
-
-
-/* body footer{
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    min-height: 100vh;
-    flex-direction: column;
-    background: #ede7f6;
-} */
+/* ================================
+   Footer
+================================ */
 
 footer {
     position: relative;
     width: 100%;
-    height: auto;
     padding: 50px 100px;
     background: #111;
     display: flex;
@@ -32,7 +16,6 @@ footer .container-footer {
     display: flex;
     justify-content: space-between;
     flex-wrap: wrap;
-    flex-direction: row;
 }
 
 footer .container-footer .sec-footer {
@@ -64,6 +47,9 @@ footer p {
     color: #999;
 }
 
+
+/* Social icons */
+
 .sci-footer {
     margin-top: 20px;
     display: flex;
@@ -74,37 +60,36 @@ footer p {
 }
 
 .sci-footer li a {
-    display: inline-block;
-    width: 40px;
-    height: 40px;
-    background: #222;
     display: flex;
     justify-content: center;
     align-items: center;
+    width: 40px;
+    height: 40px;
+    background: #222;
     margin-right: 10px;
     text-decoration: none;
     border-radius: 4px;
+    color: #fff;
+    font-size: 20px;
 }
 
 .sci-footer li a:hover {
     background: #f00;
 }
 
-.sci-footer li a.fab {
-    color: #fff;
-    font-size: 20px;
-}
-
 a {
     color: #fff;
+    text-decoration: none;
 }
 
 a:hover {
     color: #fff;
 }
 
+
+/* Quick links */
+
 .quickLinks-footer {
-    position: relative;
     width: 25%;
 }
 
@@ -123,26 +108,12 @@ a:hover {
     color: #fff;
 }
 
+
+/* Contact section */
+
 .contact-footer {
     width: calc(35% - 60px);
     margin-right: 0 !important;
-    /* border: solid 1px red; */
-}
-
-
-/* .contact-footer h2{
-    margin-right: 0 !important;
-    border: solid 1px green;
-    text-align: right;
-}
-.contact-footer li{
-    margin-right: 0 !important;
-    border: solid 1px yellow;
-    text-align: right;
-} */
-
-.contact-footer .info-footer {
-    position: relative;
 }
 
 .contact-footer .info-footer li {
@@ -160,22 +131,16 @@ a:hover {
     color: #999;
 }
 
-
-/* .contact-footer .info-footer li span i{
-    margin-left: -35px;
-}
-.quickLinks-footer .liens-footer li a{
-    margin-left: -35px;
-} */
-
 .contact-footer .info-footer li a {
     color: #999;
-    text-decoration: none;
 }
 
 .contact-footer .info-footer li a:hover {
     color: #fff;
 }
+
+
+/* Copyright */
 
 .copyrightText {
     width: 100%;
@@ -185,9 +150,14 @@ a:hover {
     color: #999;
 }
 
+
+/* ================================
+   Media Queries
+================================ */
+
 @media (max-width: 991px) {
     footer {
-        padding: 40px
+        padding: 40px;
     }
     footer .container-footer {
         flex-direction: column;
