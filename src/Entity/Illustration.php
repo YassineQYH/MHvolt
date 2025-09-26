@@ -17,7 +17,7 @@ class Illustration
 
     #[ORM\ManyToOne(targetEntity: Trottinette::class, inversedBy: "illustration")]
     #[ORM\JoinColumn(nullable:false)]
-    private ?Trottinette $trotinette = null;
+    private ?Trottinette $trottinette = null;
 
     public function __toString(): string
     {
@@ -40,14 +40,14 @@ class Illustration
         return $this;
     }
 
-    public function getTrotinette(): ?Trottinette
+    public function getTrottinette(): ?Trottinette
     {
-        return $this->trotinette;
+        return $this->trottinette;
     }
 
-    public function setTrotinette(?Trottinette $trotinette): self
+    public function setTrottinette(?Trottinette $trottinette): self
     {
-        $this->trotinette = $trotinette;
+        $this->trottinette = $trottinette;
         return $this;
     }
 }

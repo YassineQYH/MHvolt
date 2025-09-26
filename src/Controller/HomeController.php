@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Classe\Mail;
-use App\Entity\Header;
 use App\Entity\Trottinette;
 use App\Entity\Accessory;
 use App\Form\ContactType;
@@ -31,7 +30,7 @@ class HomeController extends AbstractController
         AuthenticationUtils $authenticationUtils
     ): Response
     {
-        // Formulaire de contact
+        // --- FORMULAIRE DE CONTACT ---
         $form = $this->createForm(ContactType::class);
         $form->handleRequest($request);
 
@@ -56,22 +55,31 @@ class HomeController extends AbstractController
             );
         }
 
-        // Récupération des données
-        $headers = $this->entityManager->getRepository(Header::class)->findAll();
+        // --- DONNÉES POUR LE CARROUSEL (ancien Header) ---
+        $headers = $this->entityManager->getRepository(Trottinette::class)->findBy([
+            'isHeader' => true
+        ]);
 
-        // Récupération de toutes les trottinettes pour le menu
+        // --- MENU PRINCIPAL : TROTTINETTES ---
         $trottinettesMenu = $this->entityManager->getRepository(Trottinette::class)->findAll();
 
-        // Récupération des trottinettes et accessoires "best" pour les sliders
+        // ⚡ éliminer les doublons par ID (sécurité)
+        $uniqueTrottinettesMenu = [];
+        foreach ($trottinettesMenu as $trottinette) {
+            $uniqueTrottinettesMenu[$trottinette->getId()] = $trottinette;
+        }
+        $trottinettesMenu = array_values($uniqueTrottinettesMenu);
+
+        // --- SLIDERS BEST ---
         $trottinettes = $this->entityManager->getRepository(Trottinette::class)->findBy(['isBest' => 1]);
         $accessories = $this->entityManager->getRepository(Accessory::class)->findBy(['isBest' => 1]);
 
         return $this->render('home/index.html.twig', [
-            'headers' => $headers,
-            'trottinettes' => $trottinettes,       // Slider "best" trottinettes
-            'accessories' => $accessories,       // Slider "best" accessoires
+            'headers' => $headers,                 // ⚡ trottinettes pour carrousel
+            'trottinettes' => $trottinettes,       // slider "best" trottinettes
+            'accessories' => $accessories,         // slider "best" accessoires
             'form' => $form->createView(),
-            'trottinettes_menu' => $trottinettesMenu // Menu principal
+            'trottinettes_menu' => $trottinettesMenu // menu principal sans doublons
         ]);
     }
 }

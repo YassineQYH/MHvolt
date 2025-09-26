@@ -1,7 +1,7 @@
 <nav class="menu-nav">
     <!-- logo -->
     <a href="{{ path('app_home') }}" class="logo">
-        <img src="{{ asset('/img/logo-pergolazur-nav.png') }}" alt="Logo Hich" />
+        <img src="{{ asset('/img/logo-trott.png') }}" alt="Logo Hich" />
     </a>
 
     {% for message in app.flashes('notice') %}
@@ -23,18 +23,31 @@
         <li>
             <a href="#">Nos trottinettes <span><i class="fas fa-chevron-down"></i></span></a>
             <div class="dropdown-menu-right">
+
+            {# Debug des trottinettes et accessoires #}
+            {# <pre>
+            {% for trottinette in trottinettes_menu %}
+            {{ trottinette.name }}
+            {% if trottinette.accessories|length > 0 %}
+            └─ Accessoires
+            {% endif %}
+            {% endfor %}
+            </pre> #}
+
                 <ul class="sous-menu-nom">
                     {% for trottinette in trottinettes_menu %}
                         <li>
                             <a href="{{ path('app_trottinette_show', {'slug': trottinette.slug}) }}">
                                 {{ trottinette.name }}
                             </a>
-                            {% set accessoires = trottinette.accessories %}
-                            {% if accessoires|length > 0 %}
+                            {# Vérifie si au moins 1 accessoire existe #}
+                            {% if trottinette.accessories|length > 0 %}
                                 <ul class="sous-menu-accessoires">
-                                    <li><a href="{{ path('app_trottinette_accessoires', {'slug': trottinette.slug}) }}">
-                                        Accessoires
-                                    </a></li>
+                                    <li>
+                                        <a href="{{ path('app_trottinette_accessoires', {'slug': trottinette.slug}) }}">
+                                            Accessoires
+                                        </a>
+                                    </li>
                                 </ul>
                             {% endif %}
                         </li>

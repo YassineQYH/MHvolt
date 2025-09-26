@@ -1,20 +1,25 @@
-{% block carrousel %} 
-    {% if block('carrousel') is defined %}
+{% block carrousel %}
+    {% if headers is defined and headers|length > 0 %}
     <div id="myCarousel" class="carousel slide" data-ride="carousel">
         <ol class="carousel-indicators">
-            {% for key, header in headers %}
+            {% for key, trott in headers %}
             <li data-target="#myCarousel" data-slide-to="{{ key }}"{% if key == 0 %} class="active"{% endif %}></li>
             {% endfor %}
         </ol>
         <div class="carousel-inner">
-            {% for key,header in headers %}
+            {% for key, trott in headers %}
             <div class="carousel-item {% if key == 0 %}active{% endif %}">
-            <img src="/uploads/{{ header.illustration }}" alt="" /> 
+                {# Image du carrousel spécifique à la trottinette #}
+                <img src="/uploads/{{ trott.headerImage }}" alt="{{ trott.slug }}" />
                 <div class="container">
                     <div class="carousel-caption text-left">
-                        <h1>{{ header.title }}</h1>
-                        <p>{{ header.content }}</p>
-                        <p><a class="btn btn-lg btn-info" href="{{ header.btnUrl }}" role="button">{{ header.btnTitle }}</a></p>
+                        <h1>{{ trott.slug }}</h1> {# Tu peux remplacer par trott.title si tu as un champ title #}
+                        <p>{{ trott.description }}</p>
+                        {% if trott.headerBtnTitle and trott.headerBtnUrl %}
+                        <p>
+                            <a class="btn btn-lg btn-info" href="{{ trott.headerBtnUrl }}" role="button">{{ trott.headerBtnTitle }}</a>
+                        </p>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -29,5 +34,5 @@
             <span class="sr-only">Next</span>
         </a>
     </div>
-    {% endif %}   
+    {% endif %}
 {% endblock %}
