@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Entity\Illustration;
 use App\Entity\Accessory;
+use App\Entity\Caracteristique;
 
 #[ORM\Entity(repositoryClass: TrottinetteRepository::class)]
 class Trottinette
@@ -18,11 +19,17 @@ class Trottinette
     #[ORM\Column(type:"string", length:255)]
     private ?string $name = null;
 
+    #[ORM\Column(type:"string", length:255, nullable:true)]
+    private ?string $nameShort = null;
+
     #[ORM\Column(type:"string", length:255)]
     private ?string $slug = null;
 
     #[ORM\Column(type:"text")]
     private ?string $description = null;
+
+    #[ORM\Column(type:"text", nullable:true)]
+    private ?string $descriptionShort = null;
 
     // Relation avec les images secondaires
     #[ORM\OneToMany(mappedBy:"trottinette", targetEntity: Illustration::class)]
@@ -59,10 +66,16 @@ class Trottinette
     #[ORM\JoinTable(name: "trottinette_accessory")]
     private Collection $accessories;
 
+    // Relation ManyToMany avec les caractéristiques
+    #[ORM\ManyToMany(targetEntity: Caracteristique::class, inversedBy: "trottinettes")]
+    #[ORM\JoinTable(name: "trottinette_caracteristique")]
+    private Collection $caracteristiques;
+
     public function __construct()
     {
         $this->illustrations = new ArrayCollection();
         $this->accessories = new ArrayCollection();
+        $this->caracteristiques = new ArrayCollection();
     }
 
     public function __toString(): string
@@ -76,11 +89,17 @@ class Trottinette
     public function getName(): ?string { return $this->name; }
     public function setName(string $name): self { $this->name = $name; return $this; }
 
+    public function getNameShort(): ?string { return $this->nameShort; }
+    public function setNameShort(?string $nameShort): self { $this->nameShort = $nameShort; return $this; }
+
     public function getSlug(): ?string { return $this->slug; }
     public function setSlug(string $slug): self { $this->slug = $slug; return $this; }
 
     public function getDescription(): ?string { return $this->description; }
     public function setDescription(string $description): self { $this->description = $description; return $this; }
+
+    public function getDescriptionShort(): ?string { return $this->descriptionShort; }
+    public function setDescriptionShort(?string $descriptionShort): self { $this->descriptionShort = $descriptionShort; return $this; }
 
     /** @return Collection|Illustration[] */
     public function getIllustrations(): Collection { return $this->illustrations; }
@@ -110,20 +129,18 @@ class Trottinette
 
     /** @return Collection<int, Accessory> */
     public function getAccessories(): Collection { return $this->accessories; }
-
     public function addAccessory(Accessory $accessory): self
     {
         if (!$this->accessories->contains($accessory)) {
             $this->accessories->add($accessory);
-            $accessory->addTrottinette($this); // cohérence inverse
+            $accessory->addTrottinette($this);
         }
         return $this;
     }
-
     public function removeAccessory(Accessory $accessory): self
     {
         if ($this->accessories->removeElement($accessory)) {
-            $accessory->removeTrottinette($this); // cohérence inverse
+            $accessory->removeTrottinette($this);
         }
         return $this;
     }
@@ -141,4 +158,19 @@ class Trottinette
 
     public function getHeaderBtnUrl(): ?string { return $this->headerBtnUrl; }
     public function setHeaderBtnUrl(?string $headerBtnUrl): self { $this->headerBtnUrl = $headerBtnUrl; return $this; }
+
+    /** @return Collection|Caracteristique[] */
+    public function getCaracteristiques(): Collection { return $this->caracteristiques; }
+    public function addCaracteristique(Caracteristique $caracteristique): self
+    {
+        if (!$this->caracteristiques->contains($caracteristique)) {
+            $this->caracteristiques[] = $caracteristique;
+        }
+        return $this;
+    }
+    public function removeCaracteristique(Caracteristique $caracteristique): self
+    {
+        $this->caracteristiques->removeElement($caracteristique);
+        return $this;
+    }
 }
