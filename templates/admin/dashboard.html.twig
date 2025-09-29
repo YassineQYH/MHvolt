@@ -1,55 +1,62 @@
 {% extends '@EasyAdmin/page/content.html.twig' %}
 
 {% block content %}
-    <div class="dashboard-container" style="max-width:1200px; margin:0 auto; padding:20px;">
-        <h1>Statistiques Hicham Trotinettes</h1>
+<div class="dashboard-container" style="max-width:1200px; margin:0 auto; padding:20px;">
+    <h1>Statistiques Hicham Trotinettes</h1>
 
-        <div class="charts" style="display:flex; flex-wrap:wrap; gap:30px; justify-content:space-around;">
-            <div style="flex:1 1 500px; min-width:300px;">
-                <h2>Répartition Accessoires</h2>
-                <canvas id="accessoryChart"></canvas>
-            </div>
-            <div style="flex:1 1 500px; min-width:300px;">
-                <h2>Trottinettes par catégorie</h2>
-                <canvas id="trottinetteChart"></canvas>
-            </div>
+    <div class="charts" style="display:flex; flex-wrap:wrap; gap:30px; justify-content:space-around;">
+        <div style="flex:1 1 500px; min-width:300px;">
+            <h2>Répartition Accessoires</h2>
+            <canvas id="accessoryChart"></canvas>
+        </div>
+        <div style="flex:1 1 500px; min-width:300px;">
+            <h2>Trottinettes par catégorie</h2>
+            <canvas id="trottinetteChart"></canvas>
         </div>
     </div>
+</div>
 
-    {# Chart.js depuis un CDN #}
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        const accessoryData = {{ statsAccessories|json_encode|raw }};
-        const trottinetteData = {{ statsTrottinettes|json_encode|raw }};
+{# Chart.js depuis un CDN #}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const accessoryData = {{ statsAccessories|json_encode|raw }};
+const trottinetteData = {{ statsTrottinettes|json_encode|raw }};
 
-        const accessoryChart = new Chart(document.getElementById('accessoryChart'), {
-            type: 'pie',
-            data: {
-                labels: accessoryData.labels,
-                datasets: [{
-                    label: 'Nombre de trottinettes par accessoire',
-                    data: accessoryData.values,
-                    backgroundColor: accessoryData.labels.map(() => `hsl(${Math.random() * 360}, 70%, 60%)`),
-                }]
-            }
-        });
+// ⚡ Pie chart
+const accessoryChart = new Chart(document.getElementById('accessoryChart'), {
+    type: 'pie',
+    data: {
+        labels: accessoryData.labels,
+        datasets: [{
+            label: 'Nombre de trottinettes par accessoire',
+            data: accessoryData.values,
+            backgroundColor: accessoryData.labels.map(() => `hsl(${Math.random() * 360}, 70%, 60%)`)
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: { tooltip: { enabled: true } }
+    }
+});
 
-        const trottinetteChart = new Chart(document.getElementById('trottinetteChart'), {
-            type: 'bar',
-            data: {
-                labels: trottinetteData.labels,
-                datasets: [{
-                    label: 'Nombre de trottinettes',
-                    data: trottinetteData.values,
-                    backgroundColor: 'rgba(54, 162, 235, 0.7)'
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: { beginAtZero: true }
-                }
-            }
-        });
-    </script>
+// ⚡ Bar chart
+const trottinetteChart = new Chart(document.getElementById('trottinetteChart'), {
+    type: 'bar',
+    data: {
+        labels: trottinetteData.labels,
+        datasets: [{
+            label: 'Nombre de trottinettes',
+            data: trottinetteData.values,
+            backgroundColor: 'rgba(54, 162, 235, 0.7)'
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        scales: { y: { beginAtZero: true } },
+        plugins: { tooltip: { enabled: true } }
+    }
+});
+</script>
 {% endblock %}

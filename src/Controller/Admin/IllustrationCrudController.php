@@ -17,8 +17,11 @@ class IllustrationCrudController extends AbstractCrudController
     {
         return [
             IdField::new('id')->hideOnForm(),
-            ImageField::new('image')->setUploadDir('public/uploads/illustrations')->setBasePath('/uploads/illustrations'),
-            AssociationField::new('trottinette'),
+            ImageField::new('image')
+                ->setUploadDir('public/uploads/illustrations')
+                ->setBasePath('/uploads/illustrations'),
+            AssociationField::new('trottinette')
+                ->setFormTypeOption('placeholder', 'Choisir une trottinette'), // ⚡ ici
         ];
     }
 }

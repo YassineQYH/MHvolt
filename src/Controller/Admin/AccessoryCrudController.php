@@ -5,7 +5,7 @@ namespace App\Controller\Admin;
 use App\Entity\Accessory;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\{
-    IdField, TextField, TextEditorField, BooleanField, ImageField, AssociationField, CollectionField
+    IdField, TextField, TextEditorField, BooleanField, ImageField, CollectionField
 };
 
 class AccessoryCrudController extends AbstractCrudController
@@ -22,14 +22,12 @@ class AccessoryCrudController extends AbstractCrudController
             TextField::new('name'),
             TextField::new('slug'),
             TextEditorField::new('description'),
-            ImageField::new('image')->setUploadDir('public/uploads/accessories')->setBasePath('/uploads/accessories')->setRequired(false),
+            ImageField::new('image')
+                ->setUploadDir('public/uploads/accessories')
+                ->setBasePath('/uploads/accessories')
+                ->setRequired(false),
             BooleanField::new('isBest'),
-            AssociationField::new('trottinettes'),
-            CollectionField::new('illustrationaccess')
-                ->allowAdd()
-                ->allowDelete()
-                ->setEntryType(\App\Form\IllustrationaccessType::class)
-                ->setFormTypeOption('by_reference', false),
+
         ];
     }
 }

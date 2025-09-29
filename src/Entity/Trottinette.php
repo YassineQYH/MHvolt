@@ -6,8 +6,9 @@ use App\Repository\TrottinetteRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use App\Entity\Accessory;
+use App\Entity\TrottinetteCaracteristique;
 use App\Entity\TrottinetteDescriptionSection;
+use App\Entity\TrottinetteAccessory;
 
 #[ORM\Entity(repositoryClass: TrottinetteRepository::class)]
 class Trottinette
@@ -36,7 +37,7 @@ class Trottinette
     #[ORM\Column(type:"boolean")]
     private ?bool $isBest = null;
 
-    // ---- NOUVEAUX CHAMPS POUR LE CARROUSEL ----
+    // Champs pour le carrousel
     #[ORM\Column(type:"boolean")]
     private bool $isHeader = false;
 
@@ -49,23 +50,20 @@ class Trottinette
     #[ORM\Column(type:"string", length:255, nullable:true)]
     private ?string $headerBtnUrl = null;
 
-    // ✅ Relation avec TrottinetteCaracteristique (pivot)
+    // Relations
     #[ORM\OneToMany(mappedBy: "trottinette", targetEntity: TrottinetteCaracteristique::class, cascade: ["persist", "remove"])]
     private Collection $trottinetteCaracteristiques;
 
-    // ✅ Relation ManyToMany avec Accessory
-    #[ORM\ManyToMany(targetEntity: Accessory::class, inversedBy: "trottinettes")]
-    #[ORM\JoinTable(name: "trottinette_accessory")]
-    private Collection $accessories;
+    #[ORM\OneToMany(mappedBy: "trottinette", targetEntity: TrottinetteAccessory::class, cascade: ["persist", "remove"])]
+    private Collection $trottinetteAccessories;
 
-    // ✅ Relation OneToMany avec TrottinetteDescriptionSection
     #[ORM\OneToMany(mappedBy: "trottinette", targetEntity: TrottinetteDescriptionSection::class, cascade: ["persist", "remove"])]
     private Collection $descriptionSections;
 
     public function __construct()
     {
         $this->trottinetteCaracteristiques = new ArrayCollection();
-        $this->accessories = new ArrayCollection();
+        $this->trottinetteAccessories = new ArrayCollection();
         $this->descriptionSections = new ArrayCollection();
     }
 
@@ -74,7 +72,8 @@ class Trottinette
         return $this->name ?? '';
     }
 
-    // ---- GETTERS & SETTERS ----
+    // ------------------- GETTERS & SETTERS -------------------
+
     public function getId(): ?int { return $this->id; }
 
     public function getName(): ?string { return $this->name; }
@@ -110,60 +109,53 @@ class Trottinette
     public function getHeaderBtnUrl(): ?string { return $this->headerBtnUrl; }
     public function setHeaderBtnUrl(?string $headerBtnUrl): self { $this->headerBtnUrl = $headerBtnUrl; return $this; }
 
+    // ------------------- TrottinetteCaracteristiques -------------------
     /** @return Collection<int, TrottinetteCaracteristique> */
     public function getTrottinetteCaracteristiques(): Collection { return $this->trottinetteCaracteristiques; }
-    public function addTrottinetteCaracteristique(TrottinetteCaracteristique $tc): self
-    {
+    public function addTrottinetteCaracteristique(TrottinetteCaracteristique $tc): self {
         if (!$this->trottinetteCaracteristiques->contains($tc)) {
             $this->trottinetteCaracteristiques[] = $tc;
             $tc->setTrottinette($this);
         }
         return $this;
     }
-    public function removeTrottinetteCaracteristique(TrottinetteCaracteristique $tc): self
-    {
+    public function removeTrottinetteCaracteristique(TrottinetteCaracteristique $tc): self {
         if ($this->trottinetteCaracteristiques->removeElement($tc)) {
-            if ($tc->getTrottinette() === $this) {
-                $tc->setTrottinette(null);
-            }
+            if ($tc->getTrottinette() === $this) $tc->setTrottinette(null);
         }
         return $this;
     }
 
-    /** @return Collection<int, Accessory> */
-    public function getAccessories(): Collection { return $this->accessories; }
-    public function addAccessory(Accessory $accessory): self
-    {
-        if (!$this->accessories->contains($accessory)) {
-            $this->accessories->add($accessory);
-            $accessory->addTrottinette($this);
+    // ------------------- TrottinetteAccessories -------------------
+    /** @return Collection<int, TrottinetteAccessory> */
+    public function getTrottinetteAccessories(): Collection { return $this->trottinetteAccessories; }
+    public function addTrottinetteAccessory(TrottinetteAccessory $ta): self {
+        if (!$this->trottinetteAccessories->contains($ta)) {
+            $this->trottinetteAccessories[] = $ta;
+            $ta->setTrottinette($this);
         }
         return $this;
     }
-    public function removeAccessory(Accessory $accessory): self
-    {
-        if ($this->accessories->removeElement($accessory)) {
-            $accessory->removeTrottinette($this);
+    public function removeTrottinetteAccessory(TrottinetteAccessory $ta): self {
+        if ($this->trottinetteAccessories->removeElement($ta)) {
+            if ($ta->getTrottinette() === $this) $ta->setTrottinette(null);
         }
         return $this;
     }
 
+    // ------------------- DescriptionSections -------------------
     /** @return Collection<int, TrottinetteDescriptionSection> */
     public function getDescriptionSections(): Collection { return $this->descriptionSections; }
-    public function addDescriptionSection(TrottinetteDescriptionSection $section): self
-    {
+    public function addDescriptionSection(TrottinetteDescriptionSection $section): self {
         if (!$this->descriptionSections->contains($section)) {
             $this->descriptionSections->add($section);
             $section->setTrottinette($this);
         }
         return $this;
     }
-    public function removeDescriptionSection(TrottinetteDescriptionSection $section): self
-    {
+    public function removeDescriptionSection(TrottinetteDescriptionSection $section): self {
         if ($this->descriptionSections->removeElement($section)) {
-            if ($section->getTrottinette() === $this) {
-                $section->setTrottinette(null);
-            }
+            if ($section->getTrottinette() === $this) $section->setTrottinette(null);
         }
         return $this;
     }

@@ -7,7 +7,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Entity\Illustrationaccess;
-use App\Entity\Trottinette;
 
 #[ORM\Entity(repositoryClass: AccessoryRepository::class)]
 class Accessory
@@ -33,13 +32,14 @@ class Accessory
     #[ORM\Column(type:"boolean")]
     private bool $isBest = false;
 
-    #[ORM\ManyToMany(targetEntity: Trottinette::class, mappedBy: "accessories")]
-    private Collection $trottinettes;
+    // ⚡ Relation OneToMany vers la pivot TrottinetteAccessory
+    #[ORM\OneToMany(mappedBy: "accessory", targetEntity: TrottinetteAccessory::class, cascade: ["persist", "remove"])]
+    private Collection $trottinetteAccessories;
 
     public function __construct()
     {
         $this->illustrationaccess = new ArrayCollection();
-        $this->trottinettes = new ArrayCollection();
+        $this->trottinetteAccessories = new ArrayCollection();
     }
 
     public function __toString(): string
@@ -59,16 +59,14 @@ class Accessory
 
     /** @return Collection|Illustrationaccess[] */
     public function getIllustrationaccess(): Collection { return $this->illustrationaccess; }
-    public function addIllustrationaccess(Illustrationaccess $illustrationaccess): self
-    {
+    public function addIllustrationaccess(Illustrationaccess $illustrationaccess): self {
         if (!$this->illustrationaccess->contains($illustrationaccess)) {
             $this->illustrationaccess->add($illustrationaccess);
             $illustrationaccess->setAccessory($this);
         }
         return $this;
     }
-    public function removeIllustrationaccess(Illustrationaccess $illustrationaccess): self
-    {
+    public function removeIllustrationaccess(Illustrationaccess $illustrationaccess): self {
         if ($this->illustrationaccess->removeElement($illustrationaccess)) {
             if ($illustrationaccess->getAccessory() === $this) {
                 $illustrationaccess->setAccessory(null);
@@ -83,28 +81,20 @@ class Accessory
     public function getIsBest(): bool { return $this->isBest; }
     public function setIsBest(bool $isBest): self { $this->isBest = $isBest; return $this; }
 
-    /**
-     * @return Collection<int, Trottinette>
-     */
-    public function getTrottinettes(): Collection
-    {
-        return $this->trottinettes;
-    }
-
-    public function addTrottinette(Trottinette $trottinette): self
-    {
-        if (!$this->trottinettes->contains($trottinette)) {
-            $this->trottinettes->add($trottinette);
-            $trottinette->addAccessory($this); // ⚡ cohérence inverse
+    /** @return Collection<int, TrottinetteAccessory> */
+    public function getTrottinetteAccessories(): Collection { return $this->trottinetteAccessories; }
+    public function addTrottinetteAccessory(TrottinetteAccessory $ta): self {
+        if (!$this->trottinetteAccessories->contains($ta)) {
+            $this->trottinetteAccessories[] = $ta;
+            $ta->setAccessory($this);
         }
         return $this;
     }
-
-    public function removeTrottinette(Trottinette $trottinette): self
-    {
-        if ($this->trottinettes->removeElement($trottinette)) {
-            $trottinette->removeAccessory($this); // ⚡ cohérence inverse
+    public function removeTrottinetteAccessory(TrottinetteAccessory $ta): self {
+        if ($this->trottinetteAccessories->removeElement($ta)) {
+            if ($ta->getAccessory() === $this) $ta->setAccessory(null);
         }
         return $this;
     }
 }
+

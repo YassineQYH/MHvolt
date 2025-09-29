@@ -3,8 +3,15 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Trottinette;
+use App\Entity\TrottinetteCaracteristique;
+use App\Entity\TrottinetteDescriptionSection;
+use App\Form\TrottinetteCaracteristiqueType;
+use App\Form\TrottinetteDescriptionSectionType;
+use App\Form\TrottinetteAccessoryType;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
-use EasyCorp\Bundle\EasyAdminBundle\Field\{IdField, TextField, TextEditorField, BooleanField, ImageField, CollectionField, AssociationField};
+use EasyCorp\Bundle\EasyAdminBundle\Field\{
+    IdField, TextField, TextEditorField, BooleanField, ImageField, CollectionField, AssociationField
+};
 
 class TrottinetteCrudController extends AbstractCrudController
 {
@@ -32,6 +39,7 @@ class TrottinetteCrudController extends AbstractCrudController
 
             BooleanField::new('isBest'),
             BooleanField::new('isHeader'),
+
             ImageField::new('headerImage')
                 ->setUploadDir('public/uploads/trottinettes')
                 ->setBasePath('/uploads/trottinettes')
@@ -40,17 +48,29 @@ class TrottinetteCrudController extends AbstractCrudController
             TextField::new('headerBtnTitle'),
             TextField::new('headerBtnUrl'),
 
-            AssociationField::new('accessories'),
+            // ----------------------
+            // Relations
+            // ----------------------
+
+            // Caractéristiques pivot
             CollectionField::new('trottinetteCaracteristiques')
                 ->allowAdd()
                 ->allowDelete()
-                ->setEntryType(\App\Form\TrottinetteCaracteristiqueType::class)
+                ->setEntryType(TrottinetteCaracteristiqueType::class)
                 ->setFormTypeOption('by_reference', false),
 
+            // Sections description
             CollectionField::new('descriptionSections')
                 ->allowAdd()
                 ->allowDelete()
-                ->setEntryType(\App\Form\TrottinetteDescriptionSectionType::class)
+                ->setEntryType(TrottinetteDescriptionSectionType::class)
+                ->setFormTypeOption('by_reference', false),
+
+            // Accessoires via pivot
+            CollectionField::new('trottinetteAccessories')
+                ->allowAdd()
+                ->allowDelete()
+                ->setEntryType(TrottinetteAccessoryType::class)
                 ->setFormTypeOption('by_reference', false),
         ];
     }

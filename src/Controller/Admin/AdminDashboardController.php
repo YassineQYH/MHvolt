@@ -9,6 +9,7 @@ use App\Entity\Illustrationaccess;
 use App\Entity\Trottinette;
 use App\Entity\TrottinetteCaracteristique;
 use App\Entity\TrottinetteDescriptionSection;
+use App\Entity\TrottinetteAccessory;
 use App\Entity\User;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
@@ -52,18 +53,19 @@ class AdminDashboardController extends AbstractDashboardController
         yield MenuItem::linkToCrud('Caractéristiques', 'fas fa-list', Caracteristique::class);
         yield MenuItem::linkToCrud('Sections Description', 'fas fa-align-left', TrottinetteDescriptionSection::class);
 
+        yield MenuItem::section('Trottinette ↔ Caractéristiques');
+        yield MenuItem::linkToCrud('Trottinette ↔ Caractéristique', 'fas fa-list-alt', TrottinetteCaracteristique::class);
+
         yield MenuItem::section('Accessoires');
         yield MenuItem::linkToCrud('Accessoires', 'fas fa-box', Accessory::class);
         yield MenuItem::linkToCrud('Illustration Accessoires', 'fas fa-image', Illustrationaccess::class);
+        yield MenuItem::linkToCrud('Trottinette ↔ Accessoires', 'fas fa-tags', TrottinetteAccessory::class);
 
         yield MenuItem::section('Illustrations');
         yield MenuItem::linkToCrud('Illustrations Trottinettes', 'fas fa-image', Illustration::class);
 
         yield MenuItem::section('Utilisateurs');
         yield MenuItem::linkToCrud('Users', 'fas fa-user', User::class);
-
-        yield MenuItem::section('Trottinette ↔ Caractéristiques');
-        yield MenuItem::linkToCrud('TrottinetteCaractéristique', 'fas fa-list-alt', TrottinetteCaracteristique::class);
 
         // --- Statistiques / Graphiques ---
         yield MenuItem::section('Stats');
@@ -77,9 +79,9 @@ class AdminDashboardController extends AbstractDashboardController
     private function getAccessoryStats(): array
     {
         $qb = $this->em->createQueryBuilder();
-        $qb->select('a.name AS accessory', 'COUNT(t.id) AS trottinettes')
+        $qb->select('a.name AS accessory', 'COUNT(ta.id) AS trottinettes')
             ->from(Accessory::class, 'a')
-            ->leftJoin('a.trottinettes', 't')
+            ->leftJoin('a.trottinetteAccessories', 'ta')
             ->groupBy('a.id');
 
         $results = $qb->getQuery()->getResult();
