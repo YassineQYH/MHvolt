@@ -56,6 +56,11 @@ class AdminDashboardController extends AbstractDashboardController
         yield MenuItem::section('Trottinette ↔ Caractéristiques');
         yield MenuItem::linkToCrud('Trottinette ↔ Caractéristique', 'fas fa-list-alt', TrottinetteCaracteristique::class);
 
+        // --- Nouvelle section pour les catégories de caractéristiques ---
+        yield MenuItem::section('Catégories de caractéristiques');
+        yield MenuItem::linkToCrud('Catégories', 'fas fa-folder', \App\Entity\CategorieCaracteristique::class);
+
+
         yield MenuItem::section('Accessoires');
         yield MenuItem::linkToCrud('Accessoires', 'fas fa-box', Accessory::class);
         yield MenuItem::linkToCrud('Illustration Accessoires', 'fas fa-image', Illustrationaccess::class);

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : lun. 29 sep. 2025 à 12:48
+-- Généré le : lun. 29 sep. 2025 à 13:22
 -- Version du serveur : 10.4.32-MariaDB
 -- Version de PHP : 8.2.12
 
@@ -74,6 +74,30 @@ INSERT INTO `caracteristique` (`id`, `name`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Structure de la table `categorie_caracteristique`
+--
+
+CREATE TABLE `categorie_caracteristique` (
+  `id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Déchargement des données de la table `categorie_caracteristique`
+--
+
+INSERT INTO `categorie_caracteristique` (`id`, `name`) VALUES
+(1, 'Informations générales'),
+(2, 'Motorisation'),
+(3, 'Freins'),
+(4, 'Roues & Pneus'),
+(5, 'Dimensions & Poids'),
+(6, 'Autres particularités'),
+(7, 'Équipement de sécurité');
+
+-- --------------------------------------------------------
+
+--
 -- Structure de la table `doctrine_migration_versions`
 --
 
@@ -96,7 +120,9 @@ INSERT INTO `doctrine_migration_versions` (`version`, `executed_at`, `execution_
 ('DoctrineMigrations\\Version20250929072839', '2025-09-29 09:29:00', 543),
 ('DoctrineMigrations\\Version20250929075713', '2025-09-29 09:57:34', 270),
 ('DoctrineMigrations\\Version20250929084045', '2025-09-29 10:40:57', 135),
-('DoctrineMigrations\\Version20250929095851', '2025-09-29 11:59:01', 271);
+('DoctrineMigrations\\Version20250929095851', '2025-09-29 11:59:01', 271),
+('DoctrineMigrations\\Version20250929105520', '2025-09-29 12:55:31', 128),
+('DoctrineMigrations\\Version20250929110511', '2025-09-29 13:05:14', 254);
 
 -- --------------------------------------------------------
 
@@ -222,34 +248,96 @@ INSERT INTO `trottinette_accessory` (`trottinette_id`, `accessory_id`, `id`) VAL
 CREATE TABLE `trottinette_caracteristique` (
   `id` int(11) NOT NULL,
   `trottinette_id` int(11) DEFAULT NULL,
+  `value` varchar(255) DEFAULT NULL,
+  `title` varchar(255) DEFAULT NULL,
   `caracteristique_id` int(11) DEFAULT NULL,
-  `value` varchar(255) DEFAULT NULL
+  `categorie_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `trottinette_caracteristique`
 --
 
-INSERT INTO `trottinette_caracteristique` (`id`, `trottinette_id`, `caracteristique_id`, `value`) VALUES
-(1, 1, 1, '1380 x 320 x 630 mm'),
-(2, 1, 2, '36 kg'),
-(3, 1, 3, '48 V 13 Ah'),
-(4, 1, 4, '40 km/h'),
-(5, 1, 5, '40 km'),
-(6, 1, 6, '120 kg'),
-(7, 2, 1, '1200 x 300 x 600 mm'),
-(8, 2, 2, '30 kg'),
-(9, 2, 3, '48 V 12 Ah'),
-(10, 2, 4, '45 km/h'),
-(11, 2, 5, '100 km'),
-(12, 2, 6, '120 kg'),
-(13, 3, 1, '1250 x 310 x 620 mm'),
-(14, 3, 2, '25 kg'),
-(15, 3, 3, '48 V 15 Ah'),
-(16, 3, 4, '40 km/h'),
-(17, 3, 5, '35 km'),
-(18, 3, 6, '120 kg'),
-(19, 1, 7, 'oui');
+INSERT INTO `trottinette_caracteristique` (`id`, `trottinette_id`, `value`, `title`, `caracteristique_id`, `categorie_id`) VALUES
+(1, 1, '1380 x 320 x 630 mm', 'Dimensions', 1, 1),
+(2, 1, '36 kg', 'Poids', 2, 2),
+(3, 1, '48 V 13 Ah', 'Batterie', 3, 3),
+(4, 1, '40 km/h', 'Vitesse maximale', 4, 4),
+(5, 1, '40 km', 'Autonomie', 5, 5),
+(6, 1, '120 kg', 'Charge maximale', 6, 6),
+(7, 2, '1200 x 300 x 600 mm', 'Dimensions', 1, 1),
+(8, 2, '30 kg', 'Poids', 2, 2),
+(9, 2, '48 V 12 Ah', 'Batterie', 3, 3),
+(10, 2, '45 km/h', 'Vitesse maximale', 4, 4),
+(11, 2, '100 km', 'Autonomie', 5, 5),
+(12, 2, '120 kg', 'Charge maximale', 6, 1),
+(13, 3, '1250 x 310 x 620 mm', 'Dimensions', 1, 1),
+(14, 3, '25 kg', 'Poids', 2, 2),
+(15, 3, '48 V 15 Ah', 'Batterie', 3, 3),
+(16, 3, '40 km/h', 'Vitesse maximale', 4, 4),
+(17, 3, '35 km', 'Autonomie', 5, 2),
+(18, 3, '120 kg', 'Charge maximale', 6, 1),
+(19, 1, 'oui', 'Équipement', 7, 6),
+(20, 1, '110 cm', 'Hauteur', 1, 5),
+(21, 1, '33,7 kg', 'Poids', 2, 5),
+(22, 1, 'Batterie incluse', 'Batterie incluse', 3, 6),
+(23, 1, '45 km/h', 'Vitesse maximale', 4, 1),
+(24, 1, '100 km', 'Autonomie', 5, 2),
+(25, 1, '120 kg', 'Charge maximale', 6, 1),
+(26, 1, 'Oui', NULL, 7, 7),
+(27, 2, '140 cm', NULL, 1, 5),
+(28, 2, '35 kg', NULL, 2, 5),
+(29, 2, 'Batterie incluse', NULL, 3, 6),
+(30, 2, '45 km/h', NULL, 4, 1),
+(31, 2, '100 km', NULL, 5, 2),
+(32, 2, '120 kg', NULL, 6, 1),
+(33, 2, 'Oui', NULL, 7, 7),
+(34, 3, '140 cm', NULL, 1, 5),
+(35, 3, '36 kg', NULL, 2, 5),
+(36, 3, 'Batterie incluse', NULL, 3, 6),
+(37, 3, '45 km/h', NULL, 4, 1),
+(38, 3, '100 km', NULL, 5, 2),
+(39, 3, '120 kg', NULL, 6, 1),
+(40, 3, 'Oui', NULL, 7, 7),
+(41, 1, '1380 x 320 x 630 mm', 'Dimensions', 1, 2),
+(42, 1, '36 kg', 'Poids', 2, 2),
+(43, 1, '48 V 13 Ah', 'Batterie', 3, 3),
+(44, 1, '40 km/h', 'Vitesse maximale', 4, 4),
+(45, 1, '40 km', 'Autonomie', 5, 5),
+(46, 1, '120 kg', 'Charge maximale', 6, 6),
+(47, 1, 'oui', 'Équipement', 7, 7),
+(48, 1, '110 cm', 'Hauteur', 1, 2),
+(49, 1, '33,7 kg', 'Poids', 2, 2),
+(50, 1, 'Batterie incluse', 'Batterie', 3, 3),
+(51, 1, '45 km/h', 'Vitesse maximale', 4, 4),
+(52, 1, '100 km', 'Autonomie', 5, 5),
+(53, 1, '120 kg', 'Charge maximale', 6, 6),
+(54, 2, '1200 x 300 x 600 mm', 'Dimensions', 1, 2),
+(55, 2, '30 kg', 'Poids', 2, 2),
+(56, 2, '48 V 12 Ah', 'Batterie', 3, 3),
+(57, 2, '45 km/h', 'Vitesse maximale', 4, 4),
+(58, 2, '100 km', 'Autonomie', 5, 5),
+(59, 2, '120 kg', 'Charge maximale', 6, 6),
+(60, 2, 'Siège inclus', 'Équipement', 7, 7),
+(61, 2, '115 cm', 'Hauteur', 1, 2),
+(62, 2, '32 kg', 'Poids', 2, 2),
+(63, 2, 'Batterie incluse', 'Batterie', 3, 3),
+(64, 2, '45 km/h', 'Vitesse maximale', 4, 4),
+(65, 2, '100 km', 'Autonomie', 5, 5),
+(66, 2, '120 kg', 'Charge maximale', 6, 6),
+(67, 3, '1250 x 310 x 620 mm', 'Dimensions', 1, 2),
+(68, 3, '25 kg', 'Poids', 2, 2),
+(69, 3, '48 V 15 Ah', 'Batterie', 3, 3),
+(70, 3, '40 km/h', 'Vitesse maximale', 4, 4),
+(71, 3, '35 km', 'Autonomie', 5, 5),
+(72, 3, '120 kg', 'Charge maximale', 6, 6),
+(73, 3, 'Éclairage complet', 'Équipement', 7, 7),
+(74, 3, '108 cm', 'Hauteur', 1, 2),
+(75, 3, '33 kg', 'Poids', 2, 2),
+(76, 3, 'Batterie incluse', 'Batterie', 3, 3),
+(77, 3, '40 km/h', 'Vitesse maximale', 4, 4),
+(78, 3, '35 km', 'Autonomie', 5, 5),
+(79, 3, '120 kg', 'Charge maximale', 6, 6);
 
 -- --------------------------------------------------------
 
@@ -264,6 +352,30 @@ CREATE TABLE `trottinette_description_section` (
   `content` longtext NOT NULL,
   `section_order` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Déchargement des données de la table `trottinette_description_section`
+--
+
+INSERT INTO `trottinette_description_section` (`id`, `trottinette_id`, `title`, `content`, `section_order`) VALUES
+(1, 3, 'Moteur puissant de 500 W', 'Le BOGIST M5 Pro est propulsé par un moteur de 500 W, offrant une puissance impressionnante pour les trajets urbains ou les aventures hors route. Il peut atteindre une vitesse de pointe de 40 km/h, offrant une conduite palpitante avec suffisamment de puissance pour affronter divers terrains, y compris les collines.', 1),
+(2, 3, 'Batterie haute capacité 48 V 15 Ah', 'Équipé d\'une batterie au lithium 48 V 15 Ah, le M5 Pro offre une autonomie allant jusqu\'à 35 km par charge, idéale pour les trajets plus longs.', 2),
+(3, 3, 'Cadre en aluminium robuste et léger', 'Construit en alliage d\'aluminium de haute qualité, le M5 Pro allie durabilité et portabilité. Poids de seulement 25 kg et charge maximale 120 kg. Conception pliable pour un transport et stockage faciles.', 3),
+(4, 3, 'Pneus pneumatiques de 12 pouces', 'Les pneus pneumatiques de 12 pouces offrent une conduite en douceur sur diverses surfaces, meilleure adhérence et confort amélioré pour les rues urbaines et sentiers hors route.', 4),
+(5, 3, 'Système d\'éclairage complet', 'Équipé d\'un système d\'éclairage avancé avec phares avant LED, feu arrière clignotant et klaxon pour une sécurité optimale de nuit.', 5),
+(6, 3, 'Freins à double disque', 'Freins à disque avant et arrière pour des arrêts rapides et sécurisés dans toutes les conditions.', 6),
+(7, 1, 'Moteur performant 1000 W', 'La Honey Whale M5 Max est équipée d\'un moteur 1000 W offrant une vitesse de pointe de 45 km/h et une puissance optimale pour tout type de trajet.', 1),
+(8, 1, 'Batterie longue durée', 'Batterie lithium 52 V 20 Ah, offrant jusqu\'à 40 km d\'autonomie pour les trajets quotidiens.', 2),
+(9, 1, 'Cadre robuste et léger', 'Cadre en aluminium léger et pliable, permettant un transport facile. Charge maximale 130 kg.', 3),
+(10, 1, 'Roues larges de 14 pouces', 'Roues larges offrant confort et stabilité sur les routes urbaines et chemins accidentés.', 4),
+(11, 1, 'Éclairage complet et sécurité', 'Éclairage LED à l\'avant et à l\'arrière avec klaxon intégré pour la sécurité nocturne.', 5),
+(12, 1, 'Système de freinage puissant', 'Freins à disque avant et arrière pour une conduite sûre et contrôlée.', 6),
+(13, 2, 'Moteur économique 750 W', 'La KUGOO C1 Pro dispose d\'un moteur 750 W, adapté pour des trajets urbains efficaces et une vitesse maximale de 35 km/h.', 1),
+(14, 2, 'Batterie 36 V 12 Ah', 'Batterie lithium offrant une autonomie de 30 km par charge, parfaite pour les trajets quotidiens.', 2),
+(15, 2, 'Cadre compact et pliable', 'Cadre en aluminium léger, pliable pour un rangement facile et un transport pratique.', 3),
+(16, 2, 'Pneus tout-terrain de 12 pouces', 'Pneus pneumatiques résistants offrant adhérence et confort sur routes irrégulières.', 4),
+(17, 2, 'Éclairage et sécurité', 'Phares avant et arrière LED, avec feux de signalisation et klaxon pour assurer la sécurité de nuit.', 5),
+(18, 2, 'Freinage efficace', 'Freins à disque arrière avec système de récupération d\'énergie pour un arrêt rapide et sécurisé.', 6);
 
 -- --------------------------------------------------------
 
@@ -306,6 +418,12 @@ ALTER TABLE `accessory`
 -- Index pour la table `caracteristique`
 --
 ALTER TABLE `caracteristique`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Index pour la table `categorie_caracteristique`
+--
+ALTER TABLE `categorie_caracteristique`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -357,7 +475,8 @@ ALTER TABLE `trottinette_accessory`
 ALTER TABLE `trottinette_caracteristique`
   ADD PRIMARY KEY (`id`),
   ADD KEY `IDX_22FC340CF6798F43` (`trottinette_id`),
-  ADD KEY `IDX_22FC340C1704EEB7` (`caracteristique_id`);
+  ADD KEY `IDX_22FC340C1704EEB7` (`caracteristique_id`),
+  ADD KEY `IDX_22FC340CBCF5E72D` (`categorie_id`);
 
 --
 -- Index pour la table `trottinette_description_section`
@@ -387,6 +506,12 @@ ALTER TABLE `accessory`
 -- AUTO_INCREMENT pour la table `caracteristique`
 --
 ALTER TABLE `caracteristique`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+
+--
+-- AUTO_INCREMENT pour la table `categorie_caracteristique`
+--
+ALTER TABLE `categorie_caracteristique`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
@@ -423,13 +548,13 @@ ALTER TABLE `trottinette_accessory`
 -- AUTO_INCREMENT pour la table `trottinette_caracteristique`
 --
 ALTER TABLE `trottinette_caracteristique`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=80;
 
 --
 -- AUTO_INCREMENT pour la table `trottinette_description_section`
 --
 ALTER TABLE `trottinette_description_section`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT pour la table `user`
@@ -465,6 +590,7 @@ ALTER TABLE `trottinette_accessory`
 --
 ALTER TABLE `trottinette_caracteristique`
   ADD CONSTRAINT `FK_22FC340C1704EEB7` FOREIGN KEY (`caracteristique_id`) REFERENCES `caracteristique` (`id`),
+  ADD CONSTRAINT `FK_22FC340CBCF5E72D` FOREIGN KEY (`categorie_id`) REFERENCES `categorie_caracteristique` (`id`),
   ADD CONSTRAINT `FK_22FC340CF6798F43` FOREIGN KEY (`trottinette_id`) REFERENCES `trottinette` (`id`);
 
 --
