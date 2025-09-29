@@ -25,20 +25,9 @@
             <ul class="sous-menu">
                 {% for trottinette in trottinettes_menu %}
                     <li>
-                        <a href="{{ path('trottinette_show', {'slug': trottinette.name}) }}">
+                        <a href="{{ path('trottinette_show', {'slug': trottinette.slug}) }}">
                             {{ trottinette.nameShort }}
                         </a>
-
-                        {# Si des accessoires existent pour cette trottinette #}
-                        {# {% if trottinette.trottinetteAccessories|length > 0 %}
-                            <ul class="sous-menu-accessoires">
-                                <li>
-                                    <a href="{{ path('trottinette_accessoires', {'slug': trottinette.slug}) }}">
-                                        Accessoires
-                                    </a>
-                                </li>
-                            </ul>
-                        {% endif %} #}
                     </li>
                 {% endfor %}
             </ul>
