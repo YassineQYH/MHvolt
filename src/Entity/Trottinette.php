@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 use App\Entity\TrottinetteCaracteristique;
 use App\Entity\TrottinetteDescriptionSection;
 use App\Entity\TrottinetteAccessory;
+use App\Entity\Illustration;
 
 #[ORM\Entity(repositoryClass: TrottinetteRepository::class)]
 class Trottinette
@@ -37,7 +38,6 @@ class Trottinette
     #[ORM\Column(type:"boolean")]
     private ?bool $isBest = null;
 
-    // Champs pour le carrousel
     #[ORM\Column(type:"boolean")]
     private bool $isHeader = false;
 
@@ -47,7 +47,11 @@ class Trottinette
     #[ORM\Column(type:"string", length:255, nullable:true)]
     private ?string $headerBtnTitle = null;
 
-    // Relations
+    // ------------------- Relations -------------------
+
+    #[ORM\OneToMany(mappedBy: "trottinette", targetEntity: Illustration::class, cascade: ["persist", "remove"])]
+    private Collection $illustration;
+
     #[ORM\OneToMany(mappedBy: "trottinette", targetEntity: TrottinetteCaracteristique::class, cascade: ["persist", "remove"])]
     private Collection $trottinetteCaracteristiques;
 
@@ -59,6 +63,7 @@ class Trottinette
 
     public function __construct()
     {
+        $this->illustration = new ArrayCollection();
         $this->trottinetteCaracteristiques = new ArrayCollection();
         $this->trottinetteAccessories = new ArrayCollection();
         $this->descriptionSections = new ArrayCollection();
@@ -72,7 +77,6 @@ class Trottinette
     // ------------------- GETTERS & SETTERS -------------------
 
     public function getId(): ?int { return $this->id; }
-
     public function getName(): ?string { return $this->name; }
     public function setName(string $name): self { $this->name = $name; return $this; }
 
@@ -102,6 +106,25 @@ class Trottinette
 
     public function getHeaderBtnTitle(): ?string { return $this->headerBtnTitle; }
     public function setHeaderBtnTitle(?string $headerBtnTitle): self { $this->headerBtnTitle = $headerBtnTitle; return $this; }
+
+    // ------------------- Illustrations -------------------
+    /** @return Collection<int, Illustration> */
+    public function getIllustration(): Collection { return $this->illustration; }
+    public function addIllustration(Illustration $illustration): self {
+        if (!$this->illustration->contains($illustration)) {
+            $this->illustration[] = $illustration;
+            $illustration->setTrottinette($this);
+        }
+        return $this;
+    }
+    public function removeIllustration(Illustration $illustration): self {
+        if ($this->illustration->removeElement($illustration)) {
+            if ($illustration->getTrottinette() === $this) {
+                $illustration->setTrottinette(null);
+            }
+        }
+        return $this;
+    }
 
     // ------------------- TrottinetteCaracteristiques -------------------
     /** @return Collection<int, TrottinetteCaracteristique> */
@@ -137,14 +160,8 @@ class Trottinette
         return $this;
     }
 
-    /**
-     * Alias pour Twig : permet d'accéder aux accessoires via "trottinette.accessories"
-     * @return Collection<int, TrottinetteAccessory>
-     */
-    public function getAccessories(): Collection
-    {
-        return $this->getTrottinetteAccessories();
-    }
+    /** Alias pour Twig : permet d'accéder aux accessoires via "trottinette.accessories" */
+    public function getAccessories(): Collection { return $this->getTrottinetteAccessories(); }
 
     // ------------------- DescriptionSections -------------------
     /** @return Collection<int, TrottinetteDescriptionSection> */

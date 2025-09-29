@@ -26,14 +26,14 @@
                 <ul class="sous-menu-nom">
                     {% for trottinette in trottinettes_menu %}
                         <li>
-                            <a href="{{ path('app_trottinette_show', {'slug': trottinette.slug}) }}">
+                            <a href="{{ path('trottinette_show', {'slug': trottinette.slug}) }}">
                                 {{ trottinette.name }}
                             </a>
 
                             {% if trottinette.trottinetteAccessories|length > 0 %}
                                 <ul class="sous-menu-accessoires">
                                     <li>
-                                        <a href="{{ path('app_trottinette_accessoires', {'slug': trottinette.slug}) }}">
+                                        <a href="{{ path('trottinette_accessoires', {'slug': trottinette.slug}) }}">
                                             Accessoires
                                         </a>
                                     </li>

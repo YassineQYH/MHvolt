@@ -18,17 +18,17 @@ class TrottinetteController extends AbstractController
         $this->entityManager = $entityManager;
     }
 
-    #[Route('/nos-trottinettes', name: 'app_trottinettes')]
+    #[Route('/nos-trottinettes', name: 'trottinettes')]
     public function index(): Response
     {
         $trottinettes = $this->entityManager->getRepository(Trottinette::class)->findAll();
 
-        return $this->render('trott/show.html.twig', [
+        return $this->render('trottinette/show.html.twig', [
             'trotinettes' => $trottinettes
         ]);
     }
 
-    #[Route('/trottinette/{slug}', name: 'app_trottinette_show')]
+    #[Route('/trottinette/{slug}', name: 'trottinette_show')]
     public function show(string $slug): Response
     {
         $trottinette = $this->entityManager->getRepository(Trottinette::class)
@@ -40,13 +40,13 @@ class TrottinetteController extends AbstractController
 
         $accessoires = $trottinette->getAccessories(); // relation ManyToMany
 
-        return $this->render('trot/single_trott.html.twig', [
+        return $this->render('trottinette/single_trott.html.twig', [
             'trottinette' => $trottinette,
             'accessoires' => $accessoires
         ]);
     }
 
-    #[Route('/trottinette/{slug}/accessoires', name: 'app_trottinette_accessoires')]
+    #[Route('/trottinette/{slug}/accessoires', name: 'trottinette_accessoires')]
     public function showAccessoires(string $slug): Response
     {
         $trottinette = $this->entityManager->getRepository(Trottinette::class)

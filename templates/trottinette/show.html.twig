@@ -1,0 +1,20 @@
+{% extends 'base.html.twig' %}
+
+{% block title %} Nos trottinettes {% endblock %}
+
+{% block content %}
+<br><br><br>
+<div class="trottinettes-list container">
+    {% for trottinette in trotinettes %}
+        <div class="trottinette-item">
+            <a href="{{ path('trottinette_show', {'slug': trottinette.slug}) }}">
+                <img src="/uploads/{{ trottinette.image }}" alt="{{ trottinette.name }}">
+            </a>
+            <h2>{{ trottinette.name }}</h2>
+            <p>{{ trottinette.descriptionShort }}</p>
+        </div>
+    {% else %}
+        <p>Aucune trottinette disponible.</p>
+    {% endfor %}
+</div>
+{% endblock %}

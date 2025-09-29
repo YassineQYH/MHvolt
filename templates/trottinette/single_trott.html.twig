@@ -1,0 +1,8 @@
+<div class="container-pergo-list pergo-list-center">
+    <div class="pergo-list-box" data-aos="fade" data-aos-duration="2000">
+        <a href="{{ path('trottinette_show', { 'slug': trottinette.slug } ) }}">
+            <img src="/uploads/{{ trottinette.image }}" alt="{{ trottinette.name }}" />
+        </a>
+        <p>Titre : {{ trottinette.name }}</p>
+    </div>
+</div>
