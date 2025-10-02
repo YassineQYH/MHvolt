@@ -1,61 +1,113 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ trottinette.name }}{% endblock %}
+{% block title %} {{trottinettes.name}} {% endblock %}
 
-{% block stylesheets %}
-    {{ parent() }}
-    <link rel="stylesheet" href="{{ asset('assets/css/show-product-slider.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/slide-img-product-show.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/slide-img-product-show-swiper.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/images-d-un-produit.css') }}">
-{% endblock %}
+        {% block stylesheets %}
+            {# Icone réseaux Sociaux #}
+            <link rel="stylesheet" href="https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css" />
+            {# fas fa-xxx #}
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" />
+            <!-- Font Awesome -->
+            <!-- Footer -->
+            <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PV1GOfQNHSoD2xbE+QkPxCAF1NEevoEH3S10sibvcOQVnN" crossorigin="anonymous">
+            <!-- Home-section -->
+            <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+            <!-- Glidejs | Show product slider-->
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Glide.js/3.4.1/css/glide.core.css" />
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Glide.js/3.4.1/css/glide.theme.css" />
+
+            <!-- CSS PERSONNALISEES -->
+            <link rel="stylesheet" href="{{ asset('assets/css/nav.css') }}">
+            <link rel="stylesheet" href="{{ asset('assets/css/show-product-slider.css') }}">
+            <link rel="stylesheet" href="{{ asset('assets/css/footer.css') }}">
+
+            <link rel="stylesheet" href="{{ asset('assets/css/slide-img-product-show.css') }}">
+            <link rel="stylesheet" href="{{ asset('assets/css/slide-img-product-show-swiper.min.css') }}">
+            <link rel="stylesheet" href="{{ asset('assets/css/images-d-un-produit.css') }}">
+            <link rel="stylesheet" href="{{ asset('assets/css/lightslider.css') }}">
+            <link rel="stylesheet" href="{{ asset('assets/css/styles.css') }}">
+
+
+        {% endblock %}
 
 {% block content %}
-<br><br><br><br>
 
-<section class="cart__slide" id="slider-show">
-    <div class="arrival__slide container">
-        <h1>{{ trottinette.name }}</h1>
-        <p>{{ trottinette.description }}</p>
 
+<br><br><br><br><br><br><br><br><br><br><br><br>
+        <!-- Cart Slide -->
+    <section class="cart__slide" id="slider-show">
+      <div class="arrival__slide container">
         <div class="glide" id="glide1">
-            <div class="glide__track" data-glide-el="track">
-                <ul class="glide__slides">
-                    {% for img in trottinette.illustrations %}
-                        <li class="glide__slide">
-                            <div class="arrival">
-                                <div class="cart__like">
-                                    <div class="image__holder">
-                                        <img src="{{ asset('uploads/' ~ img.image) }}" alt="{{ trottinette.name }}" />
-                                    </div>
-                                </div>
-                            </div>
-                        </li>
-                    {% else %}
-                        <li>Aucune image disponible pour cette trottinette.</li>
-                    {% endfor %}
-                </ul>
-            </div>
-
-            <div class="glide__arrows" data-glide-el="controls">
-                <button class="glide__arrow glide__arrow--left" data-glide-dir="<">Précédent</button>
-                <button class="glide__arrow glide__arrow--right" data-glide-dir=">">Suivant</button>
-            </div>
-        </div>
-
-        <h2>Accessoires associés</h2>
-        <div class="accessoires-list">
-            {% for acc in accessoires %}
-                <div class="accessoire-item">
-                    <a href="{{ path('accessoire', {'slug': acc.slug}) }}">
-                        <img src="{{ asset('uploads/' ~ acc.image) }}" alt="{{ acc.name }}">
-                    </a>
-                    <p>{{ acc.name }}</p>
+          <div class="glide__track" data-glide-el="track">
+            <ul class="glide__slides">
+            {%for item in illustrations %}
+              <li class="glide__slide">
+                <div class="arrival">
+                  <div class="cart__like">
+                    <div class="image__holder">
+                      <img src="/uploads/{{ item.image }}" alt="" />
+                    </div>
+                    <div class="cart__details">
+                      <h1>{{item.name}}</h1>
+                      <p>
+                        Lorem ipsum dolor sit amet consectetur, adipisicing
+                        elit. Doloremque eius, laborum sunt dolorem
+                        necessitatibus incidunt aut ducimus, quis, veritatis
+                        cum dolore tempora? Corporis, nostrum alias.
+                      </p>
+                    </div>
+                  </div>
                 </div>
-            {% else %}
-                <p>Aucun accessoire lié à cette trottinette.</p>
+              </li>
             {% endfor %}
+            </ul>
+          </div>
+
+          <!-- Arrows -->
+          <div class="glide__arrows" data-glide-el="controls">
+            <button class="glide__arrow glide__arrow--left" data-glide-dir="<">
+              Précédent
+            </button>
+            <button class="glide__arrow glide__arrow--right" data-glide-dir=">">
+              Suivant
+            </button>
+          </div>
+
+      <div>
+        <div class="glide">
+          <div class="glide__track" data-glide-el="track">
+            {# <ul class="glide__slides">
+              <li class="glide__slide"> #}
+
+                <div id="autoWidth" class="cs-hidden" class="glide__bullets" data-glide-el="controls[nav]" {# class="glide__slides" #}>
+                  {% for key, item in illustrations %}
+                  {% set counter = ( counter | default(-1) ) + 1 %}
+                    <button class="glide__bullet" data-glide-dir="={{ counter }}" {# class="glide__slide" #}>
+                      <div class="thumbnail">
+                        <img src="/uploads/{{ item.image }}" alt=""/>
+                      </div>
+                    </button>
+                  {% endfor %}
+                </div>
+
+              {# </li>
+            </ul> #}
+          </div>
         </div>
-    </div>
-</section>
+      </div>
+
+        </div>
+      </div>
+    </section>
+
+      {# <script src="{{ asset('assets/js/slide-img-product-show-swiper.min.js') }}" type="text/javascript"></script>
+      <script src="{{ asset('assets/js/slide-img-product-show.js') }}" type="text/javascript"></script> #}
+
+      {# caroussel meilleurs vente - script.js #}
+      {# <script src="{{ asset('assets/js/slide-product.js') }}" type="text/javascript"></script>
+      <script src="{{ asset('assets/js/lightslider.js') }}" type="text/javascript"></script> #}
+
+      {# TEST : Slide img - script.js #}
+      <script src="{{ asset('assets/js/slide-img.js') }}" type="text/javascript"></script>
+
 {% endblock %}

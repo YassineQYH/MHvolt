@@ -1,33 +1,57 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Nos Trottinettes{% endblock %}
+{% block title %}Nos Pergolas{% endblock %}
+
 
 {% block stylesheets %}
-    {{ parent() }}
+    {# Icone réseaux Sociaux #}
+    <link rel="stylesheet" href="https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css" />
+    {# fas fa-xxx #}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" />
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="{{ asset('assets/css/bootstrap.min.css') }}" >
+    <!-- Font Awesome -->
+    <!-- Footer -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PV1GOfQNHSoD2xbE+QkPxCAF1NEevoEH3S10sibvcOQVnN" crossorigin="anonymous">
+    <!-- Home-section -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+    <!-- Glidejs | Show product slider-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Glide.js/3.4.1/css/glide.core.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Glide.js/3.4.1/css/glide.theme.css" />
+
+    <!-- CSS PERSONNALISEES -->
+    <link rel="stylesheet" href="{{ asset('assets/css/nav.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/products.css') }}">
-    {# <link rel="stylesheet" href="{{ asset('assets/css/slide-product.css') }}"> #}
+    <link rel="stylesheet" href="{{ asset('assets/css/slide-product.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/lightslider.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/contact-form.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/footer.css') }}">
+
+
 {% endblock %}
 
 {% block content %}
-<section class="section-trott-list" id="trott-list">
-    <div class="title">
-        <h1>Nos Trottinettes</h1>
-        <p>Découvrez notre sélection de trottinettes.</p>
-    </div>
 
-    <div class="container-trott-list trott-list-center">
-        {% for item in trottinettes %}
-            <div class="trott-list-box" data-aos="fade" data-aos-duration="2000">
-                <a href="{{ path('trottinette_show', { 'slug': item.slug }) }}">
-                    <img src="/uploads/{{ item.image }}" alt="{{ item.name }}" />
-                </a>
-                <p>{{ item.name }}</p>
-            </div>
-        {% endfor %}
-    </div>
+    <section class="section-pergo-list" id="pergo-list">
+        <div class="title">
+            <h1>Nos Trottinettes</h1>
+            <p>Lorem ipsum dolor, sit amet consectetur adipisicing.</p>
+        </div>
 
-    <div class="pagination">
-        {{ knp_pagination_render(trottinettes) }}
-    </div>
-</section>
+
+        <div class="container-pergo-list pergo-list-center" style="color:black;">
+            {%for item in trottinettes %}
+                <div class="pergo-list-box" data-aos="fade" data-aos-duration="2000">
+                    <a href="{{ path('trottinette_show', { 'slug' : item.slug } ) }}"> <img src="/uploads/{{ item.image }}" alt="" /></a>
+                    <p>Titre : {{ item.name }}</p>
+                </div>
+            {% endfor %}
+        </div >{{ knp_pagination_render(trottinettes) }}
+    </section>
+
+    <!-- Custom Script -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init();
+    </script>
 {% endblock %}
