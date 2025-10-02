@@ -1,23 +1,15 @@
 {
-    "devDependencies": {
-        "@babel/core": "^7.17.0",
-        "@babel/preset-env": "^7.16.0",
-        "@symfony/webpack-encore": "^5.0.0",
-        "core-js": "^3.38.0",
-        "regenerator-runtime": "^0.13.9",
-        "webpack": "^5.74.0",
-        "webpack-cli": "^5.1.0"
-    },
-    "license": "UNLICENSED",
+    "name": "mon-projet",
+    "version": "1.0.0",
+    "description": "Projet web sans Webpack Encore",
     "private": true,
     "scripts": {
-        "dev-server": "encore dev-server",
-        "dev": "encore dev",
-        "watch": "encore dev --watch",
-        "build": "encore production --progress"
+        "copy-assets": "cp -R assets/css public/css && cp -R assets/js public/js && cp -R assets/images public/images"
     },
     "dependencies": {
         "bootstrap": "^5.3.8",
-        "jquerry": "^0.0.1-security"
-    }
+        "jquery": "^3.7.1"
+    },
+    "devDependencies": {},
+    "license": "UNLICENSED"
 }

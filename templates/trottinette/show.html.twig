@@ -3,14 +3,11 @@
 {% block title %}{{ trottinette.name }}{% endblock %}
 
 {% block stylesheets %}
-    <link rel="stylesheet" href="{{ asset('assets/css/nav.css') }}">
+    {{ parent() }}
     <link rel="stylesheet" href="{{ asset('assets/css/show-product-slider.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/footer.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/slide-img-product-show.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/slide-img-product-show-swiper.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/images-d-un-produit.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/lightslider.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/styles.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -29,7 +26,7 @@
                             <div class="arrival">
                                 <div class="cart__like">
                                     <div class="image__holder">
-                                        <img src="/uploads/{{ img.image }}" alt="{{ trottinette.name }}" />
+                                        <img src="{{ asset('uploads/' ~ img.image) }}" alt="{{ trottinette.name }}" />
                                     </div>
                                 </div>
                             </div>
@@ -40,7 +37,6 @@
                 </ul>
             </div>
 
-            <!-- Arrows -->
             <div class="glide__arrows" data-glide-el="controls">
                 <button class="glide__arrow glide__arrow--left" data-glide-dir="<">Précédent</button>
                 <button class="glide__arrow glide__arrow--right" data-glide-dir=">">Suivant</button>
@@ -52,7 +48,7 @@
             {% for acc in accessoires %}
                 <div class="accessoire-item">
                     <a href="{{ path('accessoire', {'slug': acc.slug}) }}">
-                        <img src="/uploads/{{ acc.image }}" alt="{{ acc.name }}">
+                        <img src="{{ asset('uploads/' ~ acc.image) }}" alt="{{ acc.name }}">
                     </a>
                     <p>{{ acc.name }}</p>
                 </div>

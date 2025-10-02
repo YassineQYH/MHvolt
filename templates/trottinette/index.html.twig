@@ -2,44 +2,22 @@
 
 {% block title %}Nos Trottinettes{% endblock %}
 
-
 {% block stylesheets %}
-    {# Icone réseaux Sociaux #}
-    <link rel="stylesheet" href="https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css" />
-    {# fas fa-xxx #}
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" />
-    <!-- Bootstrap core CSS -->
-    <link rel="stylesheet" href="{{ asset('assets/css/bootstrap.min.css') }}" >
-    <!-- Font Awesome -->
-    <!-- Footer -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PV1GOfQNHSoD2xbE+QkPxCAF1NEevoEH3S10sibvcOQVnN" crossorigin="anonymous">
-    <!-- Home-section -->
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
-    <!-- Glidejs | Show product slider-->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Glide.js/3.4.1/css/glide.core.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Glide.js/3.4.1/css/glide.theme.css" />
-
-    <!-- CSS PERSONNALISEES -->
-    <link rel="stylesheet" href="{{ asset('assets/css/nav.css') }}">
+    {{ parent() }}
     <link rel="stylesheet" href="{{ asset('assets/css/products.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/slide-product.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/lightslider.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/contact-form.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/footer.css') }}">
-
-
+    {# <link rel="stylesheet" href="{{ asset('assets/css/slide-product.css') }}"> #}
 {% endblock %}
 
 {% block content %}
-<section class="section-pergo-list" id="pergo-list">
+<section class="section-trott-list" id="trott-list">
     <div class="title">
         <h1>Nos Trottinettes</h1>
         <p>Découvrez notre sélection de trottinettes.</p>
     </div>
 
-    <div class="container-pergo-list pergo-list-center">
+    <div class="container-trott-list trott-list-center">
         {% for item in trottinettes %}
-            <div class="pergo-list-box" data-aos="fade" data-aos-duration="2000">
+            <div class="trott-list-box" data-aos="fade" data-aos-duration="2000">
                 <a href="{{ path('trottinette_show', { 'slug': item.slug }) }}">
                     <img src="/uploads/{{ item.image }}" alt="{{ item.name }}" />
                 </a>
