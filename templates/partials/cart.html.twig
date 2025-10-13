@@ -1,0 +1,66 @@
+{% set cart = cart() %} {# ⚡ récupère le panier global via CartRuntime #}
+
+<a id="cartdetails" data-toggle="dropdown" aria-haspopup="true"
+   aria-expanded="false" href="{{ path('cart') }}">
+    <i class="fas fa-shopping-cart"></i>
+</a>
+
+<div aria-labelledby="cartdetails" class="dropdown-menu dropdown-menu-left p-4" style="margin-top:13px!important;">
+    <div class="navbar-cart-product-wrapper">
+        {% set total = 0 %}
+
+        {% if cart is not empty %}
+            {% for item in cart %}
+                <div class="navbar-cart-product">
+                    <div class="w-100">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <small class="d-block text-sm"><strong>{{ item.product.name }}</strong></small>
+                            </div>
+                            <div class="col-md-6 my-auto">
+                                <img src="/uploads/{{ item.product.image }}" alt="{{ item.product.name }}" height="75px">
+                            </div>
+                            <div class="col-md-6">
+                                <small class="d-block text-sm">
+                                    Prix unité : <strong>{{ (item.product.price / 100)|number_format(2, ',','.') }} €</strong>
+                                </small>
+                                <small class="d-block text-muted">
+                                    Quantité : <strong>{{ item.quantity }}</strong>
+                                    <a class="lien-cart" href="{{ path('delete_to_cart', {'id': item.product.id}) }}"><br>
+                                        <img src="{{ asset('assets/img/delete.png') }}" height="12px" alt="Supprimer">
+                                    </a>
+                                    <a class="lien-cart" href="{{ path('decrease_to_cart', {'id': item.product.id}) }}">
+                                        <img src="{{ asset('assets/img/less.png') }}" height="8px" alt="-">
+                                    </a>
+                                    <a class="lien-cart" href="{{ path('increase_to_cart', {'id': item.product.id}) }}">
+                                        <img src="{{ asset('assets/img/more.png') }}" height="8px" alt="+">
+                                    </a>
+                                </small>
+                                <small>
+                                    Prix total : <strong>{{ ((item.product.price * item.quantity) / 100)|number_format(2, ',','.') }} €</strong>
+                                </small>
+                            </div>
+                        </div>
+                        <br>
+                    </div>
+                </div>
+                {% set total = total + (item.product.price * item.quantity) %}
+            {% endfor %}
+        {% else %}
+            <p>Votre panier est vide</p>
+        {% endif %}
+
+        <div class="navbar-cart-total">
+            <span class="text-uppercase text-muted btn btn-outline-test">
+                Total commande : <br>
+                <strong class="text-uppercase">{{ (total / 100)|number_format(2, ',','.') }} €</strong>
+            </span>
+        </div>
+
+        <div class="d-flex justify-content-between lien-panier">
+            <a href="{{ path('cart') }}" class="mr-3 btn btn-outline-dark"><small>Voir le panier</small> <i class="fa-arrow-right fa"></i></a>
+            <a href="#" class="btn btn-outline-dark"><small>Commander</small></a>
+            {# <a href="{{ path('order') }}" class="btn btn-outline-dark"><small>Commander</small></a> #}
+        </div>
+    </div>
+</div>

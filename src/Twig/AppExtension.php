@@ -18,6 +18,7 @@ class AppExtension extends AbstractExtension implements GlobalsInterface
     public function getGlobals(): array
     {
         return [
+            // accessible dans Twig via {{ trottinettes_menu }}
             'trottinettes_menu' => $this->trottinetteRepository->findAll(),
         ];
     }

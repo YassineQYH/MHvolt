@@ -2,16 +2,16 @@
 
 namespace App\Controller;
 
+use App\Classe\Cart;
 use App\Classe\Mail;
-use App\Entity\Trottinette;
 use App\Entity\Accessory;
 use App\Form\ContactType;
+use App\Entity\Trottinette;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class HomeController extends AbstractController
@@ -27,9 +27,10 @@ class HomeController extends AbstractController
     public function index(
         Request $request,
         UserPasswordHasherInterface $encoder,
-        AuthenticationUtils $authenticationUtils
+        Cart $cart
     ): Response
     {
+        $cart=$cart->getFull();
         // --- FORMULAIRE DE CONTACT ---
         $form = $this->createForm(ContactType::class);
         $form->handleRequest($request);
@@ -63,7 +64,7 @@ class HomeController extends AbstractController
         // --- MENU PRINCIPAL : TROTTINETTES ---
         $trottinettesMenu = $this->entityManager->getRepository(Trottinette::class)->findAll();
 
-        // ⚡ éliminer les doublons par ID (sécurité)
+        // ⚡ éliminer les doublons par ID
         $uniqueTrottinettesMenu = [];
         foreach ($trottinettesMenu as $trottinette) {
             $uniqueTrottinettesMenu[$trottinette->getId()] = $trottinette;
@@ -75,11 +76,12 @@ class HomeController extends AbstractController
         $accessories = $this->entityManager->getRepository(Accessory::class)->findBy(['isBest' => 1]);
 
         return $this->render('home/index.html.twig', [
-            'headers' => $headers,                 // ⚡ trottinettes pour carrousel
-            'trottinettes' => $trottinettes,       // slider "best" trottinettes
-            'accessories' => $accessories,         // slider "best" accessoires
+            'headers' => $headers,
+            'trottinettes' => $trottinettes,
+            'accessories' => $accessories,
             'form' => $form->createView(),
-            'trottinettes_menu' => $trottinettesMenu // menu principal sans doublons
+            'trottinettes_menu' => $trottinettesMenu,
+            'cart' => $cart,
         ]);
     }
 }

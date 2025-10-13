@@ -17,6 +17,8 @@
         <span class="nav-icon"></span>
     </label>
 
+    {% set cart = cart() %} {# Panier global #}
+
     <!-- menu principal -->
     <ul class="menu">
         <li><a href="{{ path('app_home') }}">Accueil</a></li>
@@ -24,20 +26,30 @@
         <li class="menu-deroulant">
             <a href="javascript:void(0)">Nos trottinettes <span><i class="fas fa-chevron-down"></i></span></a>
             <ul class="sous-menu-trottinettes">
-            {% for trottinette in trottinettes %}
-                <li class="trottinette-pair">
-                <a href="{{ path('trottinette_show', {'slug': trottinette.nameShort}) }}">
-                    {{ trottinette.nameShort }}
-                </a>
-                <span class="separator">|</span>
-                <a class="accessoire-item" href="{{ path('trottinette_accessoires', {'slug': trottinette.slug}) }}">
-                    Accessoires
-                </a>
+                {% for trottinette in trottinettes_menu %}
+                    <li class="trottinette-pair">
+                        <a href="{{ path('trottinette_show', {'slug': trottinette.nameShort}) }}">
+                            {{ trottinette.nameShort }}
+                        </a>
+                        <span class="separator">|</span>
+                        <a class="accessoire-item" href="{{ path('trottinette_accessoires', {'slug': trottinette.slug}) }}">
+                            Accessoires
+                        </a>
+                    </li>
+                {% endfor %}
+
+                <li style="color:white;">
+                    {% set total = cart|reduce((carry, item) => carry + (item.product.price * item.quantity), 0) %}
+                    <small><strong>{{ (total / 100)|number_format(2, ',','.') }} €</strong></small>
                 </li>
-            {% endfor %}
             </ul>
         </li>
 
         <li><a href="/#contact">Nous contacter</a></li>
+
+        <!-- 🛒 Panier -->
+        <li class="menu-panier">
+            {{ include('partials/cart.html.twig', { cart: cart }) }}
+        </li>
     </ul>
 </nav>
