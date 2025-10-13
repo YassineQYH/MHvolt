@@ -23,18 +23,18 @@
 
         <li class="menu-deroulant">
             <a href="javascript:void(0)">Nos trottinettes <span><i class="fas fa-chevron-down"></i></span></a>
-            <ul class="sous-menu">
-                <li class="trottinette-item"> <a href="{{ path('nos_trottinettes') }}">Toutes nos trottinettes</a></li>
-                {% for trottinette in trottinettes_menu %}
-                    <li class="trottinette-item">
-                        <a href="{{ path('trottinette_show', {'slug': trottinette.slug}) }}">
-                            {{ trottinette.nameShort }}
-                        </a>
-                        <a class="accessoire-item" href="{{ path('trottinette_accessoires', {'slug': trottinette.slug}) }}">
-                            Accessoires
-                        </a>
-                    </li>
-                {% endfor %}
+            <ul class="sous-menu-trottinettes">
+            {% for trottinette in trottinettes %}
+                <li class="trottinette-pair">
+                <a href="{{ path('trottinette_show', {'slug': trottinette.nameShort}) }}">
+                    {{ trottinette.nameShort }}
+                </a>
+                <span class="separator">|</span>
+                <a class="accessoire-item" href="{{ path('trottinette_accessoires', {'slug': trottinette.slug}) }}">
+                    Accessoires
+                </a>
+                </li>
+            {% endfor %}
             </ul>
         </li>
 
