@@ -38,7 +38,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $tel = null;
 
     // ------------------- RELATION ADDRESSES -------------------
-    #[ORM\OneToMany(mappedBy: "user", targetEntity: Address::class, cascade: ["persist", "remove"], orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: "user", targetEntity: Address::class, cascade: ["persist"], orphanRemoval: true)]
     private Collection $addresses;
 
     public function __construct()
@@ -47,7 +47,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     // ------------------- GETTERS / SETTERS -------------------
-
     public function getId(): ?int { return $this->id; }
     public function getEmail(): ?string { return $this->email; }
     public function setEmail(string $email): static { $this->email = $email; return $this; }
@@ -59,13 +58,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getPassword(): ?string { return $this->password; }
     public function setPassword(string $password): static { $this->password = $password; return $this; }
-
-    public function __serialize(): array
-    {
-        $data = (array)$this;
-        $data["\0".self::class."\0password"] = hash('crc32c', $this->password);
-        return $data;
-    }
 
     #[\Deprecated]
     public function eraseCredentials(): void {}
@@ -80,7 +72,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setTel(string $tel): static { $this->tel = $tel; return $this; }
 
     // ------------------- ADDRESSES -------------------
-
     /**
      * @return Collection<int, Address>
      */
@@ -90,7 +81,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if (!$this->addresses->contains($address)) {
             $this->addresses->add($address);
-            $address->setUser($this);
+            $address->setUser($this); // lie automatiquement l'adresse au User
         }
         return $this;
     }

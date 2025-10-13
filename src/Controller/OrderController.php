@@ -16,99 +16,123 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class OrderController extends AbstractController
 {
-    private EntityManagerInterface $entityManager;
-
-    public function __construct(EntityManagerInterface $entityManager)
-    {
-        $this->entityManager = $entityManager;
-    }
+    public function __construct(
+        private EntityManagerInterface $entityManager
+    ) {}
 
     #[Route('/commande', name: 'order')]
     public function index(Cart $cart, Request $request): Response
     {
+        /** @var \App\Entity\User $user */
         $user = $this->getUser();
+
+        // 🔐 Si non connecté → connexion
         if (!$user) {
             return $this->redirectToRoute('app_login');
         }
 
-        if (!$user->getAddresses()->getValues()) {
+        // 🛒 Vérifie que le panier n’est pas vide
+        if (empty($cart->getFull())) {
+            $this->addFlash('warning', 'Votre panier est vide.');
+            return $this->redirectToRoute('products');
+        }
+
+        // 🏠 Vérifie si l’utilisateur a au moins une adresse
+        if ($user->getAddresses()->isEmpty()) {
+            $this->addFlash('info', 'Veuillez ajouter une adresse avant de passer commande.');
             return $this->redirectToRoute('account_address_add');
         }
 
+        // 🧾 Création du formulaire
         $form = $this->createForm(OrderType::class, null, [
-            'user' => $user
+            'user' => $user,
         ]);
 
         return $this->render('order/index.html.twig', [
             'form' => $form->createView(),
-            'panier' => $cart->getFull()
+            'cart' => $cart->getFull(),
         ]);
     }
 
     #[Route('/commande/recapitulatif', name: 'order_recap', methods: ['POST'])]
     public function add(Cart $cart, Request $request, WeightRepository $weightRepo): Response
     {
+        /** @var \App\Entity\User $user */
         $user = $this->getUser();
+
         if (!$user) {
             return $this->redirectToRoute('app_login');
         }
 
-        $form = $this->createForm(OrderType::class, null, [
-            'user' => $user
-        ]);
-
-        $panier = $cart->getFull();
-        $poids = 0.0;
-        $quantity_product = 0;
-
-        foreach ($panier as $element) {
-            $poids += $element['product']->getWeight()->getKg() * $element['quantity'];
-            $quantity_product += $element['quantity'];
+        if ($user->getAddresses()->isEmpty()) {
+            $this->addFlash('info', 'Veuillez ajouter une adresse avant de confirmer votre commande.');
+            return $this->redirectToRoute('account_address_add');
         }
 
-        $prix = $weightRepo->findByKgPrice($poids)->getPrice();
-
+        $form = $this->createForm(OrderType::class, null, [
+            'user' => $user,
+        ]);
         $form->handleRequest($request);
+
+        $cartItems = $cart->getFull();
+        $totalWeight = 0.0;
+
+        foreach ($cartItems as $element) {
+            $totalWeight += $element['product']->getWeight()->getKg() * $element['quantity'];
+        }
+
+        // 💰 Récupération du tarif selon le poids total
+        $tarif = $weightRepo->findByKgPrice($totalWeight);
+        $shippingPrice = $tarif ? $tarif->getPrice() : 0;
 
         if ($form->isSubmitted() && $form->isValid()) {
             $delivery = $form->get('addresses')->getData();
-            $deliveryContent = $delivery->getFirstname().' '.$delivery->getLastname()
-                .'</br>'.$delivery->getPhone()
-                .($delivery->getCompany() ? '</br'.$delivery->getCompany() : '')
-                .'</br>'.$delivery->getAddress()
-                .'</br>'.$delivery->getPostal().' '.$delivery->getCity()
-                .'</br>'.$delivery->getCountry();
 
-            $order = new Order();
-            $reference = (new DateTime())->format('dmY').'-'.uniqid();
-            $order->setReference($reference)
-                  ->setUser($user)
-                  ->setCreatedAt(new DateTime())
-                  ->setCarrierPrice($prix)
-                  ->setDelivery($deliveryContent)
-                  ->setState(0);
+            // 🏠 Formatage de l’adresse pour stockage
+            $deliveryContent = sprintf(
+                "%s %s</br>%s%s</br>%s</br>%s %s</br>%s",
+                $delivery->getFirstname(),
+                $delivery->getLastname(),
+                $delivery->getPhone(),
+                $delivery->getCompany() ? '</br>' . $delivery->getCompany() : '',
+                $delivery->getAddress(),
+                $delivery->getPostal(),
+                $delivery->getCity(),
+                $delivery->getCountry()
+            );
+
+            // 🧾 Création de la commande
+            $order = (new Order())
+                ->setReference((new DateTime())->format('dmY') . '-' . uniqid())
+                ->setUser($user)
+                ->setCreatedAt(new DateTime())
+                ->setCarrierPrice($shippingPrice)
+                ->setDelivery($deliveryContent)
+                ->setState(0);
 
             $this->entityManager->persist($order);
 
-            foreach ($panier as $element) {
-                $details = new OrderDetails();
-                $details->setMyOrder($order)
-                        ->setProduct($element['product']->getName())
-                        ->setWeight($element['product']->getWeight())
-                        ->setQuantity($element['quantity'])
-                        ->setPrice($element['product']->getPrice())
-                        ->setTotal($element['product']->getPrice() * $element['quantity']);
+            // 🧩 Ajout des détails produits
+            foreach ($cartItems as $element) {
+                $details = (new OrderDetails())
+                    ->setMyOrder($order)
+                    ->setProduct($element['product']->getName())
+                    ->setWeight($element['product']->getWeight())
+                    ->setQuantity($element['quantity'])
+                    ->setPrice($element['product']->getPrice())
+                    ->setTotal($element['product']->getPrice() * $element['quantity']);
+
                 $this->entityManager->persist($details);
             }
 
             $this->entityManager->flush();
 
             return $this->render('order/add.html.twig', [
-                'cart' => $panier,
+                'cart' => $cartItems,
                 'delivery' => $deliveryContent,
                 'reference' => $order->getReference(),
-                'price' => $prix,
-                'totalLivraison' => null
+                'price' => $shippingPrice,
+                'totalLivraison' => null,
             ]);
         }
 

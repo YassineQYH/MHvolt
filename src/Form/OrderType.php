@@ -3,7 +3,6 @@
 namespace App\Form;
 
 use App\Entity\Address;
-use App\Entity\Weight;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -14,38 +13,32 @@ class OrderType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        //dd($options);
         $user = $options['user'];
 
-        $builder
-            ->add('addresses', EntityType::class, [
+        // ✅ On ajoute le champ uniquement si l'utilisateur a au moins une adresse
+        if ($user && count($user->getAddresses()) > 0) {
+            $builder->add('addresses', EntityType::class, [
                 'label' => false,
                 'required' => true,
                 'class' => Address::class,
-                'choices' => $user->getAddresses(), /* Me permet de récupérer uniquement les adresses de l'utilisateur et non pas des autres */
+                'choices' => $user->getAddresses(),
                 'multiple' => false,
-                'expanded' => true
-            ])
-            /* ->add('carriers', EntityType::class, [
-                'label' => 'Choisissez votre transporteur',
-                'required' => false,
-                'class' => Weight::class,
-                'multiple' => false,
-                'expanded' => true
-            ]) */
-            ->add('submit', SubmitType::class, [
-                'label' => 'Valider ma commande',
-                'attr' => [
-                    'class' => 'btn btn-success btn-block'
-                ]
-            ])
-        ;
+                'expanded' => true,
+            ]);
+        }
+
+        $builder->add('submit', SubmitType::class, [
+            'label' => 'Valider ma commande',
+            'attr' => [
+                'class' => 'btn btn-success btn-block'
+            ]
+        ]);
     }
 
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'user' => array()
+            'user' => []
         ]);
     }
 }

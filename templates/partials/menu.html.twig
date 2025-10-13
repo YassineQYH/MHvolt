@@ -51,5 +51,11 @@
         <li class="menu-panier">
             {{ include('partials/cart.html.twig', { cart: cart }) }}
         </li>
+
+        {% if app.user %}
+        <button class="btnLogin-popup">Mon Compte</button>
+        {% else %}
+        <button class="btnLogin-popup">Connexion</button>
+        {% endif %}
     </ul>
 </nav>

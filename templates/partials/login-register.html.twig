@@ -1,0 +1,92 @@
+    </br></br></br></br></br>
+    {# POP-UP LOGIN & REGISTER #}
+    <div class="wrapper" id="divOuverture">
+        <span class="icon-close">
+            <ion-icon name="close">X</ion-icon>
+        </span>
+
+        <div class="form-box login">
+            
+            <form method="post">
+                {# {% if error %}
+                    <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+                {% endif %} #}
+
+                {% if app.user %}
+                    <div class="mb-3 hello-user">
+                        Vous êtes connecter en tant que {{ app.user.userIdentifier }},<a href="{{ path('app_logout') }}" class="register-link"> </a>
+                    </div>
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <ul class="sous-menu-nom menu-mon-compte">
+                                <li><a href="/admin">Admin</a></li>
+                                <li><a href="/compte">Compte</a></li>
+                                <li><a href="{{ path('app_logout') }}">Déconnexion</a></li>
+                            </ul>
+                            {% elseif is_granted('ROLE_USER') %}
+                            <ul class="sous-menu-nom">
+                                <li><a href="/compte">Compte</a></li>
+                                <li><a href="{{ path('app_logout') }}">Déconnexion</a></li>
+                            </ul>
+                            {% else %}
+                            <ul class="sous-menu-nom">
+                                <li><a href="{{ path('app_login') }}">Connexion</a></li>
+                                <li><a href="{{ path('register') }}">Inscription</a></li>
+                            </ul>
+                        {% endif %}
+                        {% else %}
+                        <h2 style="font-weight:bold";>Se connecter</h2>
+                {# <form> #}
+                    <div class="input-box">
+                        <span class="icon"><ion-icon name="mail"></ion-icon></span>
+                        <input type="email" value="{# {{ last_username }} #}" name="email" id="inputEmail" class="form-control" autocomplete="email" required>
+                        <label for="inputEmail">Email</label>
+                    </div>
+                    <div class="input-box">
+                        <span class="icon"><ion-icon name="lock-closed"></ion-icon></span>
+                        <input type="password" name="password" id="inputPassword" class="form-control" autocomplete="current-password" required>
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+                        <label for="inputPassword">Mot De Passe</label>
+                        <span class="show-password-login">Afficher</span>
+                    </div>
+                    
+                    <div class="remember-forgot">
+                        <label style="font-weight:bold";>
+                            <input type="checkbox" name="_remember_me"> Se souvenir de moi
+                        </label>
+                    </div>
+                    <input type="hidden" name="type" value="login">
+                    <button action="api_login" role="button" type="submit" class="btn">
+                        Se connecter
+                    </button>
+                    <div class="login-register">
+                        <p style="font-weight:bold; text-align:center;">Pas encore de compte ? <a href="#" class="register-link">S'inscrire</a></p>
+                    </div>
+                {# </form> #}
+                {% endif %}
+            </form>
+        </div>
+        <div class="form-box register hello-user" style="margin-top:-420px">
+            <h2 style="font-weight:bold";>Création du compte</h2>
+            {# <form action="#"> #}
+                {# {{form(formregister)}} #}
+                {{ form_start(formregister) }}
+                    {{ form_row(formregister.email) }}
+                    {{ form_row(formregister.firstname) }}
+                    {{ form_row(formregister.lastname) }}
+                    {{ form_row(formregister.phone) }}
+                    {{ form_row(formregister.zipcode) }}
+                    {{ form_row(formregister.password) }}
+                    {{ form_row(formregister.submit) }}
+                {{ form_end(formregister) }} 
+                <input type="hidden" name="type" value="register">
+                {# <div class="remember-forgot">
+                    <label style="font-weight:bold";><input type="checkbox">I agree to the terms & conditions</label>
+                </div> #}
+                {# <button type="submit" class="btn">Register</button> #}
+                <div class="login-register">
+                    <p style="font-weight:bold";>Vous avez déjà un compte ? <a href="#" class="login-link">Se connecter</a></p>
+                </div>
+                
+            {# </form> #}
+        </div>
+    </div>
