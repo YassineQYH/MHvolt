@@ -66,26 +66,62 @@
             </form>
         </div>
         <div class="form-box register hello-user" style="margin-top:-420px">
-            <h2 style="font-weight:bold";>Création du compte</h2>
-            {# <form action="#"> #}
-                {# {{form(formregister)}} #}
-                {{ form_start(formregister) }}
-                    {{ form_row(formregister.email) }}
-                    {{ form_row(formregister.firstname) }}
-                    {{ form_row(formregister.lastname) }}
-                    {{ form_row(formregister.tel) }}
-                    {{ form_row(formregister.password) }}
-                    {{ form_row(formregister.submit) }}
-                {{ form_end(formregister) }}
-                <input type="hidden" name="type" value="register">
-                {# <div class="remember-forgot">
-                    <label style="font-weight:bold";><input type="checkbox">I agree to the terms & conditions</label>
-                </div> #}
-                {# <button type="submit" class="btn">Register</button> #}
-                <div class="login-register">
-                    <p style="font-weight:bold";>Vous avez déjà un compte ? <a href="#" class="login-link">Se connecter</a></p>
+            <h2 style="font-weight:bold;">Création du compte</h2>
+
+            {{ form_start(formregister) }}
+
+                <div class="input-box">
+                    <span class="icon"><ion-icon name="person"></ion-icon></span>
+                    {{ form_widget(formregister.firstname, {'attr': {'placeholder': 'Saisissez votre prénom'}}) }}
+                    {{ form_label(formregister.firstname) }}
+                    {{ form_errors(formregister.firstname) }}
                 </div>
 
-            {# </form> #}
+                <div class="input-box">
+                    <span class="icon"><ion-icon name="person"></ion-icon></span>
+                    {{ form_widget(formregister.lastname, {'attr': {'placeholder': 'Saisissez votre nom'}}) }}
+                    {{ form_label(formregister.lastname) }}
+                    {{ form_errors(formregister.lastname) }}
+                </div>
+
+                <div class="input-box">
+                    <span class="icon"><ion-icon name="call"></ion-icon></span>
+                    {{ form_widget(formregister.tel, {'attr': {'placeholder': '+33612345678'}}) }}
+                    {{ form_label(formregister.tel) }}
+                    {{ form_errors(formregister.tel) }}
+                </div>
+
+                <div class="input-box">
+                    <span class="icon"><ion-icon name="mail"></ion-icon></span>
+                    {{ form_widget(formregister.email, {'attr': {'placeholder': 'Saisissez votre e-mail'}}) }}
+                    {{ form_label(formregister.email) }}
+                    {{ form_errors(formregister.email) }}
+                </div>
+
+                <div class="input-box">
+                    <span class="icon"><ion-icon name="lock-closed"></ion-icon></span>
+                    {{ form_widget(formregister.password.first, {'attr': {'placeholder': 'Saisissez votre mot de passe'}}) }}
+                    {{ form_label(formregister.password.first) }}
+                    {{ form_errors(formregister.password.first) }}
+                    <span class="show-password">Afficher</span> {# Ce bouton pour le premier mot de passe #}
+                </div>
+
+                <div class="input-box">
+                    <span class="icon"><ion-icon name="lock-closed"></ion-icon></span>
+                    {{ form_widget(formregister.password.second, {'attr': {'placeholder': 'Confirmez votre mot de passe'}}) }}
+                    {{ form_label(formregister.password.second) }}
+                    {{ form_errors(formregister.password.second) }}
+                    <span class="show-password-retype">Afficher</span> {# Ce bouton pour le second mot de passe #}
+                </div>
+
+
+                {{ form_widget(formregister.submit, {'attr': {'class': 'btn'}}) }}
+
+            {{ form_end(formregister) }}
+
+            <div class="login-register">
+                <p style="font-weight:bold;">Vous avez déjà un compte ? <a href="#" class="login-link">Se connecter</a></p>
+            </div>
         </div>
+
     </div>
