@@ -3,15 +3,18 @@
 namespace App\Controller;
 
 use App\Classe\Cart;
-use App\Entity\Product;
+use App\Entity\User;
 use App\Entity\Weight;
-use App\Repository\CategoryRepository;
+use App\Entity\Product;
+use App\Form\RegisterType;
 use App\Repository\WeightRepository;
+use App\Repository\CategoryRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class CartController extends AbstractController
 {
@@ -21,10 +24,15 @@ class CartController extends AbstractController
 
     #[Route('/mon-panier', name: 'cart')]
     public function index(
+        Request $request,
+        UserPasswordHasherInterface $encoder,
         Cart $cart,
         WeightRepository $weightRepository
     ): Response {
 
+        // -------------------------------
+        // 📦 Calcul du panier
+        // -------------------------------
         $poid = 0.0;
         $quantity_product = 0;
         $totalLivraison = null;
@@ -40,18 +48,43 @@ class CartController extends AbstractController
         $weightEntity = $weightRepository->findByKgPrice($poid);
         $prix = $weightEntity ? $weightEntity->getPrice() : 0;
 
-        // Génération du tableau des poids négatifs
-        $weight_negatif = [];
-        for ($x = 0.01; $x < 1; $x += 0.01) {
-            $weight_negatif[] = $x;
+        // -------------------------------
+        // 🧍 Formulaire d’inscription
+        // -------------------------------
+        $user = new User();
+        $formregister = $this->createForm(RegisterType::class, $user);
+        $formregister->handleRequest($request);
+
+        if ($formregister->isSubmitted() && $formregister->isValid()) {
+            $user = $formregister->getData();
+
+            // Vérifie si l’email existe déjà
+            $search_email = $this->entityManager->getRepository(User::class)
+                ->findOneByEmail($user->getEmail());
+
+            if (!$search_email) {
+                $password = $encoder->hashPassword($user, $user->getPassword());
+                $user->setPassword($password);
+
+                $this->entityManager->persist($user);
+                $this->entityManager->flush();
+
+                $this->addFlash('success', "Votre compte a été créé avec succès !");
+            } else {
+                $this->addFlash('error', "L'adresse e-mail existe déjà.");
+            }
         }
 
+        // -------------------------------
+        // ⚙️ Rendu du template
+        // -------------------------------
         return $this->render('cart/index.html.twig', [
             'cart' => $cartItems,
             'poid' => $poid,
             'price' => $prix,
             'quantity_product' => $quantity_product,
             'totalLivraison' => $totalLivraison,
+            'formregister' => $formregister->createView(), // ✅ nécessaire pour ton include
         ]);
     }
 

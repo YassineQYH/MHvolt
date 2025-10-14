@@ -64,7 +64,7 @@
 .lien-panier a {
     font-size: 0.8em;
     /* diminue la taille du texte */
-    padding: 0em 1.2em;
+    padding: 0.5em 1.2em;
     /* réduit la hauteur des boutons */
     display: inline-flex;
     /* permet un alignement parfait texte + icône */
@@ -75,4 +75,8 @@
 .lien-panier {
     margin-top: 0em;
     /* espace entre le total et les boutons */
+}
+
+.lien-panier a i {
+    margin-left: 4px;
 }
