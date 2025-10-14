@@ -1,52 +1,78 @@
 /**
  * Cart
  */
- .navbar-cart-product {
+
+.navbar-cart-product {
     border-bottom: 1px solid #495057;
     padding-bottom: 0.5em;
     margin-bottom: 0.5em;
     /* font-size: 1.1rem; */
     /* background-color: yellowgreen; */
-  }
-  .navbar-cart-product-link {
+}
+
+.navbar-cart-product-link {
     color: #343a40;
     font-weight: bold;
-  }
-  
-  .navbar-cart-product-link:hover {
+}
+
+.navbar-cart-product-link:hover {
     text-decoration: none;
-  }
-  .navbar-cart-total {
+}
+
+.navbar-cart-total {
     text-align: right;
-    font-size: 1.3em;
+    font-size: 0.9em;
     padding: .5em 0;
-  }
-  
-  .nav-item {
+}
+
+.nav-item {
     text-transform: uppercase;
     font-size: .9em;
     font-weight: 300;
-  }
-  .navbar-brand {
+}
+
+.navbar-brand {
     font-weight: 700;
-  }
-  
-  .navbar-icon-link {
+}
+
+.navbar-icon-link {
     color: #343a40;
     margin: 0 .5em;
-  }
-  .navbar-icon-link:hover {
+}
+
+.navbar-icon-link:hover {
     text-decoration: none;
-  }
-  .cart-icon {
+}
+
+.cart-icon {
     height: 20px;
     padding-left: 20px;
-  }
-  
-  .titre-article-panier {
+}
+
+.titre-article-panier {
     background-color: #343a40;
     color: white;
-  }
-  .titre-article-panier p{
+}
+
+.titre-article-panier p {
     color: white;
-  }
+}
+
+
+/* Boutons du panier (voir panier / commander) */
+
+.lien-panier a {
+    font-size: 0.8em;
+    /* diminue la taille du texte */
+    padding: 0em 1.2em;
+    /* réduit la hauteur des boutons */
+    display: inline-flex;
+    /* permet un alignement parfait texte + icône */
+    align-items: center;
+    /* centre le contenu verticalement */
+}
+
+.lien-panier {
+    margin-top: 0em;
+    /* espace entre le total et les boutons */
+}
