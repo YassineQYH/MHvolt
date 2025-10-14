@@ -2,52 +2,59 @@
 
 namespace App\Controller;
 
-use App\Entity\Accessory;
 use App\Entity\Trottinette;
 use App\Entity\Illustration;
-use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-class TrottinetteController extends AbstractController
+class TrottinetteController extends BaseController
 {
-    private EntityManagerInterface $entityManager;
-
-    public function __construct(EntityManagerInterface $entityManager)
-    {
-        $this->entityManager = $entityManager;
-    }
-
     #[Route('/nos-trottinettes', name: 'nos_trottinettes')]
-    public function index(Request $request, PaginatorInterface $paginator): Response
-    {
-        // On utilise le repository pour créer une query
+    public function index(
+        Request $request,
+        PaginatorInterface $paginator,
+        UserPasswordHasherInterface $encoder
+    ): Response {
+        // -------------------------------
+        // ⚙️ Récupération et pagination
+        // -------------------------------
         $query = $this->entityManager
-                    ->getRepository(Trottinette::class)
-                    ->createQueryBuilder('t')
-                    ->getQuery();
+            ->getRepository(Trottinette::class)
+            ->createQueryBuilder('t')
+            ->getQuery();
 
-        // Paginate la query
         $pagination = $paginator->paginate(
             $query,
             $request->query->getInt('page', 1),
             9
         );
 
-        // On passe la pagination à la vue
+        // -------------------------------
+        // 🧍 Formulaire d’inscription
+        // -------------------------------
+        $formregister = $this->createRegisterForm($request, $encoder);
+
+        // -------------------------------
+        // ⚙️ Rendu du template
+        // -------------------------------
         return $this->render('trottinette/index.html.twig', [
-            'trottinettes' => $pagination
+            'trottinettes' => $pagination,
+            'formregister' => $formregister->createView(), // ✅ pour ton include
         ]);
     }
 
-
-
     #[Route('/trottinette/{slug}', name: 'trottinette_show')]
-    public function show(string $slug): Response
-    {
+    public function show(
+        string $slug,
+        Request $request,
+        UserPasswordHasherInterface $encoder
+    ): Response {
+        // -------------------------------
+        // 🛴 Récupération de la trottinette
+        // -------------------------------
         $trottinette = $this->entityManager->getRepository(Trottinette::class)
             ->findOneBy(['slug' => $slug]);
 
@@ -55,20 +62,39 @@ class TrottinetteController extends AbstractController
             throw $this->createNotFoundException('Cette trottinette n’existe pas.');
         }
 
-        $accessoires = $trottinette->getAccessories(); // relation ManyToMany
+        // -------------------------------
+        // 🔗 Relations : accessoires & illustrations
+        // -------------------------------
+        $accessoires = $trottinette->getAccessories(); // ManyToMany
+        $illustrations = $this->entityManager
+            ->getRepository(Illustration::class)
+            ->findByTrottinette($trottinette);
 
-        $illustrations = $this->entityManager->getRepository(Illustration::class)->findByTrottinette($trottinette);
+        // -------------------------------
+        // 🧍 Formulaire d’inscription
+        // -------------------------------
+        $formregister = $this->createRegisterForm($request, $encoder);
 
+        // -------------------------------
+        // ⚙️ Rendu du template
+        // -------------------------------
         return $this->render('trottinette/show.html.twig', [
             'trottinette' => $trottinette,
             'accessoires' => $accessoires,
             'illustrations' => $illustrations,
+            'formregister' => $formregister->createView(), // ✅
         ]);
     }
 
     #[Route('/trottinette/{slug}/accessoires', name: 'trottinette_accessoires')]
-    public function showAccessoires(string $slug): Response
-    {
+    public function showAccessoires(
+        string $slug,
+        Request $request,
+        UserPasswordHasherInterface $encoder
+    ): Response {
+        // -------------------------------
+        // 🛠️ Récupération de la trottinette
+        // -------------------------------
         $trottinette = $this->entityManager->getRepository(Trottinette::class)
             ->findOneBy(['slug' => $slug]);
 
@@ -76,16 +102,26 @@ class TrottinetteController extends AbstractController
             throw $this->createNotFoundException('Cette trottinette n’existe pas.');
         }
 
-        // Récupère tous les objets Accessory liés à cette trottinette
+        // -------------------------------
+        // 🎒 Récupération des accessoires liés
+        // -------------------------------
         $accessoires = [];
         foreach ($trottinette->getTrottinetteAccessories() as $ta) {
             $accessoires[] = $ta->getAccessory();
         }
 
+        // -------------------------------
+        // 🧍 Formulaire d’inscription
+        // -------------------------------
+        $formregister = $this->createRegisterForm($request, $encoder);
+
+        // -------------------------------
+        // ⚙️ Rendu du template
+        // -------------------------------
         return $this->render('trottinette/show-all-access.html.twig', [
             'trottinette' => $trottinette,
-            'accessoires' => $accessoires
+            'accessoires' => $accessoires,
+            'formregister' => $formregister->createView(), // ✅
         ]);
     }
-
 }

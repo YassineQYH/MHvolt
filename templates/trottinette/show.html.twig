@@ -3,29 +3,14 @@
 {% block title %} {{ trottinette.name }} {% endblock %}
 
 {% block stylesheets %}
-    {# Icone réseaux Sociaux #}
-    <link rel="stylesheet" href="https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css" />
-    {# fas fa-xxx #}
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" />
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PV1GOfQNHSoD2xbE+QkPxCAF1NEevoEH3S10sibvcOQVnN" crossorigin="anonymous">
-    <!-- Home-section -->
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
-    <!-- Glidejs | Show product slider-->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Glide.js/3.4.1/css/glide.core.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Glide.js/3.4.1/css/glide.theme.css" />
+    {{ parent() }} {# inclut tous les CSS de base #}
 
-    <!-- CSS PERSONNALISEES -->
-    <link rel="stylesheet" href="{{ asset('assets/css/nav.css') }}">
+    {# Ajout CSS spécifiques à cette page #}
     <link rel="stylesheet" href="{{ asset('assets/css/show-product-slider.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/footer.css') }}">
-
     <link rel="stylesheet" href="{{ asset('assets/css/slide-img-product-show.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/slide-img-product-show-swiper.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/images-d-un-produit.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/lightslider.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/styles.css') }}">
+    ...
 {% endblock %}
+
 
 {% block content %}
 <br><br><br><br><br><br><br><br>

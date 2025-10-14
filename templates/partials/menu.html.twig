@@ -28,7 +28,7 @@
             <ul class="sous-menu-trottinettes">
                 {% for trottinette in trottinettes_menu %}
                     <li class="trottinette-pair">
-                        <a href="{{ path('trottinette_show', {'slug': trottinette.nameShort}) }}">
+                        <a href="{{ path('trottinette_show', {'slug': trottinette.slug}) }}">
                             {{ trottinette.nameShort }}
                         </a>
                         <span class="separator">|</span>

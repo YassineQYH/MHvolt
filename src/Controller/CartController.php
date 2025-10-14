@@ -16,12 +16,8 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-class CartController extends AbstractController
+class CartController extends BaseController
 {
-    public function __construct(private EntityManagerInterface $entityManager)
-    {
-    }
-
     #[Route('/mon-panier', name: 'cart')]
     public function index(
         Request $request,
@@ -51,29 +47,7 @@ class CartController extends AbstractController
         // -------------------------------
         // 🧍 Formulaire d’inscription
         // -------------------------------
-        $user = new User();
-        $formregister = $this->createForm(RegisterType::class, $user);
-        $formregister->handleRequest($request);
-
-        if ($formregister->isSubmitted() && $formregister->isValid()) {
-            $user = $formregister->getData();
-
-            // Vérifie si l’email existe déjà
-            $search_email = $this->entityManager->getRepository(User::class)
-                ->findOneByEmail($user->getEmail());
-
-            if (!$search_email) {
-                $password = $encoder->hashPassword($user, $user->getPassword());
-                $user->setPassword($password);
-
-                $this->entityManager->persist($user);
-                $this->entityManager->flush();
-
-                $this->addFlash('success', "Votre compte a été créé avec succès !");
-            } else {
-                $this->addFlash('error', "L'adresse e-mail existe déjà.");
-            }
-        }
+        $formregister = $this->createRegisterForm($request, $encoder);
 
         // -------------------------------
         // ⚙️ Rendu du template
