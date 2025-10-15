@@ -30,22 +30,18 @@
                   <p>{{ trottinette.descriptionShort ?? 'Aucune description courte disponible.' }}</p>
 
                   {# ===== LOGIQUE PANIER ===== #}
-                  {% set trottinette_id = trottinette.id %}
-
+                  {% set product_id = trottinette.id %}
                   {% if trottinette.stock < 1 %}
                       <a class="buy-btn">Bientôt de retour</a>
-
-                  {% elseif cart['data'] is empty or trottinette_id not in (cart['data']|keys) %}
-                      <a href="{{ path('add_to_cart', {'id': trottinette_id}) }}" class="buy-btn">Ajouter</a>
-
-                  {% elseif cart['data'][trottinette_id] < trottinette.stock %}
-                      <a class="buy-btn">Quantité : {{ cart['data'][trottinette_id] }}</a><br>
-                      <a href="{{ path('decrease_to_cart', {'id': trottinette_id}) }}" class="buy-btn">Diminué</a><br>
-                      <a href="{{ path('add_to_cart', {'id': trottinette_id}) }}" class="buy-btn">Ajouter</a>
-
+                  {% elseif cart.data is empty or trottinette.id not in (cart.data|keys) %}
+                      <a href="{{ path('add_to_cart', {'id': product_id}) }}" class="buy-btn">Ajouter</a>
+                  {% elseif cart.get('data')[product_id] < trottinette.stock %}
+                      <a class="buy-btn">Quantité : {{ cart.get('data')[product_id] }}</a><br>
+                      <a href="{{ path('decrease_to_cart', {'id': product_id}) }}" class="buy-btn">Diminué</a><br>
+                      <a href="{{ path('add_to_cart', {'id': product_id}) }}" class="buy-btn">Ajouter</a>
                   {% else %}
-                      <a class="buy-btn">Quantité : {{ cart['data'][trottinette_id] }}</a><br>
-                      <a href="{{ path('decrease_to_cart', {'id': trottinette_id}) }}" class="buy-btn">Diminué</a><br>
+                      <a class="buy-btn">Quantité : {{ cart.get('data')[product_id] }}</a><br>
+                      <a href="{{ path('decrease_to_cart', {'id': product_id}) }}" class="buy-btn">Diminué</a><br>
                       <a class="buy-btn" style="color:red;">Max (rupture)</a>
                   {% endif %}
                   {# ===== FIN LOGIQUE PANIER ===== #}
@@ -87,6 +83,7 @@
                         <a class="buy-btn" style="color:red;">Max (rupture)</a>
                     {% endif %}
                     {# ===== FIN LOGIQUE PANIER ===== #}
+
 
                   </div>
                 </div>
