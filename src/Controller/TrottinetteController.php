@@ -42,7 +42,7 @@ class TrottinetteController extends BaseController
         // -------------------------------
         return $this->render('trottinette/index.html.twig', [
             'trottinettes' => $pagination,
-            'formregister' => $formregister->createView(), // ✅ pour ton include
+            'formregister' => $formregister->createView(),
         ]);
     }
 
@@ -63,12 +63,15 @@ class TrottinetteController extends BaseController
         }
 
         // -------------------------------
-        // 🔗 Relations : accessoires & illustrations
+        // 🔗 Relations : accessoires, illustrations, caractéristiques, sections
         // -------------------------------
-        $accessoires = $trottinette->getAccessories(); // ManyToMany
+        $accessoires = $trottinette->getAccessories();
         $illustrations = $this->entityManager
             ->getRepository(Illustration::class)
             ->findByTrottinette($trottinette);
+
+        $caracteristiques = $trottinette->getTrottinetteCaracteristiques();
+        $sections = $trottinette->getDescriptionSections();
 
         // -------------------------------
         // 🧍 Formulaire d’inscription
@@ -82,7 +85,9 @@ class TrottinetteController extends BaseController
             'trottinette' => $trottinette,
             'accessoires' => $accessoires,
             'illustrations' => $illustrations,
-            'formregister' => $formregister->createView(), // ✅
+            'caracteristiques' => $caracteristiques,
+            'sections' => $sections,
+            'formregister' => $formregister->createView(),
         ]);
     }
 
@@ -121,7 +126,7 @@ class TrottinetteController extends BaseController
         return $this->render('trottinette/show-all-access.html.twig', [
             'trottinette' => $trottinette,
             'accessoires' => $accessoires,
-            'formregister' => $formregister->createView(), // ✅
+            'formregister' => $formregister->createView(),
         ]);
     }
 }

@@ -1,24 +1,27 @@
+/* Reset & global */
+
 *,
 *::before,
 *::after {
-  margin: 0;
-  padding: 0;
-  box-sizing: inherit;
+    margin: 0;
+    padding: 0;
+    box-sizing: inherit;
 }
 
 html {
-  scroll-behavior: smooth;
-  box-sizing: border-box;
-  font-size: 62.5%;
+    scroll-behavior: smooth;
+    box-sizing: border-box;
+    font-size: 62.5%;
 }
 
 body {
-  font-family: "Poppins", sans-serif;
-  font-size: 1.6rem;
-  font-weight: 400;
-  background-color: #fff;
-  color: #222;
+    font-family: "Poppins", sans-serif;
+    font-size: 1.6rem;
+    font-weight: 400;
+    background-color: #fff;
+    color: #222;
 }
+
 nav ul li a {
     font-size: 1.4rem;
 }
@@ -56,11 +59,24 @@ img {
 }
 
 
+/* Slider correction */
+
+.cart__slide {
+    margin-top: 130px;
+    /* hauteur approximative du menu */
+    margin-bottom: 30px;
+    /* espace avec la section suivante */
+    padding-bottom: 5rem;
+}
+
+
 /* About Section */
 
 .section-pergo-list {
     padding: 8rem 0 7rem 0;
     overflow-x: hidden;
+    /* padding-top: 10rem; */
+    /* augmente l'espace entre le slider et cette section */
 }
 
 .about {
@@ -123,6 +139,7 @@ img {
         height: 280px;
     }
 }
+
 @media only screen and (max-width: 930px) {
     .about {
         grid-template-columns: 1fr;
@@ -134,6 +151,7 @@ img {
         margin-left: 70px;
     }
 }
+
 @media only screen and (max-width: 825px) {
     .about {
         grid-template-columns: 1fr;
@@ -145,6 +163,7 @@ img {
         margin-left: 15px;
     }
 }
+
 @media only screen and (max-width: 770px) {
     .about {
         grid-template-columns: 1fr;
@@ -156,6 +175,7 @@ img {
         margin-left: 0;
     }
 }
+
 @media only screen and (max-width: 752px) {
     .about {
         grid-template-columns: 1fr;
@@ -167,6 +187,7 @@ img {
         margin-left: 20px;
     }
 }
+
 @media only screen and (max-width: 649px) {
     .about {
         grid-template-columns: 1fr;
@@ -178,6 +199,7 @@ img {
         margin-left: 20px;
     }
 }
+
 @media only screen and (max-width: 553px) {
     .about {
         grid-template-columns: 1fr;
@@ -189,6 +211,7 @@ img {
         margin-left: 20px;
     }
 }
+
 @media only screen and (max-width: 455px) {
     .about {
         grid-template-columns: 1fr;
@@ -200,6 +223,7 @@ img {
         margin-left: 20px;
     }
 }
+
 @media only screen and (max-width: 405px) {
     .about {
         grid-template-columns: 1fr;
@@ -211,6 +235,7 @@ img {
         margin-left: 10px;
     }
 }
+
 @media only screen and (max-width: 342px) {
     .about {
         grid-template-columns: 1fr;
@@ -222,6 +247,7 @@ img {
         margin-left: 10px;
     }
 }
+
 @media only screen and (max-width: 290px) {
     .about {
         grid-template-columns: 1fr;
@@ -233,13 +259,11 @@ img {
         margin-left: 0;
     }
 }
+
 @media only screen and (max-width: 768px) {
     .about {
         grid-template-columns: 1fr;
         gap: 3rem;
-    }
-    .about p:last-child {
-        /* display: none; */
     }
     .about .left {
         width: 80%;
@@ -264,7 +288,7 @@ img {
 }
 
 
-/* Section Liste Pergola*/
+/* Section Liste Pergola */
 
 .container-pergo-list {
     max-width: 180rem;
@@ -287,7 +311,6 @@ img {
 }
 
 .pergo-list-box img {
-    /* height: 30rem; */
     object-fit: cover;
     max-width: 400px;
     max-height: 300px;
@@ -297,9 +320,6 @@ img {
     padding: 1.6rem 0;
     font-size: 1.8rem;
 }
-
-
-
 
 .icons {
     position: absolute;
@@ -321,6 +341,7 @@ img {
 .icons a:hover {
     color: gold;
 }
+
 @media only screen and (max-width: 1390px) {
     .pergo-list-center {
         grid-template-columns: repeat(2, 1fr);
@@ -334,7 +355,6 @@ img {
     .pergo-list-box {
         max-width: 35rem;
         padding: 1.6rem;
-
     }
     .pergo-list-box img {
         max-width: 300px;
@@ -349,7 +369,6 @@ img {
     .pergo-list-box {
         max-width: 65rem;
         padding: 1.6rem;
-
     }
     .pergo-list-box img {
         max-width: 700px;
@@ -365,11 +384,6 @@ img {
     .container-home img {
         padding: 1rem 0;
     }
-
-    /* .pergo-list-box img {
-        max-width: 300px;
-        max-height: 200px;
-    } */
 }
 
 @media only screen and (max-width: 567px) {
@@ -385,13 +399,13 @@ img {
     .pergo-list-box {
         max-width: 45rem;
         padding: 1.6rem;
-
     }
     .pergo-list-box img {
         max-width: 400px;
         max-height: 300px;
     }
 }
+
 @media only screen and (max-width: 415px) {
     .container-home img {
         padding: 2rem 0;
@@ -399,27 +413,13 @@ img {
     .pergo-list-box {
         max-width: 35rem;
         padding: 1.6rem;
-
     }
     .pergo-list-box img {
         max-width: 300px;
         max-height: 200px;
     }
 }
-@media only screen and (max-width: 394px) {
-    .container-home img {
-        padding: 2rem 0;
-    }
-    .pergo-list-box {
-        max-width: 35rem;
-        padding: 1.6rem;
 
-    }
-    .pergo-list-box img {
-        max-width: 300px;
-        max-height: 200px;
-    }
-}
 @media only screen and (max-width: 360px) {
     .container-home img {
         padding: 2rem 0;
@@ -427,13 +427,13 @@ img {
     .pergo-list-box {
         max-width: 35rem;
         padding: 1.6rem;
-
     }
     .pergo-list-box img {
         max-width: 280px;
         max-height: 200px;
     }
 }
+
 @media only screen and (max-width: 321px) {
     .container-home img {
         padding: 2rem 0;
@@ -441,13 +441,13 @@ img {
     .pergo-list-box {
         max-width: 30rem;
         padding: 1.6rem;
-
     }
     .pergo-list-box img {
         max-width: 240px;
         max-height: 170px;
     }
 }
+
 @media only screen and (max-width: 281px) {
     .container-home img {
         padding: 2rem 0;
@@ -455,10 +455,50 @@ img {
     .pergo-list-box {
         max-width: 25rem;
         padding: 1.6rem;
-
     }
     .pergo-list-box img {
         max-width: 200px;
         max-height: 150px;
     }
+}
+
+
+/* Trottinette Section */
+
+.trottinette-caracteristiques {
+    margin-top: 60px;
+}
+
+.trottinette-caracteristiques h2,
+.trottinette-descriptions h2 {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.caracteristique-categorie {
+    margin-bottom: 30px;
+}
+
+.caracteristiques-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.caracteristiques-table td {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.carac-name {
+    font-weight: bold;
+    width: 50%;
+}
+
+.description-section {
+    margin-bottom: 40px;
+}
+
+.description-section h3 {
+    color: var(--black);
+    margin-bottom: 10px;
 }
