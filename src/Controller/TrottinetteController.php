@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Classe\Cart;
 use App\Entity\Trottinette;
 use App\Entity\Illustration;
 use Knp\Component\Pager\PaginatorInterface;
@@ -52,7 +53,7 @@ class TrottinetteController extends BaseController
         string $slug,
         Request $request,
         UserPasswordHasherInterface $encoder,
-        SessionInterface $session
+        Cart $cartService // 🛒 On injecte ton service Cart ici
     ): Response {
         // -------------------------------
         // 🛴 Récupération de la trottinette
@@ -65,7 +66,7 @@ class TrottinetteController extends BaseController
         }
 
         // -------------------------------
-        // 🔗 Relations : accessoires, illustrations, caractéristiques, sections
+        // 🔗 Relations
         // -------------------------------
         $accessoires = $trottinette->getAccessories();
         $illustrations = $this->entityManager
@@ -81,12 +82,9 @@ class TrottinetteController extends BaseController
         $formregister = $this->createRegisterForm($request, $encoder);
 
         // -------------------------------
-        // 🛒 Panier
+        // 🛒 Panier via le service
         // -------------------------------
-        $cart = $session->get('cart', []);
-        if (!isset($cart['data'])) {
-            $cart['data'] = [];
-        }
+        $cart = $cartService->get(); // ou $cartService->getFull() si tu veux les objets complets
 
         // -------------------------------
         // ⚙️ Rendu du template
@@ -98,9 +96,10 @@ class TrottinetteController extends BaseController
             'caracteristiques' => $caracteristiques,
             'sections' => $sections,
             'formregister' => $formregister->createView(),
-            'cart' => $cart, // <-- ajout du panier
+            'cart' => $cartService, // 💡 ici, on passe le service entier à Twig
         ]);
     }
+
 
 
     #[Route('/trottinette/{slug}/accessoires', name: 'trottinette_accessoires')]
