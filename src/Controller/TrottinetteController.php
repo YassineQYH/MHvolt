@@ -8,6 +8,7 @@ use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class TrottinetteController extends BaseController
@@ -50,7 +51,8 @@ class TrottinetteController extends BaseController
     public function show(
         string $slug,
         Request $request,
-        UserPasswordHasherInterface $encoder
+        UserPasswordHasherInterface $encoder,
+        SessionInterface $session
     ): Response {
         // -------------------------------
         // 🛴 Récupération de la trottinette
@@ -79,6 +81,14 @@ class TrottinetteController extends BaseController
         $formregister = $this->createRegisterForm($request, $encoder);
 
         // -------------------------------
+        // 🛒 Panier
+        // -------------------------------
+        $cart = $session->get('cart', []);
+        if (!isset($cart['data'])) {
+            $cart['data'] = [];
+        }
+
+        // -------------------------------
         // ⚙️ Rendu du template
         // -------------------------------
         return $this->render('trottinette/show.html.twig', [
@@ -88,8 +98,10 @@ class TrottinetteController extends BaseController
             'caracteristiques' => $caracteristiques,
             'sections' => $sections,
             'formregister' => $formregister->createView(),
+            'cart' => $cart, // <-- ajout du panier
         ]);
     }
+
 
     #[Route('/trottinette/{slug}/accessoires', name: 'trottinette_accessoires')]
     public function showAccessoires(

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : mer. 15 oct. 2025 à 11:16
+-- Généré le : mer. 15 oct. 2025 à 11:49
 -- Version du serveur : 10.4.32-MariaDB
 -- Version de PHP : 8.2.12
 
@@ -144,7 +144,9 @@ INSERT INTO `doctrine_migration_versions` (`version`, `executed_at`, `execution_
 ('DoctrineMigrations\\Version20250924130421', '2025-09-25 10:42:28', 295),
 ('DoctrineMigrations\\Version20250924145650', '2025-09-25 10:42:29', 41),
 ('DoctrineMigrations\\Version20250929114244', '2025-09-30 12:51:40', 76),
-('DoctrineMigrations\\Version20251013140153', '2025-10-13 16:01:56', 745);
+('DoctrineMigrations\\Version20251013140153', '2025-10-13 16:01:56', 745),
+('DoctrineMigrations\\Version20251015092742', '2025-10-15 11:27:49', 187),
+('DoctrineMigrations\\Version20251015094753', '2025-10-15 11:48:00', 76);
 
 -- --------------------------------------------------------
 
@@ -239,17 +241,20 @@ CREATE TABLE `trottinette` (
   `is_best` tinyint(1) NOT NULL,
   `is_header` tinyint(1) NOT NULL,
   `header_image` varchar(255) DEFAULT NULL,
-  `header_btn_title` varchar(255) DEFAULT NULL
+  `header_btn_title` varchar(255) DEFAULT NULL,
+  `weight_id` int(11) DEFAULT NULL,
+  `stock` int(11) NOT NULL,
+  `price` double NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `trottinette`
 --
 
-INSERT INTO `trottinette` (`id`, `name`, `name_short`, `slug`, `description`, `description_short`, `image`, `is_best`, `is_header`, `header_image`, `header_btn_title`) VALUES
-(1, 'Trottinette électrique honey whale m5 max avec siège', 'Honey Whale M5 Max', 'Trottinette-électrique-honey-whale-m5-max-avec-siège', '【Performance puissante】...', 'Moteur 1000 W, pneus 14 pouces, autonomie 40 km', 'trottbleue-01.png', 1, 1, 'foot-soccer.jpg', 'test'),
-(2, 'KUGOO Kukirin C1 Pro', 'KUGOO C1 Pro', 'KUGOO-Kukirin-C1-Pro', 'Aperçu du produit : Vitesse maximale 45 km/h Charge max. 120 kg Autonomie 100 km Puissance continue 500 W Siège', 'Vitesse 45 km/h, autonomie 100 km, charge max 120 kg', 'trottjaune-01.jpg', 1, 0, 'foot-hiver.jpg', 'test'),
-(3, 'Bogist M5 Pro', 'Bogist M5 Pro', 'Bogist-M5-Pro', 'Moteur puissant de 500 W pour des vitesses élevées...', 'Moteur 500 W, pneus 12 pouces, autonomie 35 km', 'trottvert-01.jpg', 1, 1, 'foot-ete.jpg', 'test');
+INSERT INTO `trottinette` (`id`, `name`, `name_short`, `slug`, `description`, `description_short`, `image`, `is_best`, `is_header`, `header_image`, `header_btn_title`, `weight_id`, `stock`, `price`) VALUES
+(1, 'Trottinette électrique honey whale m5 max avec siège', 'Honey Whale M5 Max', 'Trottinette-électrique-honey-whale-m5-max-avec-siège', '【Performance puissante】...', 'Moteur 1000 W, pneus 14 pouces, autonomie 40 km', 'trottbleue-01.png', 1, 1, 'foot-soccer.jpg', 'test', 25, 5, 599),
+(2, 'KUGOO Kukirin C1 Pro', 'KUGOO C1 Pro', 'KUGOO-Kukirin-C1-Pro', 'Aperçu du produit : Vitesse maximale 45 km/h Charge max. 120 kg Autonomie 100 km Puissance continue 500 W Siège', 'Vitesse 45 km/h, autonomie 100 km, charge max 120 kg', 'trottjaune-01.jpg', 1, 0, 'foot-hiver.jpg', 'test', 22, 0, 1299),
+(3, 'Bogist M5 Pro', 'Bogist M5 Pro', 'Bogist-M5-Pro', 'Moteur puissant de 500 W pour des vitesses élevées...', 'Moteur 500 W, pneus 12 pouces, autonomie 35 km', 'trottvert-01.jpg', 1, 1, 'foot-ete.jpg', 'test', 28, 7, 750);
 
 -- --------------------------------------------------------
 
@@ -383,6 +388,58 @@ INSERT INTO `user` (`id`, `email`, `roles`, `password`, `first_name`, `last_name
 (1, 'admin@admin.fr', '[\"ROLE_ADMIN\",\"ROLE_USER\"]', 'Admin', 'Admin', 'Admin', '06 04 05 02 09'),
 (2, 'user@user.fr', '[]', 'User', 'User', 'User', '06 01 01 01 02');
 
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `weight`
+--
+
+CREATE TABLE `weight` (
+  `id` int(11) NOT NULL,
+  `kg` double NOT NULL,
+  `price` double NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Déchargement des données de la table `weight`
+--
+
+INSERT INTO `weight` (`id`, `kg`, `price`) VALUES
+(1, 0.25, 5.96),
+(2, 0.5, 6.71),
+(3, 0.75, 7.5),
+(4, 1, 8.14),
+(5, 2, 9.13),
+(7, 3, 10.01),
+(8, 4, 10.92),
+(9, 5, 11.8),
+(10, 6, 12.35),
+(18, 7, 13.21),
+(19, 8, 14.07),
+(20, 9, 14.96),
+(21, 10, 15.83),
+(22, 11, 16.38),
+(23, 12, 17.23),
+(24, 13, 18.08),
+(25, 14, 18.95),
+(26, 15, 19.8),
+(27, 16, 20.65),
+(28, 17, 21.5),
+(29, 18, 22.35),
+(30, 19, 23.22),
+(31, 20, 24.06),
+(32, 21, 24.68),
+(33, 22, 25.52),
+(34, 23, 26.37),
+(35, 24, 27.22),
+(36, 25, 28.05),
+(37, 26, 28.91),
+(38, 27, 29.75),
+(39, 28, 30.6),
+(40, 29, 31.46),
+(41, 30, 32.28),
+(46, 0.1, 2.65);
+
 --
 -- Index pour les tables déchargées
 --
@@ -445,7 +502,8 @@ ALTER TABLE `messenger_messages`
 -- Index pour la table `trottinette`
 --
 ALTER TABLE `trottinette`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `IDX_44559939350035DC` (`weight_id`);
 
 --
 -- Index pour la table `trottinette_accessory`
@@ -477,6 +535,12 @@ ALTER TABLE `trottinette_description_section`
 ALTER TABLE `user`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `UNIQ_IDENTIFIER_EMAIL` (`email`);
+
+--
+-- Index pour la table `weight`
+--
+ALTER TABLE `weight`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- AUTO_INCREMENT pour les tables déchargées
@@ -555,6 +619,12 @@ ALTER TABLE `user`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
+-- AUTO_INCREMENT pour la table `weight`
+--
+ALTER TABLE `weight`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
+
+--
 -- Contraintes pour les tables déchargées
 --
 
@@ -575,6 +645,12 @@ ALTER TABLE `illustration`
 --
 ALTER TABLE `illustrationaccess`
   ADD CONSTRAINT `FK_EA75D19D27E8CC78` FOREIGN KEY (`accessory_id`) REFERENCES `accessory` (`id`);
+
+--
+-- Contraintes pour la table `trottinette`
+--
+ALTER TABLE `trottinette`
+  ADD CONSTRAINT `FK_44559939350035DC` FOREIGN KEY (`weight_id`) REFERENCES `weight` (`id`);
 
 --
 -- Contraintes pour la table `trottinette_accessory`

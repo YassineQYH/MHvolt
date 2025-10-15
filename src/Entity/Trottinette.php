@@ -10,6 +10,7 @@ use App\Entity\TrottinetteCaracteristique;
 use App\Entity\TrottinetteDescriptionSection;
 use App\Entity\TrottinetteAccessory;
 use App\Entity\Illustration;
+use App\Entity\Weight;
 
 #[ORM\Entity(repositoryClass: TrottinetteRepository::class)]
 class Trottinette
@@ -47,6 +48,15 @@ class Trottinette
     #[ORM\Column(type:"string", length:255, nullable:true)]
     private ?string $headerBtnTitle = null;
 
+    #[ORM\Column(type:"integer")]
+    private ?int $stock = 0;
+
+    #[ORM\Column(type:"float")]
+    private ?float $price = null;
+
+    #[ORM\ManyToOne(targetEntity: Weight::class, inversedBy: "trottinettes")]
+    private ?Weight $weight = null;
+
     // ------------------- Relations -------------------
 
     #[ORM\OneToMany(mappedBy: "trottinette", targetEntity: Illustration::class, cascade: ["persist", "remove"])]
@@ -77,6 +87,7 @@ class Trottinette
     // ------------------- GETTERS & SETTERS -------------------
 
     public function getId(): ?int { return $this->id; }
+
     public function getName(): ?string { return $this->name; }
     public function setName(string $name): self { $this->name = $name; return $this; }
 
@@ -106,6 +117,15 @@ class Trottinette
 
     public function getHeaderBtnTitle(): ?string { return $this->headerBtnTitle; }
     public function setHeaderBtnTitle(?string $headerBtnTitle): self { $this->headerBtnTitle = $headerBtnTitle; return $this; }
+
+    public function getStock(): ?int { return $this->stock; }
+    public function setStock(int $stock): self { $this->stock = $stock; return $this; }
+
+    public function getPrice(): ?float { return $this->price; }
+    public function setPrice(float $price): self { $this->price = $price; return $this; }
+
+    public function getWeight(): ?Weight { return $this->weight; }
+    public function setWeight(?Weight $weight): self { $this->weight = $weight; return $this; }
 
     // ------------------- Illustrations -------------------
     /** @return Collection<int, Illustration> */
@@ -160,7 +180,6 @@ class Trottinette
         return $this;
     }
 
-    /** Alias pour Twig : permet d'accéder aux accessoires via "trottinette.accessories" */
     public function getAccessories(): Collection { return $this->getTrottinetteAccessories(); }
 
     // ------------------- DescriptionSections -------------------
