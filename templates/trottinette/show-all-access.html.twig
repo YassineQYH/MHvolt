@@ -3,10 +3,22 @@
 {% block title %}Accessoires pour {{ trottinette.name }}{% endblock %}
 
 {% block stylesheets %}
+    {# On reprend uniquement les CSS essentiels, sans les carrousels ni les sections #}
+
+    {# Librairies de base #}
+    <link rel="stylesheet" href="https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" crossorigin="anonymous">
+    <link rel="stylesheet" href="{{ asset('assets/css/bootstrap.min.css') }}">
+
+    {# CSS de ton projet nécessaires au panier et au login #}
+    <link rel="stylesheet" href="{{ asset('assets/css/cart.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/nav.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/products.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/lightslider.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/login-register.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/footer.css') }}">
+
+    {# CSS spécifiques à cette page #}
+    <link rel="stylesheet" href="{{ asset('assets/css/products.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -20,7 +32,7 @@
             {% if accessoires is not empty %}
                 {% for item in accessoires %}
                     <div class="pergo-list-box" data-aos="fade" data-aos-duration="2000">
-                        <a href="{{ path('accessoire', { 'slug' : item.slug }) }}">
+                        <a href="{{ path('accessory_show', { 'slug' : item.slug }) }}">
                             <img src="/uploads/{{ item.image }}" alt="{{ item.name }}">
                         </a>
                         <p>{{ item.name }}</p>
