@@ -67,6 +67,12 @@ class Accessory
         return $this->name ?? '';
     }
 
+    public function getImagePath(): string
+    {
+        return '/uploads/accessoires/' . $this->image;
+    }
+
+
     // ------------------- GETTERS & SETTERS -------------------
     public function getId(): ?int { return $this->id; }
 

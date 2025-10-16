@@ -84,6 +84,12 @@ class Trottinette
         return $this->name ?? '';
     }
 
+    public function getImagePath(): string
+    {
+        return '/uploads/trottinettes/' . $this->image;
+    }
+
+
     // ------------------- GETTERS & SETTERS -------------------
 
     public function getId(): ?int { return $this->id; }
