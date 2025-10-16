@@ -36,6 +36,13 @@
     </head>
 
     <body>
+        {# Login overlay #}
+        <login>
+            {% block login %}
+                {{ include('partials/login-register.html.twig') }}
+            {% endblock %}
+        </login>
+
         <header>
             {% block menu %}
                 {{ include('partials/menu.html.twig') }}
@@ -57,13 +64,6 @@
         <div class="copyrightText">
             <p>Copyright © 2021 Yassine Qayouh. All Rights Reserved.</p>
         </div>
-
-        {# ✅ Popup login/register déplacée ici (plus logique et sans interférer avec le header) #}
-        <login>
-            {% block login %}
-                {{ include('partials/login-register.html.twig') }}
-            {% endblock %}
-        </login>
 
         {% block javascripts %}
             {# jQuery #}
@@ -89,7 +89,6 @@
             {# Mini-panier toggle #}
             <script>
                 $(document).ready(function(){
-
                     // Gestion du mini-panier
                     $('#cart-toggle').click(function(e){
                         e.preventDefault(); // empêche la redirection
@@ -124,9 +123,6 @@
                         passwordField.attr('type', type);
                         $(this).text(type === 'text' ? 'cacher' : 'afficher');
                     });
-
-                    // 💬 Petit log de test pour vérifier que le JS de base fonctionne
-                    console.log("✅ base.html.twig : scripts chargés correctement");
                 });
             </script>
         {% endblock %}
