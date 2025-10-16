@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Entity\Trottinette;
+use App\Entity\Accessory;
 
 #[ORM\Entity(repositoryClass: WeightRepository::class)]
 class Weight
@@ -23,9 +24,14 @@ class Weight
     #[ORM\OneToMany(mappedBy: "weight", targetEntity: Trottinette::class)]
     private Collection $trottinettes;
 
+    // 🔗 Ajout de la relation avec Accessory
+    #[ORM\OneToMany(mappedBy: "weight", targetEntity: Accessory::class)]
+    private Collection $accessories;
+
     public function __construct()
     {
         $this->trottinettes = new ArrayCollection();
+        $this->accessories = new ArrayCollection();
     }
 
     public function __toString(): string
@@ -57,6 +63,28 @@ class Weight
         if ($this->trottinettes->removeElement($trottinette)) {
             if ($trottinette->getWeight() === $this) {
                 $trottinette->setWeight(null);
+            }
+        }
+        return $this;
+    }
+
+    /** @return Collection<int, Accessory> */
+    public function getAccessories(): Collection { return $this->accessories; }
+
+    public function addAccessory(Accessory $accessory): self
+    {
+        if (!$this->accessories->contains($accessory)) {
+            $this->accessories[] = $accessory;
+            $accessory->setWeight($this);
+        }
+        return $this;
+    }
+
+    public function removeAccessory(Accessory $accessory): self
+    {
+        if ($this->accessories->removeElement($accessory)) {
+            if ($accessory->getWeight() === $this) {
+                $accessory->setWeight(null);
             }
         }
         return $this;

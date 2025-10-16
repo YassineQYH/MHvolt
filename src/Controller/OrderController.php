@@ -76,11 +76,9 @@ class OrderController extends AbstractController
         $form->handleRequest($request);
 
         $cartItems = $cart->getFull();
-        $totalWeight = 0.0;
 
-        foreach ($cartItems as $element) {
-            $totalWeight += $element['product']->getWeight()->getKg() * $element['quantity'];
-        }
+        // ------------------- Poids total du panier -------------------
+        $totalWeight = $cart->getTotalWeight();
 
         // 💰 Récupération du tarif selon le poids total
         $tarif = $weightRepo->findByKgPrice($totalWeight);

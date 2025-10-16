@@ -36,7 +36,9 @@ class CartController extends BaseController
         $cartItems = $cart->getFull();
 
         foreach ($cartItems as $element) {
-            $poidAndQuantity = $element['product']->getWeight()->getKg() * $element['quantity'];
+            $weightObj = $element['product']->getWeight();
+            $kg = $weightObj ? $weightObj->getKg() : 0;
+            $poidAndQuantity = $kg * $element['quantity'];
             $quantity_product += $element['quantity'];
             $poid += $poidAndQuantity;
         }
@@ -74,10 +76,10 @@ class CartController extends BaseController
         return $priceList;
     }
 
-    #[Route('/cart/add/{id}', name: 'add_to_cart', methods: ['GET', 'POST'])]
-    public function add(Cart $cart, int $id, Request $request): Response
+    #[Route('/cart/add/{id}/{type}', name: 'add_to_cart', defaults: ['type' => 'trottinette'], methods: ['GET', 'POST'])]
+    public function add(Cart $cart, int $id, string $type, Request $request): Response
     {
-        $cart->add($id);
+        $cart->add($id, $type);
 
         return $this->redirect($request->headers->get('referer'));
     }
@@ -90,26 +92,26 @@ class CartController extends BaseController
         return $this->redirectToRoute('products');
     }
 
-    #[Route('/cart/delete/{id}', name: 'delete_to_cart')]
-    public function delete(Cart $cart, int $id, Request $request): Response
+    #[Route('/cart/delete/{id}/{type}', name: 'delete_to_cart', defaults: ['type' => 'trottinette'])]
+    public function delete(Cart $cart, int $id, string $type, Request $request): Response
     {
-        $cart->delete($id);
+        $cart->delete($id, $type);
 
         return $this->redirect($request->headers->get('referer'));
     }
 
-    #[Route('/cart/decrease/{id}', name: 'decrease_to_cart')]
-    public function decrease(Cart $cart, int $id, Request $request): Response
+    #[Route('/cart/decrease/{id}/{type}', name: 'decrease_to_cart', defaults: ['type' => 'trottinette'])]
+    public function decrease(Cart $cart, int $id, string $type, Request $request): Response
     {
-        $cart->decrease($id);
+        $cart->decrease($id, $type);
 
         return $this->redirect($request->headers->get('referer'));
     }
 
-    #[Route('/cart/increase/{id}', name: 'increase_to_cart')]
-    public function increase(Cart $cart, int $id, Request $request): Response
+    #[Route('/cart/increase/{id}/{type}', name: 'increase_to_cart', defaults: ['type' => 'trottinette'])]
+    public function increase(Cart $cart, int $id, string $type, Request $request): Response
     {
-        $cart->add($id);
+        $cart->add($id, $type);
 
         return $this->redirect($request->headers->get('referer'));
     }

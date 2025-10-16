@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : mer. 15 oct. 2025 à 11:49
+-- Généré le : jeu. 16 oct. 2025 à 14:21
 -- Version du serveur : 10.4.32-MariaDB
 -- Version de PHP : 8.2.12
 
@@ -29,9 +29,13 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `accessory` (
   `id` int(11) NOT NULL,
+  `weight_id` int(11) DEFAULT NULL,
+  `category_id` int(11) DEFAULT NULL,
   `name` varchar(255) NOT NULL,
   `slug` varchar(255) NOT NULL,
   `description` longtext NOT NULL,
+  `stock` int(11) NOT NULL,
+  `price` double DEFAULT NULL,
   `image` varchar(255) NOT NULL,
   `is_best` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -40,12 +44,22 @@ CREATE TABLE `accessory` (
 -- Déchargement des données de la table `accessory`
 --
 
-INSERT INTO `accessory` (`id`, `name`, `slug`, `description`, `image`, `is_best`) VALUES
-(1, 'Siege', 'siege', 'Siege pour trott', 'Xtreme-Siege.jpg', 1),
-(2, 'Roue', 'roue', 'Roue pour trott', 'roues-etoiles.jpg', 1),
-(3, 'Guidon', 'guidon', 'Guidon pour trott', 'guidon-blunt-black-v3.jpg', 0),
-(4, 'Frein', 'frein', 'Frein pour trott', 'freins.jpg', 0),
-(5, 'Accessoire de test', 'Accessoire-de-test', 'Accessoire de test', 'roues-gold.jpg', 0);
+INSERT INTO `accessory` (`id`, `weight_id`, `category_id`, `name`, `slug`, `description`, `stock`, `price`, `image`, `is_best`) VALUES
+(1, 3, 3, 'Xtreme Siege', 'Xtreme-Siege', 'Siege pour trott', 3, 15, 'Xtreme-Siege.jpg', 1),
+(2, 8, 4, 'roues etoiles', 'roues-etoiles', 'Roue pour trott', 4, 45, 'roues-etoiles.jpg', 1),
+(3, 2, 1, 'guidon blunt black v3', 'guidon-blunt-black-v3', 'Guidon pour trott', 2, 49, 'guidon-blunt-black-v3.jpg', 0),
+(4, 1, 2, 'Frein Jaune', 'freinfreins-jaune', 'Frein pour trott', 0, 19, 'freins-jaune.jpg', 0),
+(6, 5, 2, 'etrier de frein', 'etrier-de-frein', 'etrier-de-frein', 2, 56, 'etrier-de-frein.jpg', 1),
+(7, 3, 4, 'Roues freestyle', 'Roues-freestyle', 'Roues-freestyle', 4, 1, 'Roues-freestyle.jpg', 0),
+(8, 2, 4, 'roues gold', 'roues-gold.jpg', 'roues-gold', 5, 89, 'roues-gold.jpg', 0),
+(9, 4, 4, 'roues stunt', 'roues-stunt', 'roues-stunt', 4, 55, 'roues-stunt.jpg', 0),
+(10, 2, 2, 'freins rouge', 'freins-rouge', 'freins-rouge', 3, 26, 'freins-rouge.jpeg', 0),
+(11, 4, 3, 'siege double', 'siege-double', 'siege-double', 2, 21, 'siege-double.jpg', 0),
+(12, 2, 3, 'siege rouge', 'siege-rouge', 'siege-rouge', 6, 45, 'siege-rouge.jpg', 1),
+(13, 3, 3, 'Xtreme Siege', 'Xtreme-Siege', 'Xtreme-Siege', 0, 25, 'Xtreme-Siege.jpg', 0),
+(14, 7, 1, 'guidon blunt black v3', 'guidon-blunt-black-v3', 'guidon-blunt-black-v3', 3, 89, 'guidon-blunt-black-v3.jpg', 0),
+(15, 7, 1, 'guidon multicolor', 'guidon-multicolor', 'guidon-multicolor', 4, 25, 'guidon-multicolor.jpg', 0),
+(16, 4, 1, 'guidon titanium', 'guidon-titanium', 'guidon-titanium', 0, 48, 'guidon-titanium.jpg', 0);
 
 -- --------------------------------------------------------
 
@@ -127,6 +141,29 @@ INSERT INTO `categorie_caracteristique` (`id`, `name`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Structure de la table `category_accessory`
+--
+
+CREATE TABLE `category_accessory` (
+  `id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `illustration` varchar(255) NOT NULL,
+  `description` longtext NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Déchargement des données de la table `category_accessory`
+--
+
+INSERT INTO `category_accessory` (`id`, `name`, `illustration`, `description`) VALUES
+(1, 'Guidon', 'guidon-blunt-black-v2.jpg', 'guidon-blunt-black-v2'),
+(2, 'Freins', 'freins.jpg', 'freins'),
+(3, 'siege', 'siege-trott-elec.jpg', 'siege-trott-elec'),
+(4, 'Roues', 'Roues-freestyle.jpg', 'Roues-freestyle');
+
+-- --------------------------------------------------------
+
+--
 -- Structure de la table `doctrine_migration_versions`
 --
 
@@ -142,11 +179,8 @@ CREATE TABLE `doctrine_migration_versions` (
 
 INSERT INTO `doctrine_migration_versions` (`version`, `executed_at`, `execution_time`) VALUES
 ('DoctrineMigrations\\Version20250924130421', '2025-09-25 10:42:28', 295),
-('DoctrineMigrations\\Version20250924145650', '2025-09-25 10:42:29', 41),
-('DoctrineMigrations\\Version20250929114244', '2025-09-30 12:51:40', 76),
-('DoctrineMigrations\\Version20251013140153', '2025-10-13 16:01:56', 745),
-('DoctrineMigrations\\Version20251015092742', '2025-10-15 11:27:49', 187),
-('DoctrineMigrations\\Version20251015094753', '2025-10-15 11:48:00', 76);
+('DoctrineMigrations\\Version20251016112647', '2025-10-16 13:32:30', 80),
+('DoctrineMigrations\\Version20251016114952', '2025-10-16 13:49:55', 784);
 
 -- --------------------------------------------------------
 
@@ -167,15 +201,6 @@ CREATE TABLE `illustration` (
 INSERT INTO `illustration` (`id`, `trottinette_id`, `image`) VALUES
 (1, 1, 'trottbleue-02.png'),
 (2, 1, 'trottbleue-03.png'),
-(3, 1, 'trottbleue-04.png'),
-(4, 1, 'trottbleue-05.png'),
-(5, 2, 'trottjaune-02.jpg'),
-(6, 2, 'trottjaune-03.jpg'),
-(7, 2, 'trottjaune-04.jpg'),
-(8, 2, 'trottjaune-05.jpg'),
-(9, 3, 'trottvert-02.jpg'),
-(10, 3, 'trottvert-03.jpg'),
-(11, 3, 'trottvert-04.jpg'),
 (12, 3, 'trottvert-05.jpg');
 
 -- --------------------------------------------------------
@@ -196,17 +221,53 @@ CREATE TABLE `illustrationaccess` (
 
 INSERT INTO `illustrationaccess` (`id`, `accessory_id`, `image`) VALUES
 (1, 1, 'siege-trott-elec.jpg'),
-(2, 1, 'siege-rouge.jpg'),
-(3, 1, 'siege-double.jpg'),
-(4, 2, 'Roues-freestyle.jpg'),
-(5, 2, 'roues-gold.jpg'),
-(6, 2, 'roues-stunt.jpg'),
-(7, 3, 'guidon-blunt-black-v3.jpg'),
-(8, 3, 'guidon-multicolor.png'),
-(9, 3, 'guidon-titanium.jpg'),
-(10, 4, 'freins-jaune.jpg'),
-(11, 4, 'freins-rouge.jpeg'),
-(12, 4, 'etrier-de-frein.jpg');
+(12, 4, 'etrier-de-frein.jpg'),
+(13, 1, 'Xtreme-Siege.jpg'),
+(14, 1, 'Xtreme-Siege.jpg'),
+(15, 1, 'Xtreme-Siege.jpg'),
+(16, 1, 'Xtreme-Siege.jpg'),
+(17, 2, 'roues-etoiles.jpg'),
+(18, 2, 'roues-etoiles.jpg'),
+(19, 2, 'roues-etoiles.jpg'),
+(20, 3, 'guidon-blunt-black-v3.jpg'),
+(21, 3, 'guidon-blunt-black-v3.jpg'),
+(22, 3, 'guidon-blunt-black-v3.jpg'),
+(23, 4, 'freins-jaune.jpg'),
+(24, 4, 'freins-jaune.jpg'),
+(25, 4, 'freins-jaune.jpg'),
+(26, 6, 'etrier-de-frein.jpg'),
+(27, 6, 'etrier-de-frein.jpg'),
+(28, 6, 'etrier-de-frein.jpg'),
+(29, 7, 'Roues-freestyle.jpg'),
+(30, 7, 'Roues-freestyle.jpg'),
+(31, 7, 'Roues-freestyle.jpg'),
+(32, 8, 'roues-gold.jpg'),
+(33, 8, 'roues-gold.jpg'),
+(34, 8, 'roues-gold.jpg'),
+(35, 9, 'roues-stunt.jpg'),
+(36, 9, 'roues-stunt.jpg'),
+(37, 9, 'roues-stunt.jpg'),
+(38, 10, 'freins-rouge.jpeg'),
+(39, 10, 'freins-rouge.jpeg'),
+(40, 10, 'freins-rouge.jpeg'),
+(41, 11, 'siege-double.jpg'),
+(42, 11, 'siege-double.jpg'),
+(43, 11, 'siege-double.jpg'),
+(44, 12, 'siege-rouge.jpg'),
+(45, 12, 'siege-rouge.jpg'),
+(46, 12, 'siege-rouge.jpg'),
+(47, 13, 'Xtreme-Siege.jpg'),
+(48, 13, 'Xtreme-Siege.jpg'),
+(49, 13, 'Xtreme-Siege.jpg'),
+(50, 14, 'guidon-blunt-black-v3.jpg'),
+(51, 14, 'guidon-blunt-black-v3.jpg'),
+(52, 14, 'guidon-blunt-black-v3.jpg'),
+(53, 15, 'guidon-multicolor.jpg'),
+(54, 15, 'guidon-multicolor.jpg'),
+(55, 15, 'guidon-multicolor.jpg'),
+(56, 16, 'guidon-titanium.jpg'),
+(57, 16, 'guidon-titanium.jpg'),
+(58, 16, 'guidon-titanium.jpg');
 
 -- --------------------------------------------------------
 
@@ -232,6 +293,7 @@ CREATE TABLE `messenger_messages` (
 
 CREATE TABLE `trottinette` (
   `id` int(11) NOT NULL,
+  `weight_id` int(11) DEFAULT NULL,
   `name` varchar(255) NOT NULL,
   `name_short` varchar(255) DEFAULT NULL,
   `slug` varchar(255) NOT NULL,
@@ -242,7 +304,6 @@ CREATE TABLE `trottinette` (
   `is_header` tinyint(1) NOT NULL,
   `header_image` varchar(255) DEFAULT NULL,
   `header_btn_title` varchar(255) DEFAULT NULL,
-  `weight_id` int(11) DEFAULT NULL,
   `stock` int(11) NOT NULL,
   `price` double NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -251,10 +312,10 @@ CREATE TABLE `trottinette` (
 -- Déchargement des données de la table `trottinette`
 --
 
-INSERT INTO `trottinette` (`id`, `name`, `name_short`, `slug`, `description`, `description_short`, `image`, `is_best`, `is_header`, `header_image`, `header_btn_title`, `weight_id`, `stock`, `price`) VALUES
-(1, 'Trottinette électrique honey whale m5 max avec siège', 'Honey Whale M5 Max', 'Trottinette-électrique-honey-whale-m5-max-avec-siège', '【Performance puissante】...', 'Moteur 1000 W, pneus 14 pouces, autonomie 40 km', 'trottbleue-01.png', 1, 1, 'foot-soccer.jpg', 'test', 25, 5, 599),
-(2, 'KUGOO Kukirin C1 Pro', 'KUGOO C1 Pro', 'KUGOO-Kukirin-C1-Pro', 'Aperçu du produit : Vitesse maximale 45 km/h Charge max. 120 kg Autonomie 100 km Puissance continue 500 W Siège', 'Vitesse 45 km/h, autonomie 100 km, charge max 120 kg', 'trottjaune-01.jpg', 1, 0, 'foot-hiver.jpg', 'test', 22, 0, 1299),
-(3, 'Bogist M5 Pro', 'Bogist M5 Pro', 'Bogist-M5-Pro', 'Moteur puissant de 500 W pour des vitesses élevées...', 'Moteur 500 W, pneus 12 pouces, autonomie 35 km', 'trottvert-01.jpg', 1, 1, 'foot-ete.jpg', 'test', 28, 7, 750);
+INSERT INTO `trottinette` (`id`, `weight_id`, `name`, `name_short`, `slug`, `description`, `description_short`, `image`, `is_best`, `is_header`, `header_image`, `header_btn_title`, `stock`, `price`) VALUES
+(1, 25, 'Trottinette électrique honey whale m5 max avec siège', 'Honey Whale M5 Max', 'Trottinette-électrique-honey-whale-m5-max-avec-siège', '【Performance puissante】...', 'Moteur 1000 W, pneus 14 pouces, autonomie 40 km', 'trottbleue-01.png', 1, 1, 'foot-soccer.jpg', 'test', 5, 599),
+(2, 22, 'KUGOO Kukirin C1 Pro', 'KUGOO C1 Pro', 'KUGOO-Kukirin-C1-Pro', 'Aperçu du produit : Vitesse maximale 45 km/h Charge max. 120 kg Autonomie 100 km Puissance continue 500 W Siège', 'Vitesse 45 km/h, autonomie 100 km, charge max 120 kg', 'trottjaune-01.jpg', 1, 0, 'foot-hiver.jpg', 'test', 0, 1299),
+(3, 28, 'Bogist M5 Pro', 'Bogist M5 Pro', 'Bogist-M5-Pro', 'Moteur puissant de 500 W pour des vitesses élevées...', 'Moteur 500 W, pneus 12 pouces, autonomie 35 km', 'trottvert-01.jpg', 1, 1, 'foot-ete.jpg', 'test', 4, 754);
 
 -- --------------------------------------------------------
 
@@ -281,7 +342,22 @@ INSERT INTO `trottinette_accessory` (`id`, `trottinette_id`, `accessory_id`) VAL
 (6, 2, 3),
 (7, 3, 2),
 (8, 3, 4),
-(9, 1, 5);
+(21, 1, 1),
+(22, 1, 3),
+(23, 1, 7),
+(24, 1, 10),
+(25, 1, 11),
+(26, 1, 15),
+(27, 2, 2),
+(28, 2, 4),
+(29, 2, 6),
+(30, 2, 8),
+(31, 2, 15),
+(32, 3, 1),
+(33, 3, 3),
+(34, 3, 7),
+(35, 3, 12),
+(36, 3, 16);
 
 -- --------------------------------------------------------
 
@@ -306,27 +382,6 @@ INSERT INTO `trottinette_caracteristique` (`id`, `trottinette_id`, `caracteristi
 (1, 1, 1, 1, 'Dimensions', '1380 x 320 x 630 mm'),
 (2, 1, 2, 2, 'Poids', '36 kg'),
 (3, 1, 3, 3, 'Batterie', '48 V 13 Ah'),
-(79, 3, 6, 6, 'Charge maximale', '120 kg'),
-(80, 1, 1, 5, 'Dimensions', '1380 x 320 x 630 mm'),
-(81, 1, 2, 5, 'Poids', '36 kg'),
-(82, 1, 3, 2, 'Batterie', '48 V 13 Ah'),
-(83, 1, 4, 2, 'Vitesse maximale', '45 km/h'),
-(84, 1, 5, 2, 'Autonomie', '40 km'),
-(85, 1, 6, 2, 'Charge maximale', '120 kg'),
-(86, 1, 7, 7, 'Sécurité enfant', 'Oui'),
-(87, 2, 1, 5, 'Dimensions', '1250 x 300 x 600 mm'),
-(88, 2, 2, 5, 'Poids', '32 kg'),
-(89, 2, 3, 2, 'Batterie', '48 V 10 Ah'),
-(90, 2, 4, 2, 'Vitesse maximale', '45 km/h'),
-(91, 2, 5, 2, 'Autonomie', '100 km'),
-(92, 2, 6, 2, 'Charge maximale', '120 kg'),
-(93, 2, 7, 7, 'Sécurité enfant', 'Non'),
-(94, 3, 1, 5, 'Dimensions', '1200 x 280 x 600 mm'),
-(95, 3, 2, 5, 'Poids', '28 kg'),
-(96, 3, 3, 2, 'Batterie', '48 V 15 Ah'),
-(97, 3, 4, 2, 'Vitesse maximale', '40 km/h'),
-(98, 3, 5, 2, 'Autonomie', '35 km'),
-(99, 3, 6, 2, 'Charge maximale', '120 kg'),
 (100, 3, 7, 7, 'Sécurité enfant', 'Oui');
 
 -- --------------------------------------------------------
@@ -348,20 +403,7 @@ CREATE TABLE `trottinette_description_section` (
 --
 
 INSERT INTO `trottinette_description_section` (`id`, `trottinette_id`, `title`, `content`, `section_order`) VALUES
-(1, 3, 'Moteur puissant de 500 W', 'Le BOGIST M5 Pro est propulsé par un moteur de 500 W, offrant une puissance impressionnante pour les trajets urbains ou les aventures hors route...', 1),
-(2, 3, 'Batterie haute capacité 48 V 15 Ah', 'Équipé d\'une batterie au lithium 48 V 15 Ah, le M5 Pro offre une autonomie allant jusqu\'à 35 km par charge...', 2),
-(18, 2, 'Freinage efficace', 'Freins à disque arrière avec système de récupération d\'énergie pour un arrêt rapide et sécurisé.', 6),
-(19, 1, 'Moteur haute performance', 'La Honey Whale M5 Max est équipée d\'un moteur puissant de 1000 W, offrant des accélérations rapides et une vitesse maximale de 45 km/h.', 1),
-(20, 1, 'Batterie longue durée', 'Batterie lithium 48 V 13 Ah pour une autonomie allant jusqu\'à 40 km, idéale pour les trajets urbains quotidiens.', 2),
-(21, 1, 'Confort et design', 'Siège ergonomique et suspension optimisée pour un confort maximal lors des trajets.', 3),
-(22, 1, 'Sécurité', 'Éclairage LED avant/arrière et freins à disque pour un freinage sûr dans toutes les conditions.', 4),
-(23, 2, 'Puissance du moteur', 'Moteur 500 W offrant une conduite stable et une vitesse maximale de 45 km/h.', 1),
-(24, 2, 'Autonomie prolongée', 'Batterie 48 V 10 Ah permettant jusqu\'à 100 km d\'autonomie selon le mode de conduite.', 2),
-(25, 2, 'Design compact', 'Structure légère et pliable pour un transport facile et un rangement pratique.', 3),
-(26, 2, 'Freinage sûr', 'Freins à disque arrière avec récupération d\'énergie pour un arrêt rapide.', 4),
-(27, 3, 'Moteur puissant de 500 W', 'Le BOGIST M5 Pro est propulsé par un moteur de 500 W, offrant une puissance impressionnante pour les trajets urbains ou les aventures hors route.', 1),
-(28, 3, 'Batterie haute capacité 48 V 15 Ah', 'Équipé d\'une batterie au lithium 48 V 15 Ah, le M5 Pro offre une autonomie allant jusqu\'à 35 km par charge.', 2),
-(29, 3, 'Confort et maniabilité', 'Pneus de 12 pouces et suspension optimisée pour un confort maximal sur tous les types de routes.', 3),
+(1, 3, 'Moteur puissant de 500 W', 'Le BOGIST M5 Pro est propulsé par un moteur de 500 W, offrant une puissance impressionnante...', 1),
 (30, 3, 'Sécurité complète', 'Éclairage LED, freins à disque et protection enfant pour une sécurité optimale.', 4);
 
 -- --------------------------------------------------------
@@ -448,7 +490,9 @@ INSERT INTO `weight` (`id`, `kg`, `price`) VALUES
 -- Index pour la table `accessory`
 --
 ALTER TABLE `accessory`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `IDX_A1B1251C350035DC` (`weight_id`),
+  ADD KEY `IDX_A1B1251C12469DE2` (`category_id`);
 
 --
 -- Index pour la table `address`
@@ -467,6 +511,12 @@ ALTER TABLE `caracteristique`
 -- Index pour la table `categorie_caracteristique`
 --
 ALTER TABLE `categorie_caracteristique`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Index pour la table `category_accessory`
+--
+ALTER TABLE `category_accessory`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -550,7 +600,7 @@ ALTER TABLE `weight`
 -- AUTO_INCREMENT pour la table `accessory`
 --
 ALTER TABLE `accessory`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT pour la table `address`
@@ -571,6 +621,12 @@ ALTER TABLE `categorie_caracteristique`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
+-- AUTO_INCREMENT pour la table `category_accessory`
+--
+ALTER TABLE `category_accessory`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
 -- AUTO_INCREMENT pour la table `illustration`
 --
 ALTER TABLE `illustration`
@@ -580,7 +636,7 @@ ALTER TABLE `illustration`
 -- AUTO_INCREMENT pour la table `illustrationaccess`
 --
 ALTER TABLE `illustrationaccess`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=59;
 
 --
 -- AUTO_INCREMENT pour la table `messenger_messages`
@@ -598,7 +654,7 @@ ALTER TABLE `trottinette`
 -- AUTO_INCREMENT pour la table `trottinette_accessory`
 --
 ALTER TABLE `trottinette_accessory`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
 
 --
 -- AUTO_INCREMENT pour la table `trottinette_caracteristique`
@@ -627,6 +683,13 @@ ALTER TABLE `weight`
 --
 -- Contraintes pour les tables déchargées
 --
+
+--
+-- Contraintes pour la table `accessory`
+--
+ALTER TABLE `accessory`
+  ADD CONSTRAINT `FK_A1B1251C12469DE2` FOREIGN KEY (`category_id`) REFERENCES `category_accessory` (`id`),
+  ADD CONSTRAINT `FK_A1B1251C350035DC` FOREIGN KEY (`weight_id`) REFERENCES `weight` (`id`);
 
 --
 -- Contraintes pour la table `address`
