@@ -28,7 +28,8 @@ class OrderController extends AbstractController
 
         // 🔐 Si non connecté → connexion
         if (!$user) {
-            return $this->redirectToRoute('app_login');
+            $this->addFlash('login_required', 'Vous devez être connecté pour valider votre panier.');
+            return $this->redirectToRoute('cart');
         }
 
         // 🛒 Vérifie que le panier n’est pas vide

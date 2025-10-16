@@ -79,4 +79,20 @@
             <p><b>Votre panier est vide.</b></p>
             {% endif %}
     </div>
+
+    {% for message in app.flashes('login_required') %}
+        <div class="alert alert-warning text-center mt-3">
+            {{ message }}
+        </div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const wrapper = document.querySelector('.wrapper');
+                if (wrapper) {
+                    wrapper.classList.add('active-popup');
+                }
+            });
+        </script>
+    {% endfor %}
+
+
 {% endblock %}
