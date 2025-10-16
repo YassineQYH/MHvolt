@@ -88,11 +88,19 @@
             document.addEventListener('DOMContentLoaded', function () {
                 const wrapper = document.querySelector('.wrapper');
                 if (wrapper) {
+                    // Affiche la popup login/register
                     wrapper.classList.add('active-popup');
+
+                    // Si ton fichier script-login-register.js est déjà chargé,
+                    // les listeners d'ouverture/fermeture continueront de fonctionner normalement
+                    console.log("Popup de connexion ouverte suite à un flash login_required");
+                } else {
+                    console.warn("⚠️ Élément .wrapper non trouvé — vérifie que la popup login/register est bien incluse sur cette page.");
                 }
             });
         </script>
     {% endfor %}
+
 
 
 {% endblock %}
