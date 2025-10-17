@@ -83,9 +83,11 @@
             <a href="{{ path('add_to_cart', {'id': product_id}) }}" class="buy-btn">Ajouter</a>
 
         {% elseif quantity_in_cart < trottinette.stock %}
+            <a class="buy-btn">Stock disponible : {{ trottinette.stock }}</a><br>
             <a class="buy-btn">Quantité : {{ quantity_in_cart }}</a><br>
             <a href="{{ path('decrease_to_cart', {'id': product_id}) }}" class="buy-btn">Diminuer</a><br>
             <a href="{{ path('add_to_cart', {'id': product_id}) }}" class="buy-btn">Ajouter</a>
+
 
         {% else %}
             <a class="buy-btn">Quantité : {{ quantity_in_cart }}</a><br>

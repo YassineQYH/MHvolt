@@ -1,4 +1,4 @@
-{% set cart = cart() %} {# ⚡ récupère le panier global via CartRuntime #}
+{% set cart_items = cart() %} {# ⚡ récupère le panier global via CartRuntime #}
 
 <a id="cartdetails" data-toggle="dropdown" aria-haspopup="true"
    aria-expanded="false" href="{{ path('cart') }}">
@@ -11,8 +11,8 @@
 
         {# Wrapper scrollable pour les articles #}
         <div class="navbar-cart-product-list">
-            {% if cart is not empty %}
-                {% for item in cart %}
+            {% if cart_items is not empty %}
+                {% for item in cart_items %}
                     <div class="navbar-cart-product">
                         <div class="w-100">
                             <div class="row">
@@ -31,20 +31,23 @@
                                     <small class="d-block text-sm">
                                         Prix unité : <strong>{{ (item.product.price / 100)|number_format(2, ',','.') }} €</strong>
                                     </small>
+
+                                    {# Affiche la quantité et boutons selon type #}
                                     <small class="d-block text-muted">
                                         Quantité : <strong>{{ item.quantity }}</strong>
                                         <span class="cart-buttons">
-                                            <a class="lien-cart" href="{{ path('delete_to_cart', {'id': item.product.id}) }}">
+                                            <a class="lien-cart" href="{{ path('delete_to_cart', {'id': item.product.id, 'type': item.type|default('trottinette') }) }}">
                                                 <img src="{{ asset('img/delete.png') }}" alt="Supprimer">
                                             </a>
-                                            <a class="lien-cart" href="{{ path('decrease_to_cart', {'id': item.product.id}) }}">
+                                            <a class="lien-cart" href="{{ path('decrease_to_cart', {'id': item.product.id, 'type': item.type|default('trottinette') }) }}">
                                                 <img src="{{ asset('img/less.png') }}" alt="-">
                                             </a>
-                                            <a class="lien-cart" href="{{ path('increase_to_cart', {'id': item.product.id}) }}">
+                                            <a class="lien-cart" href="{{ path('increase_to_cart', {'id': item.product.id, 'type': item.type|default('trottinette') }) }}">
                                                 <img src="{{ asset('img/more.png') }}" alt="+">
                                             </a>
                                         </span>
                                     </small>
+
                                     <small>
                                         Prix total : <strong>{{ ((item.product.price * item.quantity) / 100)|number_format(2, ',','.') }} €</strong>
                                     </small>

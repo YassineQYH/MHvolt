@@ -93,6 +93,7 @@
             <a href="{{ path('add_to_cart', {'id': product_id, 'type': 'accessory'}) }}" class="buy-btn">Ajouter</a>
 
         {% elseif quantity_in_cart < accessory.stock %}
+        <a class="buy-btn">Stock disponible : {{ accessory.stock }}</a><br>
             <a class="buy-btn">Quantité : {{ quantity_in_cart }}</a><br>
             <a href="{{ path('decrease_to_cart', {'id': product_id, 'type': 'accessory'}) }}" class="buy-btn">Diminuer</a><br>
             <a href="{{ path('add_to_cart', {'id': product_id, 'type': 'accessory'}) }}" class="buy-btn">Ajouter</a>

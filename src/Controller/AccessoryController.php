@@ -2,12 +2,13 @@
 
 namespace App\Controller;
 
+use App\Classe\Cart;
 use App\Entity\Accessory;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class AccessoryController extends BaseController
@@ -36,7 +37,12 @@ class AccessoryController extends BaseController
     }
 
     #[Route('/accessoire/{slug}', name: 'accessory_show')]
-    public function show(string $slug, Request $request, UserPasswordHasherInterface $encoder): Response
+    public function show(
+        string $slug,
+        Request $request,
+        UserPasswordHasherInterface $encoder,
+        Cart $cartService // 🛒 injecte le service
+    ): Response
     {
         $accessory = $this->entityManager->getRepository(Accessory::class)
             ->findOneBy(['slug' => $slug]);
@@ -47,17 +53,16 @@ class AccessoryController extends BaseController
 
         $illustrations = $accessory->getIllustrationaccess();
 
-        // -------------------------------
-        // 🧍 Formulaire d’inscription
-        // -------------------------------
         $formregister = $this->createRegisterForm($request, $encoder);
 
         return $this->render('accessoires/show.html.twig', [
             'accessory' => $accessory,
             'illustrations' => $illustrations,
             'formregister' => $formregister->createView(),
+            'cart' => $cartService, // 💡 passer le service à Twig
         ]);
     }
+
 
     #[Route('/accessoire/{slug}/trottinettes', name: 'accessoire_trottinettes')]
     public function showTrottinettes(string $slug, Request $request, UserPasswordHasherInterface $encoder): Response
