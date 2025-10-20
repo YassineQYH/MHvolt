@@ -462,3 +462,31 @@ body.modal-open {
         margin-left: 20%;
     }
 }
+
+
+/* Menu utilisateur connecté - texte réduit et espacement optimisé */
+
+.sous-menu-nom.menu-mon-compte li a {
+    color: #000;
+    /* texte noir */
+    text-decoration: none;
+    /* pas de soulignement */
+    display: inline-block;
+    /* plutôt que block pour que ça ne prenne pas toute la largeur */
+    font-size: 1em;
+    /* réduit la taille du texte */
+    padding: 2px 6px;
+    /* petit espacement autour du texte */
+    margin-right: 5px;
+    /* petit espace entre les liens */
+    border-radius: 4px;
+    /* arrondi léger si besoin */
+    transition: background 0.2s;
+    /* effet au survol */
+    margin-top: 20px;
+}
+
+.sous-menu-nom.menu-mon-compte li a:hover {
+    background: #f0f0f0;
+    /* léger fond au survol */
+}
