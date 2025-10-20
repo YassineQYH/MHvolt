@@ -28,9 +28,6 @@ class UserCrudController extends AbstractCrudController
             TextField::new('firstName'),
             TextField::new('lastName'),
             TextField::new('tel'),
-            TextField::new('country'),
-            TextField::new('postalCode'),
-            TextField::new('address'),
         ];
     }
 }
