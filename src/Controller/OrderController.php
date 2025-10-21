@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Controller;
 
@@ -22,7 +23,7 @@ class OrderController extends AbstractController
         private readonly EntityManagerInterface $entityManager
     ) {}
 
-    #[Route('/commande', name: 'order', methods: ['GET', 'POST'])]
+    #[Route('/commande', name: 'order', methods: ['GET','POST'])]
     public function index(
         Cart $cart,
         Request $request,
@@ -30,21 +31,22 @@ class OrderController extends AbstractController
     ): Response {
         $categories = $categoryAccessoryRepository->findAll();
 
-        /** @var User $user */
+        /** @var User|null $user */
         $user = $this->getUser();
 
-        // 🔹 Dump de l'utilisateur
-        //dump($user);
-
+        // 🔐 Si non connecté → redirection vers le panier (ou login selon ton flux)
         if (!$user) {
             $this->addFlash('login_required', 'Vous devez être connecté pour valider votre panier.');
             return $this->redirectToRoute('cart');
         }
 
+        // 🏠 Si pas d'adresse → redirection vers ajout d'adresse
         if ($user->getAddresses()->isEmpty()) {
+            $this->addFlash('info', 'Veuillez ajouter une adresse avant de passer commande.');
             return $this->redirectToRoute('account_address_add');
         }
 
+        // Création du formulaire (OrderType attend l'option 'user')
         $form = $this->createForm(OrderType::class, null, [
             'user' => $user,
         ]);
@@ -65,13 +67,11 @@ class OrderController extends AbstractController
     ): Response {
         $categories = $categoryAccessoryRepository->findAll();
 
-        /** @var User $user */
+        /** @var User|null $user */
         $user = $this->getUser();
 
-        // 🔹 Dump pour vérifier l'utilisateur
-        //dump($user);
-
         if (!$user) {
+            $this->addFlash('login_required', 'Vous devez être connecté pour valider votre panier.');
             return $this->redirectToRoute('cart');
         }
 
@@ -81,21 +81,24 @@ class OrderController extends AbstractController
 
         $form->handleRequest($request);
 
-        // 🔹 Dump du formulaire pour vérifier submission et validité
-        /* dump([
-            'isSubmitted' => $form->isSubmitted(),
-            'isValid' => $form->isValid(),
-            'request_method' => $request->getMethod(),
-            'request_data' => $request->request->all(),
-        ]); */
+        // Débug utile (décommenter si besoin)
+        // dump([
+        //     'isSubmitted' => $form->isSubmitted(),
+        //     'isValid' => $form->isValid(),
+        //     'request_method' => $request->getMethod(),
+        //     'request_data' => $request->request->all(),
+        // ]);
+        // if ($form->isSubmitted() && !$form->isValid()) {
+        //     dd($form->getErrors(true, false));
+        // }
 
+        // Calcul du poids total et de la quantité
         $poidsTotal = 0.0;
         $quantiteTotale = 0;
-
         foreach ($cart->getFull() as $element) {
             $produit = $element['product'];
-            $quantite = $element['quantity'];
-            $poids = $produit->getWeight()->getKg();
+            $quantite = (int) $element['quantity'];
+            $poids = $produit->getWeight() ? (float) $produit->getWeight()->getKg() : 0.0;
 
             $poidsTotal += $poids * $quantite;
             $quantiteTotale += $quantite;
@@ -104,12 +107,7 @@ class OrderController extends AbstractController
         $poidsTarif = $weightRepository->findByKgPrice($poidsTotal);
         $prixLivraison = $poidsTarif ? $poidsTarif->getPrice() : 0;
 
-        $priceList = $this->fillPriceList($weightRepository);
-
         if ($form->isSubmitted() && $form->isValid()) {
-            // 🔹 Dump pour confirmer qu'on passe dans la condition
-            //dd('Formulaire soumis et valide !');
-
             $date = new DateTime();
             $delivery = $form->get('addresses')->getData();
 
@@ -124,6 +122,7 @@ class OrderController extends AbstractController
                 $delivery->getCountry()
             );
 
+            // Création de la commande
             $order = new Order();
             $reference = $date->format('dmY') . '-' . uniqid();
 
@@ -136,14 +135,15 @@ class OrderController extends AbstractController
 
             $this->entityManager->persist($order);
 
+            // Enregistrement des détails
             foreach ($cart->getFull() as $element) {
                 $produit = $element['product'];
-                $quantite = $element['quantity'];
+                $quantite = (int) $element['quantity'];
 
                 $orderDetails = new OrderDetails();
                 $orderDetails->setMyOrder($order);
                 $orderDetails->setProduct($produit->getName());
-                $orderDetails->setWeight($produit->getWeight());
+                $orderDetails->setWeight($produit->getWeight() ? (string) $produit->getWeight()->getKg() : '0');
                 $orderDetails->setQuantity($quantite);
                 $orderDetails->setPrice($produit->getPrice());
                 $orderDetails->setTotal($produit->getPrice() * $quantite);
@@ -153,14 +153,19 @@ class OrderController extends AbstractController
 
             $this->entityManager->flush();
 
-            return $this->redirectToRoute('stripe_create_session', [
-                'reference' => $order->getReference()
+            // Affiche la page récap avant paiement (order/add.html.twig)
+            return $this->render('order/add.html.twig', [
+                'cart' => $cart->getFull(),
+                'delivery' => $deliveryContent,
+                'reference' => $order->getReference(),
+                'price' => $prixLivraison,
+                'totalLivraison' => null,
+                'categories' => $categories,
             ]);
         }
 
-        // 🔹 Si formulaire pas soumis ou invalide, dump et stop
-        //dd('Formulaire pas soumis ou invalide', $request->request->all());
-
+        // Non soumis / invalide → retour panier (tu peux dump pour debug)
+        // dd('form invalid', $request->request->all());
         return $this->redirectToRoute('cart');
     }
 
