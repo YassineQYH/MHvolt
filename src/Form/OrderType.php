@@ -21,9 +21,13 @@ class OrderType extends AbstractType
                 'label' => false,
                 'required' => true,
                 'class' => Address::class,
-                'choices' => $user->getAddresses(),
+                'choices' => $user->getAddresses()->toArray(), // <-- convertit la collection en tableau
                 'multiple' => false,
                 'expanded' => true,
+                'choice_label' => function (Address $address) {
+                    return $address->getAddress() . ' - ' . $address->getCity();
+                },
+                'choice_value' => 'id', // <-- transforme l'objet en son ID pour le formulaire
             ]);
         }
 
@@ -38,7 +42,7 @@ class OrderType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'user' => []
+            'user' => null,
         ]);
     }
 }

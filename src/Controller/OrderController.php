@@ -8,43 +8,40 @@ use App\Entity\Order;
 use App\Entity\OrderDetails;
 use App\Form\OrderType;
 use App\Repository\WeightRepository;
+use App\Repository\CategoryAccessoryRepository; // ✅ On importe la bonne classe
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class OrderController extends AbstractController
 {
     public function __construct(
-        private EntityManagerInterface $entityManager
+        private readonly EntityManagerInterface $entityManager
     ) {}
 
-    #[Route('/commande', name: 'order')]
-    public function index(Cart $cart, Request $request): Response
-    {
-        /** @var \App\Entity\User $user */
+    #[Route('/commande', name: 'order', methods: ['GET', 'POST'])]
+    public function index(
+        Cart $cart,
+        Request $request,
+        CategoryAccessoryRepository $categoryAccessoryRepository
+    ): Response {
+        $categories = $categoryAccessoryRepository->findAll();
+
         $user = $this->getUser();
 
-        // 🔐 Si non connecté → connexion
+        // 🔐 Si non connecté → redirection vers login
         if (!$user) {
             $this->addFlash('login_required', 'Vous devez être connecté pour valider votre panier.');
             return $this->redirectToRoute('cart');
         }
 
-        // 🛒 Vérifie que le panier n’est pas vide
-        if (empty($cart->getFull())) {
-            $this->addFlash('warning', 'Votre panier est vide.');
-            return $this->redirectToRoute('products');
-        }
-
-        // 🏠 Vérifie si l’utilisateur a au moins une adresse
-        if ($user->getAddresses()->isEmpty()) {
-            $this->addFlash('info', 'Veuillez ajouter une adresse avant de passer commande.');
+        // 🏠 Vérifie que l’utilisateur a au moins une adresse
+        if (!$user->getAddresses()->getValues()) {
             return $this->redirectToRoute('account_address_add');
         }
 
-        // 🧾 Création du formulaire
         $form = $this->createForm(OrderType::class, null, [
             'user' => $user,
         ]);
@@ -52,89 +49,107 @@ class OrderController extends AbstractController
         return $this->render('order/index.html.twig', [
             'form' => $form->createView(),
             'cart' => $cart->getFull(),
+            'categories' => $categories,
         ]);
     }
 
+
     #[Route('/commande/recapitulatif', name: 'order_recap', methods: ['POST'])]
-    public function add(Cart $cart, Request $request, WeightRepository $weightRepo): Response
-    {
-        /** @var \App\Entity\User $user */
-        $user = $this->getUser();
-
-        if (!$user) {
-            return $this->redirectToRoute('app_login');
-        }
-
-        if ($user->getAddresses()->isEmpty()) {
-            $this->addFlash('info', 'Veuillez ajouter une adresse avant de confirmer votre commande.');
-            return $this->redirectToRoute('account_address_add');
-        }
+    public function add(
+        Cart $cart,
+        Request $request,
+        WeightRepository $weightRepository,
+        CategoryAccessoryRepository $categoryAccessoryRepository // ✅
+    ): Response {
+        $categories = $categoryAccessoryRepository->findAll(); // ✅
 
         $form = $this->createForm(OrderType::class, null, [
-            'user' => $user,
+            'user' => $this->getUser(),
         ]);
+
         $form->handleRequest($request);
 
-        $cartItems = $cart->getFull();
+        $poidsTotal = 0.0;
+        $quantiteTotale = 0;
 
-        // ------------------- Poids total du panier -------------------
-        $totalWeight = $cart->getTotalWeight();
+        foreach ($cart->getFull() as $element) {
+            $produit = $element['product'];
+            $quantite = $element['quantity'];
+            $poids = $produit->getWeight()->getKg();
 
-        // 💰 Récupération du tarif selon le poids total
-        $tarif = $weightRepo->findByKgPrice($totalWeight);
-        $shippingPrice = $tarif ? $tarif->getPrice() : 0;
+            $poidsTotal += $poids * $quantite;
+            $quantiteTotale += $quantite;
+        }
+
+        $poidsTarif = $weightRepository->findByKgPrice($poidsTotal);
+        $prixLivraison = $poidsTarif ? $poidsTarif->getPrice() : 0;
+
+        $priceList = $this->fillPriceList($weightRepository);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $date = new DateTime();
             $delivery = $form->get('addresses')->getData();
 
-            // 🏠 Formatage de l’adresse pour stockage
             $deliveryContent = sprintf(
-                "%s %s</br>%s%s</br>%s</br>%s %s</br>%s",
+                '%s %s<br>%s<br>%s%s%s<br>%s',
                 $delivery->getFirstname(),
                 $delivery->getLastname(),
                 $delivery->getPhone(),
-                $delivery->getCompany() ? '</br>' . $delivery->getCompany() : '',
+                $delivery->getCompany() ? $delivery->getCompany() . '<br>' : '',
                 $delivery->getAddress(),
-                $delivery->getPostal(),
-                $delivery->getCity(),
+                '<br>' . $delivery->getPostal() . ' ' . $delivery->getCity(),
                 $delivery->getCountry()
             );
 
-            // 🧾 Création de la commande
-            $order = (new Order())
-                ->setReference((new DateTime())->format('dmY') . '-' . uniqid())
-                ->setUser($user)
-                ->setCreatedAt(new DateTime())
-                ->setCarrierPrice($shippingPrice)
-                ->setDelivery($deliveryContent)
-                ->setState(0);
+            $order = new Order();
+            $reference = $date->format('dmY') . '-' . uniqid();
+
+            $order->setReference($reference);
+            $order->setUser($this->getUser());
+            $order->setCreatedAt($date);
+            $order->setCarrierPrice($prixLivraison);
+            $order->setDelivery($deliveryContent);
+            $order->setState(0);
 
             $this->entityManager->persist($order);
 
-            // 🧩 Ajout des détails produits
-            foreach ($cartItems as $element) {
-                $details = (new OrderDetails())
-                    ->setMyOrder($order)
-                    ->setProduct($element['product']->getName())
-                    ->setWeight($element['product']->getWeight())
-                    ->setQuantity($element['quantity'])
-                    ->setPrice($element['product']->getPrice())
-                    ->setTotal($element['product']->getPrice() * $element['quantity']);
+            foreach ($cart->getFull() as $element) {
+                $produit = $element['product'];
+                $quantite = $element['quantity'];
 
-                $this->entityManager->persist($details);
+                $orderDetails = new OrderDetails();
+                $orderDetails->setMyOrder($order);
+                $orderDetails->setProduct($produit->getName());
+                $orderDetails->setWeight($produit->getWeight());
+                $orderDetails->setQuantity($quantite);
+                $orderDetails->setPrice($produit->getPrice());
+                $orderDetails->setTotal($produit->getPrice() * $quantite);
+
+                $this->entityManager->persist($orderDetails);
             }
 
             $this->entityManager->flush();
 
             return $this->render('order/add.html.twig', [
-                'cart' => $cartItems,
+                'cart' => $cart->getFull(),
                 'delivery' => $deliveryContent,
                 'reference' => $order->getReference(),
-                'price' => $shippingPrice,
+                'price' => $prixLivraison,
                 'totalLivraison' => null,
+                'categories' => $categories,
             ]);
         }
 
         return $this->redirectToRoute('cart');
+    }
+
+    private function fillPriceList(WeightRepository $weightRepository): array
+    {
+        $priceList = [];
+        foreach ($weightRepository->findAll() as $item) {
+            $priceList[(string) $item->getKg()] = (string) $item->getPrice();
+        }
+
+        return $priceList;
     }
 }

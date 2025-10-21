@@ -1,58 +1,55 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Valider ma commande : Zone frais{% endblock %}
+{% block title %}Valider ma commande : Hich-Trott{% endblock %}
 
 {% block menu %}
     {{ include('partials/menu.html.twig') }}
 {% endblock %}
 
-{% block content %}
-<br><br><br><br><br><br><br>
-<div class="container">
-    <h2>Je passe ma commande</h2>
-    <p>Choisissez vos préférences avant de passer votre commande sur La Boutique Hich-Trott.</p>
-    <hr>
-    <div class="row">
-        <div class="col-md-6">
-            {% if form.addresses is defined %}
-                {{ form_start(form, {action: path('order_recap')}) }}
-                    {{ form_label(form.addresses, 'Choisissez votre adresse de livraison') }}
-                    <a href="{{ path('account_address_add') }}">Ajouter une nouvelle adresse</a>
+{% block content %}<br><br><br><br><br><br><br>
+    <div class="container">
+        <h2>Je passe ma commande</h2>
+        <p>Choisissez vos préférences avant de passer votre commande sur La Boutique SY-Shop.</p>
+        <hr>
+        <div class="row">
+            <div class="col-md-6">
+                {% set formHtml %}
+                    {{ form_start(form, {action:path('order_recap')}) }}
+                        {{ form_label(form.addresses, 'Choisissez votre adresse de livraison') }}
+                        <a href="{{ path('account_address_add') }}">Ajouter une nouvelle adresse</a>
                     {{ form_end(form) }}
-            {% else %}
-                <p>Vous n’avez pas encore d’adresse enregistrée.</p>
-                <a href="{{ path('account_address_add') }}" class="btn btn-primary">Ajouter une adresse</a>
-            {% endif %}
-        </div>
+                {% endset %}
 
-        <div class="col-md-6">
-            <div class="text-center">
-                <b>Récap de ma commande</b></br>
-                <p>Retrouvez le récapitulatif de vos produits.</p>
+                {{ formHtml|replace({'[br]' : '</br>'})|raw }}
+
             </div>
-
-            <div class="order-summary">
-                {% for key, item in cart %}
-                    <div class="row {% if key > 0 %}mt-2{% endif %}">
-                        <div class="col-4">
-                        {% if item.product.imagePath %}
-                            <img class="cart-product-image" src="{{ asset(item.product.imagePath) }}" alt="{{ item.product.name }}" height="75px">
-                        {% else %}
-                            <img class="cart-product-image" src="{{ asset('img/default.png') }}" alt="image par défaut" height="75px">
-                        {% endif %}
-                    </div>
-
-                        <div class="col-6 my-auto">
-                            {{ item.product.name }} - {{ (item.product.price / 100)|number_format(2, ',', '.') }} €</br>
-                            <small>{{ item.product.description }}</small>
-                        </div>
-                        <div class="col-2 my-auto">
-                            x {{ item.quantity }}
-                        </div>
-                    </div></br>
-                {% endfor %}
-            </div></br></br>
+            <div class="col-md-6">
+                <div class="text-center">
+                    <b>Récap de ma commande</b></br>
+                    <p>Retrouvez le récapitulatif de vos produits.</p>
+                </div>
+                {# {{ dump(cart) }} #}
+                <div class="order-summary">
+                    {% for key,item in cart %}{# key => pour être en mesure de compter #}
+                        <div class="row {% if key> 0 %}mt-2{% endif %}">
+                            <div class="col-4">
+                                {% if item.product.imagePath %}
+                                <img src="{{ asset(item.product.imagePath) }}" alt="{{ item.product.name }}" height="75px">
+                                {% else %}
+                                <img src="{{ asset('img/default.png') }}" alt="image par défaut" height="75px">
+                                {% endif %}
+                            </div>
+                            <div class="col-6 my-auto">
+                                {{ item.product.name }} - {{ (item.product.price / 100)|number_format(2, ',', '.') }} €</br>
+                                <small>{{ item.product.description }}</small>
+                            </div>
+                            <div class="col-2 my-auto">
+                                x {{ item.quantity }}
+                            </div>
+                        </div></br>
+                    {% endfor %}
+                </div></br></br>
+            </div>
         </div>
     </div>
-</div>
 {% endblock %}
