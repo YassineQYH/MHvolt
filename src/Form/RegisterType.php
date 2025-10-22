@@ -73,12 +73,10 @@ class RegisterType extends AbstractType
                         'pattern' => '/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}(\.[a-z]{2,})?$/i',
                         'message' => 'Veuillez saisir une adresse email valide (ex: xxx@xxx.xx ou xxx@xxx.xx.xx)',
                     ])
-
                 ],
                 'attr' => [
                     'placeholder' => 'Saisissez votre e-mail',
-                    'pattern' => '^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$',
-                    'title' => 'Format attendu: xx@xxxx.xx',
+                    'title' => 'Format attendu: xxx@xxx.xx ou xxx@xxx.xx.xx',
                     'required' => true
                 ],
             ])
