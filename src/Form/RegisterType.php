@@ -73,6 +73,7 @@ class RegisterType extends AbstractType
                         'pattern' => '/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}(\.[a-z]{2,})?$/i',
                         'message' => 'Veuillez saisir une adresse email valide (ex: xxx@xxx.xx ou xxx@xxx.xx.xx)',
                     ])
+
                 ],
                 'attr' => [
                     'placeholder' => 'Saisissez votre e-mail',
@@ -111,7 +112,7 @@ class RegisterType extends AbstractType
                     new Regex([
                         // ici aussi, on garde les antislashs simples, car c'est du PHP pur
                         'pattern' => '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z0-9]).{10,}$/',
-                        'message' => 'Le mot de passe doit contenir au moins 10 caractères, 1 majuscule, 1 minuscule, 1 chiffre et 1 caractère spécial.',
+                        'message' => 'Min 10 caractères, 1 maj, 1 min, 1 chiffre, 1 caractère spécial.',
                     ])
                 ]
             ])

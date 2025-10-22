@@ -114,15 +114,19 @@
             {# Champ E-mail #}
             <div class="input-box">
                 <span class="icon"><ion-icon name="mail"></ion-icon></span>
-                {{ form_widget(formregister.email, {'attr': {
-                    'placeholder': 'Saisissez votre e-mail',
-                    'pattern': '^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}(\.[a-z]{2,})?$',
-                    'title': 'Veuillez saisir un email valide, format: xxx@xxx.xx ou xxx@xxx.xx.xx',
-                    'required': true
-                }}) }}
+                {{ form_widget(formregister.email, {
+                    'attr': {
+                        'type': 'text',  # <-- force text pour que pattern soit pris en compte
+                        'placeholder': 'Saisissez votre e-mail',
+                        'pattern': '^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}(\.[a-z]{2,})?$',
+                        'title': 'Veuillez saisir un email valide, format: xxx@xxx.xx ou xxx@xxx.xx.xx',
+                        'required': true
+                    }
+                }) }}
                 {{ form_label(formregister.email) }}
                 {{ form_errors(formregister.email) }}
             </div>
+
 
 
             {# Champ mot de passe #}
@@ -131,7 +135,7 @@
                 {{ form_widget(formregister.password.first, {'attr': {
                     'placeholder': 'Saisissez votre mot de passe',
                     'pattern': '.{10,}',  # juste longueur minimale
-                    'title': 'Min 10 caractères',
+                    'title': 'Min 10 caractères, 1 maj, 1 min, 1 chiffre, 1 caractère spécial',
                     'required': true
                 }}) }}
 
@@ -146,7 +150,7 @@
                 {{ form_widget(formregister.password.second, {'attr': {
                     'placeholder': 'Confirmez votre mot de passe',
                     'pattern': '.{10,}',
-                    'title': 'Min 10 caractères',
+                    'title': 'Min 10 caractères, 1 maj, 1 min, 1 chiffre, 1 caractère spécial',
                     'required': true
                 }}) }}
                 {{ form_label(formregister.password.second) }}
