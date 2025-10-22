@@ -44,7 +44,8 @@
                                 <small>{{ item.product.description }}</small>
                                 </td>
                                 <td>
-                                    <a href="{{ path('decrease_to_cart', {'id' : item.product.id }) }}">
+                                    {# ⚡ ajout du type pour gérer accessoires et trottinettes #}
+                                    <a href="{{ path('decrease_to_cart', {'id' : item.product.id, 'type': item.type|default('trottinette') }) }}">
                                         <img src="{{ asset('assets/img/less.png') }}" height="12px" style="color:blue"; alt="-">
                                     </a>
                                     <small>x</small> {{ item.quantity }}
@@ -53,7 +54,7 @@
                                         Max <span>(rupture)</span>
                                     </a>
                                     {% else %}
-                                    <a href="{{ path('add_to_cart', {'id' : item.product.id }) }}">
+                                    <a href="{{ path('add_to_cart', {'id' : item.product.id, 'type': item.type|default('trottinette') }) }}">
                                         <img src="{{ asset('assets/img/more.png') }}" height="12px" style="color:blue"; alt="+">
                                     </a>
                                     {% endif %}
@@ -62,7 +63,7 @@
                                 <td>{{ ((item.product.price * item.quantity) / 100)|number_format(2, ',','.') }} €</td>
                                 <td>{{ (item.product.weight.kg * item.quantity) }} Kg</td>
                                 <td>
-                                <a href="{{ path('delete_to_cart', {'id' : item.product.id }) }}" style="color:blue">
+                                <a href="{{ path('delete_to_cart', {'id' : item.product.id, 'type': item.type|default('trottinette') }) }}" style="color:blue">
                                     <img src="{{ asset('assets/img/delete.png') }}" height="18px" alt="Supprimer"></td>
                                 </a>
                             </tr>
@@ -104,7 +105,6 @@
             });
         </script>
     {% endfor %}
-
 
 
 {% endblock %}
