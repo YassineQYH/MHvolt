@@ -76,10 +76,11 @@ class AdminDashboardController extends AbstractDashboardController
         yield MenuItem::section('Utilisateurs');
         yield MenuItem::linkToCrud('Users', 'fas fa-user', User::class);
 
-        //-- Commandes --//
+        // -- Commandes --//
         yield MenuItem::section('Commandes');
-        yield MenuItem::linkToCrud('Commande', 'fa fa-shopping-cart', Order::class);
-        yield MenuItem::linkToCrud('Détails de commande', 'fa fa-shopping-cart', OrderDetails::class);
+        yield MenuItem::linkToCrud('Commandes', 'fa fa-shopping-cart', Order::class);
+        // Plus besoin du CRUD séparé OrderDetails
+
 
         // --- Statistiques / Graphiques ---
         yield MenuItem::section('Stats');
