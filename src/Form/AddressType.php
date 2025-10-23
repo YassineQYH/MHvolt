@@ -67,11 +67,6 @@ class AddressType extends AbstractType
                         'message' => 'Le numéro doit commencer par +336 ou +337 et contenir 8 chiffres.'
                     ])
                 ]
-            ])
-            ->add('type', TextType::class, [
-                'label' => 'Type d’adresse',
-                'required' => false,
-                'attr' => ['placeholder' => '(facultatif) Ex : Livraison, Facturation']
             ]);
     }
 

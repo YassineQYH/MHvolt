@@ -2,21 +2,24 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\User;
+use App\Entity\Order;
+use App\Entity\Weight;
 use App\Entity\Accessory;
-use App\Entity\Caracteristique;
-use App\Entity\Illustration;
-use App\Entity\Illustrationaccess;
 use App\Entity\Trottinette;
+use App\Entity\Illustration;
+use App\Entity\Caracteristique;
+use App\Entity\Illustrationaccess;
+use App\Entity\OrderDetails;
+use App\Entity\TrottinetteAccessory;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\TrottinetteCaracteristique;
 use App\Entity\TrottinetteDescriptionSection;
-use App\Entity\TrottinetteAccessory;
-use App\Entity\User;
-use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
-use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
-use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
-use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
 use Symfony\Component\HttpFoundation\Response;
-use Doctrine\ORM\EntityManagerInterface;
+use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
+use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
+use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
 
 #[AdminDashboard(routePath: '/admin', routeName: 'admin')]
 class AdminDashboardController extends AbstractDashboardController
@@ -49,28 +52,34 @@ class AdminDashboardController extends AbstractDashboardController
 
         // --- CRUD Produits ---
         yield MenuItem::section('Trottinettes');
-        yield MenuItem::linkToCrud('Trottinettes', 'fas fa-scooter', Trottinette::class);
-        yield MenuItem::linkToCrud('Caractéristiques', 'fas fa-list', Caracteristique::class);
+        yield MenuItem::linkToCrud('Trottinettes', 'fas fa-folder', Trottinette::class);
         yield MenuItem::linkToCrud('Sections Description', 'fas fa-align-left', TrottinetteDescriptionSection::class);
-
-        yield MenuItem::section('Trottinette ↔ Caractéristiques');
+        yield MenuItem::linkToCrud('Caractéristiques', 'fas fa-list', Caracteristique::class);
         yield MenuItem::linkToCrud('Trottinette ↔ Caractéristique', 'fas fa-list-alt', TrottinetteCaracteristique::class);
 
-        // --- Nouvelle section pour les catégories de caractéristiques ---
-        yield MenuItem::section('Catégories de caractéristiques');
-        yield MenuItem::linkToCrud('Catégories', 'fas fa-folder', \App\Entity\CategorieCaracteristique::class);
-
-
+        // --- CRUD Accessoires ---
         yield MenuItem::section('Accessoires');
+        yield MenuItem::linkToCrud('Catégories', 'fas fa-folder', \App\Entity\CategorieCaracteristique::class);
         yield MenuItem::linkToCrud('Accessoires', 'fas fa-box', Accessory::class);
-        yield MenuItem::linkToCrud('Illustration Accessoires', 'fas fa-image', Illustrationaccess::class);
         yield MenuItem::linkToCrud('Trottinette ↔ Accessoires', 'fas fa-tags', TrottinetteAccessory::class);
 
+        //-- Illustrations --//
         yield MenuItem::section('Illustrations');
         yield MenuItem::linkToCrud('Illustrations Trottinettes', 'fas fa-image', Illustration::class);
+        yield MenuItem::linkToCrud('Illustration Accessoires', 'fas fa-image', Illustrationaccess::class);
 
+        //-- Poids --//
+        yield MenuItem::section('Poids');
+        yield MenuItem::linkToCrud('Poids', 'fas fa-home', Weight::class);
+
+        //-- Users --//
         yield MenuItem::section('Utilisateurs');
         yield MenuItem::linkToCrud('Users', 'fas fa-user', User::class);
+
+        //-- Commandes --//
+        yield MenuItem::section('Commandes');
+        yield MenuItem::linkToCrud('Commande', 'fa fa-shopping-cart', Order::class);
+        yield MenuItem::linkToCrud('Détails de commande', 'fa fa-shopping-cart', OrderDetails::class);
 
         // --- Statistiques / Graphiques ---
         yield MenuItem::section('Stats');
