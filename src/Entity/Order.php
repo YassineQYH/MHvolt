@@ -39,7 +39,11 @@ class Order
     private ?string $stripeSessionId = null;
 
     #[ORM\Column(type: 'integer')]
-    private ?int $state = null;
+    private ?int $paymentState = 0;
+
+    #[ORM\Column(type: 'integer')]
+    private ?int $deliveryState = 0;
+
 
     public function __construct()
     {
@@ -93,12 +97,19 @@ class Order
         return $this;
     }
 
+    // 🟢 --- GETTERS & SETTERS ---
+
     public function getReference(): ?string { return $this->reference; }
     public function setReference(string $reference): self { $this->reference = $reference; return $this; }
 
     public function getStripeSessionId(): ?string { return $this->stripeSessionId; }
     public function setStripeSessionId(?string $stripeSessionId): self { $this->stripeSessionId = $stripeSessionId; return $this; }
 
-    public function getState(): ?int { return $this->state; }
-    public function setState(int $state): self { $this->state = $state; return $this; }
+    // ✅ Paiement (0 = Non payée, 1 = Payée)
+    public function getPaymentState(): ?int { return $this->paymentState; }
+    public function setPaymentState(int $paymentState): self { $this->paymentState = $paymentState; return $this; }
+
+    // ✅ Livraison (0 = Préparation en cours, 1 = Livraison en cours)
+    public function getDeliveryState(): ?int { return $this->deliveryState; }
+    public function setDeliveryState(int $deliveryState): self { $this->deliveryState = $deliveryState; return $this; }
 }

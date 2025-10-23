@@ -35,17 +35,11 @@ class OrderCrudController extends AbstractCrudController
     {
         $updatePreparation = Action::new('updatePreparation', 'Préparation en cours', 'fas fa-box-open')
             ->linkToCrudAction('updatePreparation')
-            ->displayIf(static function ($entityInstance) {
-                return $entityInstance->getState() < 2;
-            })
-            ->setHtmlAttributes(['data-id' => 'entity.id']);
+            ->displayIf(static fn(Order $order) => $order->getDeliveryState() === 0);
 
         $updateDelivery = Action::new('updateDelivery', 'Livraison en cours', 'fas fa-truck')
             ->linkToCrudAction('updateDelivery')
-            ->displayIf(static function ($entityInstance) {
-                return $entityInstance->getState() == 2;
-            })
-            ->setHtmlAttributes(['data-id' => 'entity.id']);
+            ->displayIf(static fn(Order $order) => $order->getDeliveryState() === 1 && $order->getPaymentState() === 1);
 
         return $actions
             ->add(Crud::PAGE_DETAIL, $updatePreparation)
@@ -53,21 +47,20 @@ class OrderCrudController extends AbstractCrudController
             ->add(Crud::PAGE_INDEX, Action::DETAIL);
     }
 
-
-    private function handleOrderState(Order $order, int $state, string $message)
+    private function handleDeliveryState(Order $order, int $state, string $message)
     {
-        $order->setState($state);
+        $order->setDeliveryState($state);
         $this->entityManager->flush();
 
         $this->addFlash('notice', $message);
 
         // Envoi du mail
         $mail = new Mail();
-        $content = "Bonjour ".$order->getUser()->getFirstname()."<br>Hich'Trott vous informe que votre commande n°<strong>" .$order->getReference()."</strong> est ".$message;
+        $content = "Bonjour " . $order->getUser()->getFirstName() . "<br>Hich'Trott vous informe que votre commande n°<strong>" . $order->getReference() . "</strong> est " . $message;
         $mail->send(
             $order->getUser()->getEmail(),
-            $order->getUser()->getFirstname(),
-            "Votre commande ".$order->getReference(),
+            $order->getUser()->getFirstName(),
+            "Votre commande " . $order->getReference(),
             $content
         );
     }
@@ -82,7 +75,7 @@ class OrderCrudController extends AbstractCrudController
             return $this->redirect($this->adminUrlGenerator->setController(self::class)->setAction('index')->generateUrl());
         }
 
-        $this->handleOrderState($order, 2, '<u>en cours de préparation</u>');
+        $this->handleDeliveryState($order, 1, '<u>en cours de préparation</u>');
 
         return $this->redirect($this->adminUrlGenerator
             ->setController(self::class)
@@ -101,7 +94,7 @@ class OrderCrudController extends AbstractCrudController
             return $this->redirect($this->adminUrlGenerator->setController(self::class)->setAction('index')->generateUrl());
         }
 
-        $this->handleOrderState($order, 3, '<u>en cours de livraison</u>');
+        $this->handleDeliveryState($order, 2, '<u>en cours de livraison</u>');
 
         return $this->redirect($this->adminUrlGenerator
             ->setController(self::class)
@@ -109,7 +102,6 @@ class OrderCrudController extends AbstractCrudController
             ->setEntityId($order->getId())
             ->generateUrl());
     }
-
 
     public function configureCrud(Crud $crud): Crud
     {
@@ -121,16 +113,40 @@ class OrderCrudController extends AbstractCrudController
         return [
             IdField::new('id')->onlyOnIndex(),
             DateTimeField::new('createdAt', 'Passée le'),
-            TextField::new('user.getFullname', 'Utilisateur'),
+
+            // Affiche le user mais ne le rend pas éditable
+            TextField::new('user', 'Utilisateur')
+                ->onlyOnDetail()
+                ->formatValue(fn($value, $entity) => (string) $entity->getUser()),
+
             TextEditorField::new('delivery', 'Adresse de livraison')->onlyOnDetail(),
             MoneyField::new('total', 'Total produit')->setCurrency('EUR')->setStoredAsCents(false),
             MoneyField::new('carrierPrice', 'Frais de livraison')->setCurrency('EUR')->setStoredAsCents(false),
-            ChoiceField::new('state', 'Statut')->setChoices([
-                'Non payée' => 0,
-                'Payée' => 1,
-                'Préparation en cours' => 2,
-                'Livraison en cours' => 3,
-            ]),
+
+            // Paiement séparé
+            ChoiceField::new('paymentState', 'Paiement')
+                ->setChoices([
+                    'Non payée' => 0,
+                    'Payée' => 1,
+                ])
+                ->renderAsBadges([
+                    0 => 'danger',
+                    1 => 'success',
+                ]),
+
+            // Livraison / traitement
+            ChoiceField::new('deliveryState', 'Traitement')
+                ->setChoices([
+                    'Commande en attente' => 0,
+                    'Préparation en cours' => 1,
+                    'Livraison en cours' => 2,
+                ])
+                ->renderAsBadges([
+                    0 => 'secondary',
+                    1 => 'warning',
+                    2 => 'info',
+                ]),
+
             ArrayField::new('orderDetails', 'Produits achetés')
                 ->setTemplatePath('admin/fields/order_details.html.twig')
                 ->onlyOnDetail(),
