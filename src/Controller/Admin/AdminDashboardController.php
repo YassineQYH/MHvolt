@@ -50,6 +50,18 @@ class AdminDashboardController extends AbstractDashboardController
     {
         yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
 
+         //-- Users --//
+        yield MenuItem::section('Utilisateurs');
+        yield MenuItem::linkToCrud('Users', 'fas fa-user', User::class);
+
+        // -- Commandes --//
+        yield MenuItem::section('Commandes');
+        yield MenuItem::linkToCrud('Commandes', 'fa fa-shopping-cart', Order::class);
+
+        //-- Poids --//
+        yield MenuItem::section('Poids');
+        yield MenuItem::linkToCrud('Poids', 'fas fa-home', Weight::class);
+
         // --- CRUD Produits ---
         yield MenuItem::section('Trottinettes');
         yield MenuItem::linkToCrud('Trottinettes', 'fas fa-folder', Trottinette::class);
@@ -67,20 +79,6 @@ class AdminDashboardController extends AbstractDashboardController
         yield MenuItem::section('Illustrations');
         yield MenuItem::linkToCrud('Illustrations Trottinettes', 'fas fa-image', Illustration::class);
         yield MenuItem::linkToCrud('Illustration Accessoires', 'fas fa-image', Illustrationaccess::class);
-
-        //-- Poids --//
-        yield MenuItem::section('Poids');
-        yield MenuItem::linkToCrud('Poids', 'fas fa-home', Weight::class);
-
-        //-- Users --//
-        yield MenuItem::section('Utilisateurs');
-        yield MenuItem::linkToCrud('Users', 'fas fa-user', User::class);
-
-        // -- Commandes --//
-        yield MenuItem::section('Commandes');
-        yield MenuItem::linkToCrud('Commandes', 'fa fa-shopping-cart', Order::class);
-        // Plus besoin du CRUD séparé OrderDetails
-
 
         // --- Statistiques / Graphiques ---
         yield MenuItem::section('Stats');
