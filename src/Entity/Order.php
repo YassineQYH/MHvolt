@@ -50,6 +50,11 @@ class Order
         $this->orderDetails = new ArrayCollection();
     }
 
+        public function __toString(): string
+    {
+        return $this->reference ?? 'Commande n°' . $this->id;
+    }
+
     public function getTotal(): float
     {
         $total = 0.0;

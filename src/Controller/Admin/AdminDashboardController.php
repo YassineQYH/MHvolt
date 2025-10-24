@@ -58,9 +58,10 @@ class AdminDashboardController extends AbstractDashboardController
         // -- Commandes --//
         yield MenuItem::section('Commandes');
         yield MenuItem::linkToCrud('Commandes', 'fa fa-shopping-cart', Order::class);
+        yield MenuItem::linkToCrud('Détails Commandes', 'fas fa-receipt', OrderDetails::class);
 
         //-- Poids --//
-        yield MenuItem::section('Poids');
+        yield MenuItem::section('Tableau tarifaire des Poids');
         yield MenuItem::linkToCrud('Poids', 'fas fa-home', Weight::class);
 
         // --- CRUD Produits ---

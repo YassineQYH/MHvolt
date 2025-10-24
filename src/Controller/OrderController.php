@@ -131,7 +131,8 @@ class OrderController extends AbstractController
             $order->setCreatedAt($date);
             $order->setCarrierPrice($prixLivraison);
             $order->setDelivery($deliveryContent);
-            $order->setState(0);
+            $order->setPaymentState(0);  // Non payée
+            $order->setDeliveryState(0); // Préparation en cours
 
             $this->entityManager->persist($order);
 
