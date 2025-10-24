@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : ven. 24 oct. 2025 à 15:22
+-- Généré le : ven. 24 oct. 2025 à 15:24
 -- Version du serveur : 10.4.32-MariaDB
 -- Version de PHP : 8.2.12
 
@@ -323,12 +323,12 @@ INSERT INTO `order` (`id`, `user_id`, `created_at`, `carrier_price`, `delivery`,
 (2, 1, '2025-10-21 14:29:08', 23.22, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '21102025-68f77c9423c2c', NULL, 0, 0, '31131211131221', 'BPOST', NULL, NULL),
 (3, 1, '2025-10-21 14:29:28', 23.22, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '21102025-68f77ca83d2a7', NULL, 0, 0, '1113213211', 'BPOST', NULL, NULL),
 (4, 1, '2025-10-21 14:31:59', 23.22, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '21102025-68f77d3f4629b', 'cs_test_b1IFG5Q9gll0ZuAgc3zlYqDKvwrd6uJOHwJcWVZSGbXo8AewDIYVEWUcv9', 0, 0, 'CC088942925FR', 'BPOST', NULL, NULL),
-(5, 1, '2025-10-21 14:32:57', 23.22, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '21102025-68f77d799ff9b', 'cs_test_b1hL2avKtpCc9IokW6GFqrzSV3jEvMmzBlqosbd8TBlykrOREGjpR1c7YE', 1, 0, '6G61316524338', 'BPOST', NULL, NULL),
-(6, 1, '2025-10-21 16:34:49', 22.35, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '21102025-68f79a09bd15f', NULL, 1, 0, '6G61366363482', 'BPOST', NULL, NULL),
+(5, 1, '2025-10-21 14:32:57', 23.22, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '21102025-68f77d799ff9b', 'cs_test_b1hL2avKtpCc9IokW6GFqrzSV3jEvMmzBlqosbd8TBlykrOREGjpR1c7YE', 1, 1, '6G61316524338', 'BPOST', NULL, NULL),
+(6, 1, '2025-10-21 16:34:49', 22.35, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '21102025-68f79a09bd15f', NULL, 1, 1, '6G61366363482', 'BPOST', NULL, NULL),
 (7, 1, '2025-10-21 16:35:23', 22.35, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '21102025-68f79a2bbf571', NULL, 1, 3, '6G61397378424', 'BPOST', NULL, NULL),
 (8, 1, '2025-10-21 16:37:04', 19.8, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '21102025-68f79a902672b', 'cs_test_b11AmvahjrP8RuTIhMPNCtqZwyg6T0fJQ81CLWFBzisnEATWsvQWmN8fSD', 1, 1, '6G61397895822', 'LAPOSTE', NULL, NULL),
-(9, 1, '2025-10-22 09:35:14', 19.8, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '22102025-68f88932a6b2e', 'cs_test_b1MfDJ2kREupjottpXlscZl1IhorILdWvOFmrGBHtokfu5bVWFuqXapsYo', 1, 3, '6G61398207501', 'LAPOSTE', NULL, NULL),
-(10, 4, '2025-10-22 16:28:00', 20.65, 'Yass Qay<br>+33641515128<br>17 marie marving<br>63200 riom<br>FR', '22102025-68f8e9f1541e1', 'cs_test_b16TGqtnQO05GSgFvVzu0G8kdkwP4QvAaAaCwIZ289xG8H11x0UVaRWmMH', 1, 3, 'CC084147325FR', 'LAPOSTE', NULL, NULL);
+(9, 1, '2025-10-22 09:35:14', 19.8, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '22102025-68f88932a6b2e', 'cs_test_b1MfDJ2kREupjottpXlscZl1IhorILdWvOFmrGBHtokfu5bVWFuqXapsYo', 1, 2, '6G61398207501', 'LAPOSTE', NULL, NULL),
+(10, 4, '2025-10-22 16:28:00', 20.65, 'Yass Qay<br>+33641515128<br>17 marie marving<br>63200 riom<br>FR', '22102025-68f8e9f1541e1', 'cs_test_b16TGqtnQO05GSgFvVzu0G8kdkwP4QvAaAaCwIZ289xG8H11x0UVaRWmMH', 1, 2, 'CC084147325FR', 'LAPOSTE', NULL, NULL);
 
 -- --------------------------------------------------------
 
