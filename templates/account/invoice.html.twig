@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Facture {{ order.reference }}</title>
+</head>
+<body>
+    <h1>Facture {{ order.reference }}</h1>
+
+    <div class="company-info">
+        <strong>Vendeur :</strong> Hich-Trott<br>
+        <strong>Adresse :</strong> 123 Rue Exemple, 75000 Paris<br>
+        <strong>Email :</strong> contact@hich-trott.fr
+    </div>
+
+    <div class="client-info">
+        <strong>Client :</strong> {{ order.user.firstname }} {{ order.user.lastname }}<br>
+        <strong>Adresse :</strong> {{ order.delivery|raw }}
+    </div>
+
+    <hr>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Produit</th>
+                <th>Quantité</th>
+                <th>Poids</th>
+                <th>Prix unitaire HT</th>
+                <th>Total HT</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% set totalHT = 0 %}
+            {% for item in order.orderDetails %}
+                {% set totalItemHT = item.price * item.quantity %}
+                <tr>
+                    <td>{{ item.product }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>{{ item.weight * item.quantity }} kg</td>
+                    <td>{{ (item.price / 100)|number_format(2, ',', '.') }} €</td>
+                    <td>{{ (totalItemHT / 100)|number_format(2, ',', '.') }} €</td>
+                </tr>
+                {% set totalHT = totalHT + totalItemHT %}
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% set tvaRate = 0.20 %}
+    {% set tvaAmount = totalHT * tvaRate %}
+    {% set totalTTC = (totalHT + tvaAmount + order.carrierPrice * 100) / 100 %}
+
+    <table class="totals">
+        <tbody>
+            <tr>
+                <td><strong>Sous-total HT :</strong></td>
+                <td class="text-right">{{ (totalHT / 100)|number_format(2, ',', '.') }} €</td>
+            </tr>
+            <tr>
+                <td><strong>TVA (20%) :</strong></td>
+                <td class="text-right">{{ (tvaAmount / 100)|number_format(2, ',', '.') }} €</td>
+            </tr>
+            <tr>
+                <td><strong>Frais de livraison :</strong></td>
+                <td class="text-right">{{ (order.carrierPrice)|number_format(2, ',', '.') }} €</td>
+            </tr>
+            <tr>
+                <td><strong>Total TTC :</strong></td>
+                <td class="text-right">{{ totalTTC|number_format(2, ',', '.') }} €</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div style="clear: both;"></div>
+
+    <p style="margin-top: 50px; font-size: 10px; color: #666;">
+        Merci pour votre commande !<br>
+        Hich-Trott - Tous droits réservés.
+    </p>
+</body>
+</html>

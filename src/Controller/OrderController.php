@@ -16,11 +16,13 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Service\PdfService;
 
 class OrderController extends AbstractController
 {
     public function __construct(
-        private readonly EntityManagerInterface $entityManager
+        private readonly EntityManagerInterface $entityManager,
+        private readonly PdfService $pdfService
     ) {}
 
     #[Route('/commande', name: 'order', methods: ['GET','POST'])]
@@ -34,19 +36,16 @@ class OrderController extends AbstractController
         /** @var User|null $user */
         $user = $this->getUser();
 
-        // 🔐 Si non connecté → redirection vers le panier (ou login selon ton flux)
         if (!$user) {
             $this->addFlash('login_required', 'Vous devez être connecté pour valider votre panier.');
             return $this->redirectToRoute('cart');
         }
 
-        // 🏠 Si pas d'adresse → redirection vers ajout d'adresse
         if ($user->getAddresses()->isEmpty()) {
             $this->addFlash('info', 'Veuillez ajouter une adresse avant de passer commande.');
             return $this->redirectToRoute('account_address_add');
         }
 
-        // Création du formulaire (OrderType attend l'option 'user')
         $form = $this->createForm(OrderType::class, null, [
             'user' => $user,
         ]);
@@ -66,8 +65,6 @@ class OrderController extends AbstractController
         CategoryAccessoryRepository $categoryAccessoryRepository
     ): Response {
         $categories = $categoryAccessoryRepository->findAll();
-
-        /** @var User|null $user */
         $user = $this->getUser();
 
         if (!$user) {
@@ -81,18 +78,7 @@ class OrderController extends AbstractController
 
         $form->handleRequest($request);
 
-        // Débug utile (décommenter si besoin)
-        // dump([
-        //     'isSubmitted' => $form->isSubmitted(),
-        //     'isValid' => $form->isValid(),
-        //     'request_method' => $request->getMethod(),
-        //     'request_data' => $request->request->all(),
-        // ]);
-        // if ($form->isSubmitted() && !$form->isValid()) {
-        //     dd($form->getErrors(true, false));
-        // }
-
-        // Calcul du poids total et de la quantité
+        // Calcul poids total + quantité
         $poidsTotal = 0.0;
         $quantiteTotale = 0;
         foreach ($cart->getFull() as $element) {
@@ -124,20 +110,17 @@ class OrderController extends AbstractController
 
             // Création de la commande
             $order = new Order();
-            $order->setCarrier('bpost'); // 🚚 Transporteur par défaut
-            $reference = $date->format('dmY') . '-' . uniqid();
-
-            $order->setReference($reference);
+            $order->setCarrier('bpost');
+            $order->setReference($date->format('dmY') . '-' . uniqid());
             $order->setUser($user);
             $order->setCreatedAt($date);
             $order->setCarrierPrice($prixLivraison);
             $order->setDelivery($deliveryContent);
-            $order->setPaymentState(0);  // Non payée
-            $order->setDeliveryState(0); // Préparation en cours
+            $order->setPaymentState(0);
+            $order->setDeliveryState(0);
 
             $this->entityManager->persist($order);
 
-            // Enregistrement des détails
             foreach ($cart->getFull() as $element) {
                 $produit = $element['product'];
                 $quantite = (int) $element['quantity'];
@@ -155,7 +138,6 @@ class OrderController extends AbstractController
 
             $this->entityManager->flush();
 
-            // Affiche la page récap avant paiement (order/add.html.twig)
             return $this->render('order/add.html.twig', [
                 'cart' => $cart->getFull(),
                 'delivery' => $deliveryContent,
@@ -166,18 +148,38 @@ class OrderController extends AbstractController
             ]);
         }
 
-        // Non soumis / invalide → retour panier (tu peux dump pour debug)
-        // dd('form invalid', $request->request->all());
         return $this->redirectToRoute('cart');
     }
 
-    private function fillPriceList(WeightRepository $weightRepository): array
+    #[Route('/account/order/{reference}/facture', name: 'account_order_invoice', methods: ['GET'])]
+    public function generateInvoice(string $reference, Request $request): Response
     {
-        $priceList = [];
-        foreach ($weightRepository->findAll() as $item) {
-            $priceList[(string) $item->getKg()] = (string) $item->getPrice();
+        $order = $this->entityManager->getRepository(Order::class)->findOneBy(['reference' => $reference]);
+        if (!$order || $order->getUser() !== $this->getUser()) {
+            throw $this->createAccessDeniedException('Commande introuvable ou non autorisée.');
         }
 
-        return $priceList;
+        $download = $request->query->getBoolean('download', false);
+
+        return $this->pdfService->generate(
+            'account/invoice.html.twig',
+            ['order' => $order],
+            'facture_' . $order->getReference() . '.pdf',
+            $download ? 'attachment' : 'inline'  // inline = affichage navigateur, attachment = téléchargement
+        );
     }
+
+    #[Route('/account/order/{reference}/facture/web', name: 'account_order_invoice_web', methods: ['GET'])]
+    public function viewInvoiceWeb(string $reference): Response
+    {
+        $order = $this->entityManager->getRepository(Order::class)->findOneBy(['reference' => $reference]);
+        if (!$order || $order->getUser() !== $this->getUser()) {
+            throw $this->createAccessDeniedException('Commande introuvable ou non autorisée.');
+        }
+
+        return $this->render('account/invoice_web.html.twig', [
+            'order' => $order
+        ]);
+    }
+
 }

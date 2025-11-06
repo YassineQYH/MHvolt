@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Bordereau BPOST {{ order.reference }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            margin: 0;
+            padding: 5px;
+        }
+        .bordereau {
+            width: 105mm; /* A6 portrait */
+            height: 148mm;
+            padding: 5mm;
+            border: 1px solid #000;
+            box-sizing: border-box;
+        }
+        h1, h2, h3 {
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        h2 {
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 5px;
+            font-size: 11px;
+        }
+        th, td {
+            border: 1px solid #000;
+            padding: 2px;
+            text-align: left;
+        }
+        .client-qr {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-top: 5px;
+        }
+        .client-info {
+            width: 65%; /* prend 65% de la largeur */
+        }
+        .qr {
+            width: 30%; /* prend 30% de la largeur */
+            text-align: center;
+        }
+        .footer {
+            font-size: 10px;
+            margin-top: 5px;
+            color: gray;
+        }
+    </style>
+</head>
+<body>
+    <div class="bordereau">
+        <h1>BPOST - Commande {{ order.reference }}</h1>
+
+        <div class="client-qr">
+            <div class="client-info">
+                <h2>Client</h2>
+                <p>
+                    {{ order.user.firstName }} {{ order.user.lastName }}<br>
+                    {% if order.user.phoneNumber is defined %}{{ order.user.phoneNumber }}<br>{% endif %}
+                    {{ order.delivery|raw }}
+                </p>
+            </div>
+            <div class="qr">
+                {% if qrCode %}
+                    <img src="{{ qrCode }}" alt="QR Code">
+                {% endif %}
+            </div>
+        </div>
+
+        <h2>Produits</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Produit</th>
+                    <th>Qté</th>
+                    <th>Poids</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for detail in order.orderDetails %}
+                    <tr>
+                        <td>{{ detail.product }}</td>
+                        <td>{{ detail.quantity }}</td>
+                        <td>{{ detail.weight }} kg</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <h2>Transport</h2>
+        <p>
+            Transporteur : {{ order.carrier }}<br>
+            Numéro de suivi : <strong>{{ order.trackingNumber }}</strong>
+        </p>
+
+        <div class="footer">
+            Ce bordereau doit être scanné par le transporteur lors de la prise en charge et à la livraison.
+        </div>
+    </div>
+</body>
+</html>

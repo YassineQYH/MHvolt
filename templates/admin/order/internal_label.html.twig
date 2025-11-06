@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Étiquette Interne</title>
+    <style>
+        body { font-family: Arial, sans-serif; font-size: 12px; }
+        .header { font-weight: bold; margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #000; padding: 5px; text-align: left; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        Étiquette Interne - Commande n°{{ order.reference }}
+    </div>
+
+    <h3>Client</h3>
+    <p>{{ order.user.firstName }} {{ order.user.lastName }}<br>
+       {{ order.delivery|raw }}</p>
+
+    <h3>Produits</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Produit</th>
+                <th>Quantité</th>
+                <th>Poids</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for detail in order.orderDetails %}
+                <tr>
+                    <td>{{ detail.product }}</td>
+                    <td>{{ detail.quantity }}</td>
+                    <td>{{ detail.weight }} kg</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

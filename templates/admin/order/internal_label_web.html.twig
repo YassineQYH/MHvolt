@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Étiquette Interne {{ order.reference }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5" style="max-width: 80%;">
+    <h1>Étiquette Interne - Commande {{ order.reference }}</h1>
+
+    <div class="d-flex gap-2 mt-3 mb-3">
+        {# Bouton pour voir le Web #}
+        <a href="/admin?crudAction=internalLabelWeb&crudControllerFqcn=App%5CController%5CAdmin%5COrderCrudController&entityId={{ order.id }}"
+           class="btn btn-secondary btn-sm" target="_blank">
+           Voir Web
+        </a>
+
+        {# Bouton pour télécharger PDF #}
+        <a href="/admin?crudAction=generateInternalLabel&crudControllerFqcn=App%5CController%5CAdmin%5COrderCrudController&entityId={{ order.id }}"
+           class="btn btn-primary btn-sm" target="_blank">
+           Télécharger PDF
+        </a>
+    </div>
+
+    <h3>Client</h3>
+    <p>{{ order.user.firstName }} {{ order.user.lastName }}<br>
+       {{ order.delivery|raw }}</p>
+
+    <h3>Produits</h3>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Produit</th>
+                <th>Quantité</th>
+                <th>Poids</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for detail in order.orderDetails %}
+                <tr>
+                    <td>{{ detail.product }}</td>
+                    <td>{{ detail.quantity }}</td>
+                    <td>{{ detail.weight }} kg</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Facture {{ order.reference }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>Facture {{ order.reference }}</h1>
+    <a href="{{ path('account_order') }}">← Retour</a>
+
+    <div class="d-flex gap-2 mt-3 mb-3">
+        <a href="{{ path('account_order_invoice', { reference: order.reference, download: true }) }}"
+           class="btn btn-primary btn-sm">
+            Télécharger PDF
+        </a>
+        {# <a href="{{ path('account_order_invoice', { reference: order.reference }) }}"
+           class="btn btn-secondary btn-sm" target="_blank">
+            Ouvrir PDF dans un nouvel onglet
+        </a> #}
+    </div>
+
+    <hr>
+
+    <p><strong>Client :</strong> {{ order.user.firstname }} {{ order.user.lastname }}</p>
+    <p><strong>Adresse :</strong><br> {{ order.delivery|raw }}</p>
+    <p><strong>Commande passée le :</strong> {{ order.createdAt|date('d/m/Y') }}</p>
+
+    <h4>Détails :</h4>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Produit</th>
+                <th>Quantité</th>
+                <th>Poids</th>
+                <th>Prix unitaire</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% set total = 0 %}
+            {% for item in order.orderDetails %}
+                {% set totalItem = item.price * item.quantity %}
+                <tr>
+                    <td>{{ item.product }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>{{ item.weight * item.quantity }} kg</td>
+                    <td>{{ (item.price / 100)|number_format(2, ',', '.') }} €</td>
+                    <td>{{ (totalItem / 100)|number_format(2, ',', '.') }} €</td>
+                </tr>
+                {% set total = total + totalItem %}
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="text-end me-3">
+        <p><strong>Sous-total :</strong> {{ (total / 100)|number_format(2, ',', '.') }} €</p>
+        <p><strong>Frais livraison :</strong> {{ (order.carrierPrice)|number_format(2, ',', '.') }} €</p>
+        <p><strong>Total :</strong> {{ ((total / 100) + order.carrierPrice)|number_format(2, ',', '.') }} €</p>
+    </div>
+</div>
+{% endblock %}

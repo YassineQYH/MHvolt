@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Classe\Mail;
 use App\Entity\Order;
+use App\Service\PdfService;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
@@ -14,17 +15,21 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\{
     IdField, TextField, ArrayField, MoneyField, ChoiceField, DateTimeField, TextEditorField
 };
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
+use Symfony\Component\HttpFoundation\Response;
+
+// Endroid QR Code
+use Endroid\QrCode\QrCode;
+use Endroid\QrCode\Writer\PngWriter;
+use Endroid\QrCode\Encoding\Encoding;
+use Endroid\QrCode\ErrorCorrectionLevel\ErrorCorrectionLevel;
 
 class OrderCrudController extends AbstractCrudController
 {
-    private EntityManagerInterface $entityManager;
-    private AdminUrlGenerator $adminUrlGenerator;
-
-    public function __construct(EntityManagerInterface $entityManager, AdminUrlGenerator $adminUrlGenerator)
-    {
-        $this->entityManager = $entityManager;
-        $this->adminUrlGenerator = $adminUrlGenerator;
-    }
+    public function __construct(
+        private readonly EntityManagerInterface $entityManager,
+        private readonly AdminUrlGenerator $adminUrlGenerator,
+        private readonly PdfService $pdfService,
+    ) {}
 
     public static function getEntityFqcn(): string
     {
@@ -35,69 +40,152 @@ class OrderCrudController extends AbstractCrudController
     {
         $updatePreparation = Action::new('updatePreparation', 'Préparation en cours', 'fas fa-box-open')
             ->linkToCrudAction('updatePreparation')
-            ->displayIf(static fn($order) => $order->getDeliveryState() === 0)
-            ->setHtmlAttributes(['data-id' => 'entity.id']);
+            ->displayIf(fn($order) => $order->getDeliveryState() === 0);
 
         $updateDelivery = Action::new('updateDelivery', 'Livraison en cours', 'fas fa-truck')
             ->linkToCrudAction('updateDelivery')
-            ->displayIf(static fn($order) => $order->getDeliveryState() === 1)
-            ->setHtmlAttributes(['data-id' => 'entity.id']);
+            ->displayIf(fn($order) => $order->getDeliveryState() === 1);
+
+        $internalLabelWeb = Action::new('internalLabelWeb', 'Voir Étiquette Web', 'fas fa-eye')
+            ->linkToCrudAction('internalLabelWeb')
+            ->setHtmlAttributes(['target' => '_blank']);
+
+        $internalLabelPdf = Action::new('generateInternalLabel', 'Télécharger Étiquette', 'fas fa-file-pdf')
+            ->linkToCrudAction('generateInternalLabel')
+            ->setHtmlAttributes(['target' => '_blank']);
+
+        $bpostLabelWeb = Action::new('bpostLabelWeb', 'Voir Bordereau Web', 'fas fa-eye')
+            ->linkToCrudAction('bpostLabelWeb')
+            ->setHtmlAttributes(['target' => '_blank']);
+
+        $bpostLabelPdf = Action::new('generateBpostLabel', 'Télécharger Bordereau', 'fas fa-truck-fast')
+            ->linkToCrudAction('generateBpostLabel')
+            ->setHtmlAttributes(['target' => '_blank']);
 
         return $actions
             ->add(Crud::PAGE_DETAIL, $updatePreparation)
             ->add(Crud::PAGE_DETAIL, $updateDelivery)
+            ->add(Crud::PAGE_DETAIL, $internalLabelWeb)
+            ->add(Crud::PAGE_DETAIL, $internalLabelPdf)
+            ->add(Crud::PAGE_DETAIL, $bpostLabelWeb)
+            ->add(Crud::PAGE_DETAIL, $bpostLabelPdf)
             ->add(Crud::PAGE_INDEX, Action::DETAIL);
     }
 
-    private function handleOrderState(Order $order, int $deliveryState, string $message)
+    // 🔹 Rendu web
+    public function internalLabelWeb(AdminContext $context): Response
     {
-        $order->setDeliveryState($deliveryState);
-        $this->entityManager->flush();
+        $order = $this->getOrderFromContext($context);
+        if (!$order) return $this->redirectToOrderIndex();
 
-        $this->addFlash('notice', $message);
+        return $this->render('admin/order/internal_label_web.html.twig', [
+            'order' => $order
+        ]);
+    }
 
-        $mail = new Mail();
-        $content = "Bonjour " . $order->getUser()->getFirstName() . "<br>Hich'Trott vous informe que votre commande n°<strong>"
-            . $order->getReference() . "</strong> est " . $message;
-        $mail->send(
-            $order->getUser()->getEmail(),
-            $order->getUser()->getFirstName(),
-            "Votre commande " . $order->getReference(),
-            $content
+    public function bpostLabelWeb(AdminContext $context): Response
+    {
+        $order = $this->getOrderFromContext($context);
+        if (!$order) return $this->redirectToOrderIndex();
+
+        return $this->render('admin/order/bpost_label_web.html.twig', [
+            'order' => $order
+        ]);
+    }
+
+    // 🔹 Génération des PDF
+    public function generateInternalLabel(AdminContext $context): Response
+    {
+        $order = $this->getOrderFromContext($context);
+        if (!$order) return $this->redirectToOrderIndex();
+
+        return $this->pdfService->generate(
+            'admin/order/internal_label.html.twig',
+            ['order' => $order],
+            'etiquette_interne_' . $order->getReference() . '.pdf',
+            'attachment'
         );
     }
 
-    public function updatePreparation(AdminContext $context)
+    public function generateBpostLabel(AdminContext $context): Response
     {
-        $orderId = $context->getRequest()->query->get('entityId');
-        $order = $this->entityManager->getRepository(Order::class)->find($orderId);
+        $order = $this->getOrderFromContext($context);
+        if (!$order) return $this->redirectToOrderIndex();
 
-        if (!$order) {
-            $this->addFlash('danger', 'Commande introuvable.');
-            return $this->redirect($this->adminUrlGenerator->setController(self::class)->setAction('index')->generateUrl());
+        // Si aucun numéro de suivi, en générer un temporaire
+        if (!$order->getTrackingNumber()) {
+            $order->setTrackingNumber('TEST-' . random_int(100000000, 999999999));
+            $this->entityManager->flush();
         }
 
-        $this->handleOrderState($order, 1, '<u>en cours de préparation</u>');
+        // Génération du QR code pour PDF
+        $qrCode = new QrCode($order->getTrackingNumber());
+        $writer = new PngWriter();
+        $result = $writer->write($qrCode);
 
+        // Base64 utilisable dans Twig
+        $qrCodeBase64 = $result->getDataUri();
+
+        return $this->pdfService->generate(
+            'admin/order/bpost_label.html.twig',
+            [
+                'order' => $order,
+                'qrCode' => $qrCodeBase64
+            ],
+            'bordereau_bpost_' . $order->getReference() . '.pdf',
+            'attachment'
+        );
+    }
+
+    // 🔹 Gestion d'état
+    public function updatePreparation(AdminContext $context): Response
+    {
+        $order = $this->getOrderFromContext($context);
+        if (!$order) return $this->redirectToOrderIndex();
+
+        $this->updateOrderState($order, 1, 'en cours de préparation');
+        return $this->redirectToOrderDetail($order);
+    }
+
+    public function updateDelivery(AdminContext $context): Response
+    {
+        $order = $this->getOrderFromContext($context);
+        if (!$order) return $this->redirectToOrderIndex();
+
+        $this->updateOrderState($order, 2, 'en cours de livraison');
+        return $this->redirectToOrderDetail($order);
+    }
+
+    private function updateOrderState(Order $order, int $state, string $message): void
+    {
+        $order->setDeliveryState($state);
+        $this->entityManager->flush();
+
+        $this->addFlash('notice', "Commande {$order->getReference()} $message");
+
+        $mail = new Mail();
+        $content = "Bonjour {$order->getUser()->getFirstName()},<br>
+        Votre commande n°<strong>{$order->getReference()}</strong> est $message.";
+        $mail->send($order->getUser()->getEmail(), $order->getUser()->getFirstName(), 'Suivi de commande', $content);
+    }
+
+    // 🔹 Outils internes
+    private function getOrderFromContext(AdminContext $context): ?Order
+    {
+        $orderId = $context->getRequest()->query->get('entityId');
+        return $this->entityManager->getRepository(Order::class)->find($orderId);
+    }
+
+    private function redirectToOrderIndex(): Response
+    {
         return $this->redirect($this->adminUrlGenerator
             ->setController(self::class)
-            ->setAction('detail')
-            ->setEntityId($order->getId())
+            ->setAction('index')
             ->generateUrl());
     }
 
-    public function updateDelivery(AdminContext $context)
+    private function redirectToOrderDetail(Order $order): Response
     {
-        $orderId = $context->getRequest()->query->get('entityId');
-        $order = $this->entityManager->getRepository(Order::class)->find($orderId);
-
-        if (!$order) {
-            $this->addFlash('danger', 'Commande introuvable.');
-            return $this->redirect($this->adminUrlGenerator->setController(self::class)->setAction('index')->generateUrl());
-        }
-
-        $this->handleOrderState($order, 2, '<u>en cours de livraison</u>');
-
         return $this->redirect($this->adminUrlGenerator
             ->setController(self::class)
             ->setAction('detail')
@@ -115,45 +203,30 @@ class OrderCrudController extends AbstractCrudController
         return [
             IdField::new('id')->onlyOnIndex(),
             DateTimeField::new('createdAt', 'Passée le'),
-
-            TextField::new('user', 'Utilisateur')
-                ->onlyOnDetail()
-                ->formatValue(fn($value, $entity) => (string) $entity->getUser()),
-
+            TextField::new('user', 'Utilisateur')->onlyOnDetail(),
             TextEditorField::new('delivery', 'Adresse de livraison')->onlyOnDetail(),
             MoneyField::new('total', 'Total produit')->setCurrency('EUR')->setStoredAsCents(false),
             MoneyField::new('carrierPrice', 'Frais de livraison')->setCurrency('EUR')->setStoredAsCents(false),
-
-            ChoiceField::new('paymentState', 'Paiement')
-                ->setChoices([
-                    'Non payée' => 0,
-                    'Payée' => 1,
-                ])
-                ->renderAsBadges([
-                    0 => 'danger',
-                    1 => 'success',
-                ]),
-
-            ChoiceField::new('deliveryState', 'Traitement')
-                ->setChoices([
-                    'Commande en attente' => 0,
-                    'Préparation en cours' => 1,
-                    'Livraison en cours' => 2,
-                    'Livraison terminée' => 3,
-                ])
-                ->renderAsBadges([
-                    0 => 'secondary',
-                    1 => 'warning',
-                    2 => 'info',
-                    3 => 'success',
-                ]),
-
-            // 🟢 Transporteur & suivi - maintenant éditables
-            TextField::new('carrier', 'Transporteur principal')->onlyOnDetail()->setFormTypeOption('disabled', false),
-            TextField::new('trackingNumber', 'Numéro de suivi principal')->onlyOnDetail()->setFormTypeOption('disabled', false),
-            TextField::new('secondaryCarrierTrackingNumber', 'Numéro de suivi secondaire')->onlyOnDetail()->setFormTypeOption('disabled', false),
-
-            // 🟢 Produits achetés
+            ChoiceField::new('paymentState', 'Paiement')->setChoices([
+                'Non payée' => 0,
+                'Payée' => 1,
+            ])->renderAsBadges([
+                0 => 'danger',
+                1 => 'success',
+            ]),
+            ChoiceField::new('deliveryState', 'Traitement')->setChoices([
+                'Commande en attente' => 0,
+                'Préparation en cours' => 1,
+                'Livraison en cours' => 2,
+                'Livraison terminée' => 3,
+            ])->renderAsBadges([
+                0 => 'secondary',
+                1 => 'warning',
+                2 => 'info',
+                3 => 'success',
+            ]),
+            TextField::new('carrier', 'Transporteur')->onlyOnDetail(),
+            TextField::new('trackingNumber', 'Numéro de suivi')->onlyOnDetail(),
             ArrayField::new('orderDetails', 'Produits achetés')
                 ->setTemplatePath('admin/fields/order_details.html.twig')
                 ->onlyOnDetail(),
