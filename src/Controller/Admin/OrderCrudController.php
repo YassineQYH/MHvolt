@@ -118,19 +118,21 @@ class OrderCrudController extends AbstractCrudController
             $this->entityManager->flush();
         }
 
-        // Génération du QR code pour PDF
+        // Génération du QR code
         $qrCode = new QrCode($order->getTrackingNumber());
         $writer = new PngWriter();
         $result = $writer->write($qrCode);
 
-        // Base64 utilisable dans Twig
-        $qrCodeBase64 = $result->getDataUri();
+        // Écriture du QR temporaire
+        $tempPath = sys_get_temp_dir() . '/qr_' . $order->getId() . '.png';
+        $result->saveToFile($tempPath);
 
+        // Dans le PDF Twig
         return $this->pdfService->generate(
             'admin/order/bpost_label.html.twig',
             [
                 'order' => $order,
-                'qrCode' => $qrCodeBase64
+                'qrCodePath' => $tempPath
             ],
             'bordereau_bpost_' . $order->getReference() . '.pdf',
             'attachment'
