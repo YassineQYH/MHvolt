@@ -1,4 +1,4 @@
-{% set cart_items = cart() %} {# ⚡ récupère le panier global via CartRuntime #}
+{% set cart_items = cart() %}
 
 <a id="cartdetails" data-toggle="dropdown" aria-haspopup="true"
    aria-expanded="false" href="{{ path('cart') }}">
@@ -8,8 +8,6 @@
 <div aria-labelledby="cartdetails" class="dropdown-menu dropdown-menu-left p-2" style="margin-top:13px!important; width: 360px;">
     <div class="navbar-cart-product-wrapper">
         {% set total = 0 %}
-
-        {# Wrapper scrollable pour les articles #}
         <div class="navbar-cart-product-list">
             {% if cart_items is not empty %}
                 {% for item in cart_items %}
@@ -20,7 +18,6 @@
                                     <small class="d-block text-sm"><strong>{{ item.product.name }}</strong></small>
                                 </div>
                                 <div class="col-md-3 my-auto">
-                                    {# ⚡ vérifie si item.product.imagePath existe #}
                                     {% if item.product.imagePath %}
                                         <img class="cart-product-image" src="{{ asset(item.product.imagePath) }}" alt="{{ item.product.name }}">
                                     {% else %}
@@ -29,10 +26,8 @@
                                 </div>
                                 <div class="col-md-9">
                                     <small class="d-block text-sm">
-                                        Prix unité : <strong>{{ (item.product.price / 100)|number_format(2, ',','.') }} €</strong>
+                                        Prix unité : <strong>{{ (item.product.price)|number_format(2, ',','.') }} €</strong>
                                     </small>
-
-                                    {# Affiche la quantité et boutons selon type #}
                                     <small class="d-block text-muted">
                                         Quantité : <strong>{{ item.quantity }}</strong>
                                         <span class="cart-buttons">
@@ -47,9 +42,8 @@
                                             </a>
                                         </span>
                                     </small>
-
                                     <small>
-                                        Prix total : <strong>{{ ((item.product.price * item.quantity) / 100)|number_format(2, ',','.') }} €</strong>
+                                        Prix total : <strong>{{ ((item.product.price * item.quantity))|number_format(2, ',','.') }} €</strong>
                                     </small>
                                 </div>
                             </div>
@@ -60,17 +54,15 @@
             {% else %}
                 <p>Votre panier est vide</p>
             {% endif %}
-        </div> {# fin navbar-cart-product-list #}
+        </div>
 
-        {# Bloc total commande #}
         <div class="navbar-cart-total">
             <span class="text-uppercase text-muted btn btn-outline-test">
                 Total commande : <br>
-                <strong class="text-uppercase">{{ (total / 100)|number_format(2, ',','.') }} €</strong>
+                <strong class="text-uppercase">{{ (total)|number_format(2, ',','.') }} €</strong>
             </span>
         </div>
 
-        {# Boutons Voir panier / Commander #}
         <div class="d-flex justify-content-between lien-panier">
             <a href="{{ path('cart') }}" class="mr-3 btn btn-outline-dark">
                 <small>Voir panier</small> <i class="fa-arrow-right fa"></i>

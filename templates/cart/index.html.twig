@@ -5,106 +5,100 @@
     {{ include('partials/menu.html.twig') }}
 {% endblock %}
 
-
 {% block content %}
-    <div class="container"></br></br></br></br></br></br></br>
-        <h1>Mon panier</h1>
-            Retrouvez l'ensemble des produits que vous avez ajouté à votre panier.
+<div class="container"></br></br></br></br></br></br></br>
+    <h1>Mon panier</h1>
+    Retrouvez l'ensemble des produits que vous avez ajouté à votre panier.
 
-            {% if cart|length > 0 %}
-                <table class="table table-striped mt-3">
-                    <thead class="thead-dark">
-                        <tr>
-                        <th scope="col">Produit</th>
-                        <th scope="col"></th>
-                        <th scope="col">Quantité</th>
-                        <th scope="col">Prix/unité</th>
-                        <th scope="col">Total</th>
-                        <th scope="col">Poids</th>
-                        <th scope="col"></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    {% set prix_total_article = null %}
-                    {% set poid_total = null %}
-                    {% set prix_total_poid = null %}
-                    {% set articles_panier = null %}
-                        {% for item in cart %}
-                            {# {{ dump(product) }} #}
-                            <tr>
-                                <th>
-                                    {% if item.product.imagePath %}
-                                        <img class="cart-product-image" src="{{ asset(item.product.imagePath) }}" alt="{{ item.product.name }}" height="75px">
-                                    {% else %}
-                                        <img class="cart-product-image" src="{{ asset('img/default.png') }}" alt="image par défaut" height="75px">
-                                    {% endif %}
-                                </th>
-                                <td>
-                                {{ item.product.name }} - {# {{ item.product.weight.nakgme }} #}</br>
-                                <small>{{ item.product.description }}</small>
-                                </td>
-                                <td>
-                                    {# ⚡ ajout du type pour gérer accessoires et trottinettes #}
-                                    <a href="{{ path('decrease_to_cart', {'id' : item.product.id, 'type': item.type|default('trottinette') }) }}">
-                                        <img src="{{ asset('assets/img/less.png') }}" height="12px" style="color:blue"; alt="-">
-                                    </a>
-                                    <small>x</small> {{ item.quantity }}
-                                    {% if item.product.stock <= item.quantity %}
-                                    <a style="color:red;">
-                                        Max <span>(rupture)</span>
-                                    </a>
-                                    {% else %}
-                                    <a href="{{ path('add_to_cart', {'id' : item.product.id, 'type': item.type|default('trottinette') }) }}">
-                                        <img src="{{ asset('assets/img/more.png') }}" height="12px" style="color:blue"; alt="+">
-                                    </a>
-                                    {% endif %}
-                                </td>
-                                <td>{{ (item.product.price / 100)|number_format(2, ',','.') }} €</td>
-                                <td>{{ ((item.product.price * item.quantity) / 100)|number_format(2, ',','.') }} €</td>
-                                <td>{{ (item.product.weight.kg * item.quantity) }} Kg</td>
-                                <td>
-                                <a href="{{ path('delete_to_cart', {'id' : item.product.id, 'type': item.type|default('trottinette') }) }}" style="color:blue">
-                                    <img src="{{ asset('assets/img/delete.png') }}" height="18px" alt="Supprimer"></td>
+    {% if cart|length > 0 %}
+        <table class="table table-striped mt-3">
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col">Produit</th>
+                    <th scope="col"></th>
+                    <th scope="col">Quantité</th>
+                    <th scope="col">Prix/unité</th>
+                    <th scope="col">Total</th>
+                    <th scope="col">Poids</th>
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% set prix_total_article = 0 %}
+                {% set poid_total = 0 %}
+                {% set prix_total_poid = 0 %}
+                {% set articles_panier = 0 %}
+                {% for item in cart %}
+                    <tr>
+                        <th>
+                            {% if item.product.imagePath %}
+                                <img class="cart-product-image" src="{{ asset(item.product.imagePath) }}" alt="{{ item.product.name }}" height="75px">
+                            {% else %}
+                                <img class="cart-product-image" src="{{ asset('img/default.png') }}" alt="image par défaut" height="75px">
+                            {% endif %}
+                        </th>
+                        <td>
+                            {{ item.product.name }} <br>
+                            <small>{{ item.product.description }}</small>
+                        </td>
+                        <td>
+                            <a href="{{ path('decrease_to_cart', {'id' : item.product.id, 'type': item.type|default('trottinette') }) }}">
+                                <img src="{{ asset('assets/img/less.png') }}" height="12px" style="color:blue" alt="-">
+                            </a>
+                            <small>x</small> {{ item.quantity }}
+                            {% if item.product.stock <= item.quantity %}
+                                <a style="color:red;">
+                                    Max <span>(rupture)</span>
                                 </a>
-                            </tr>
-                            {# PRIX TOTAL DES ARTICLES #}
-                            {% set prix_total_article = prix_total_article + (item.product.price * item.quantity) %}
-                        {% endfor %}
-                    </tbody>
-                </table>
-                <div class="text-right mb-5">
-                    <b>Nombre de produits :</b> {{ (quantity_product) }}</br>
-                    <b>Prix de mon panier :</b> {{ (prix_total_article / 100)|number_format(2, ',','.') }} € </br>
-                    <b>Prix livraison :</b> {{ (poid)|number_format(2, ',','.') }} kg = {{ (price)|number_format(2, ',','.') }} € </br>
-                    <b>Prix Total :</b> {{ ((prix_total_article / 100 ) + price)|number_format(2, ',','.') }} €
-                    <a href="{{ path('order') }}" class="btn btn-success btn-block">Valider mon panier</a>
-                </div>
-            {% else %}
-            <hr>
-            <p><b>Votre panier est vide.</b></p>
-            {% endif %}
-    </div>
+                            {% else %}
+                                <a href="{{ path('add_to_cart', {'id' : item.product.id, 'type': item.type|default('trottinette') }) }}">
+                                    <img src="{{ asset('assets/img/more.png') }}" height="12px" style="color:blue" alt="+">
+                                </a>
+                            {% endif %}
+                        </td>
+                        <td>{{ (item.product.price)|number_format(2, ',','.') }} €</td>
+                        <td>{{ ((item.product.price * item.quantity))|number_format(2, ',','.') }} €</td>
+                        <td>{{ (item.product.weight.kg * item.quantity) }} Kg</td>
+                        <td>
+                            <a href="{{ path('delete_to_cart', {'id' : item.product.id, 'type': item.type|default('trottinette') }) }}" style="color:blue">
+                                <img src="{{ asset('assets/img/delete.png') }}" height="18px" alt="Supprimer">
+                            </a>
+                        </td>
+                    </tr>
+                    {% set prix_total_article = prix_total_article + (item.product.price * item.quantity) %}
+                    {% set poid_total = poid_total + (item.product.weight.kg * item.quantity) %}
+                {% endfor %}
+            </tbody>
+        </table>
 
-    {% for message in app.flashes('login_required') %}
-        <div class="alert alert-warning text-center mt-3">
-            {{ message }}
+        <div class="text-right mb-5">
+            <b>Nombre de produits :</b> {{ quantity_product }}<br>
+            <b>Prix de mon panier :</b> {{ (prix_total_article)|number_format(2, ',','.') }} €<br>
+            <b>Poids total :</b> {{ poid_total }} kg<br>
+            <b>Prix livraison :</b> {{ (price)|number_format(2, ',','.') }} €<br>
+            <b>Prix Total :</b> {{ ((prix_total_article) + price)|number_format(2, ',','.') }} €
+            <a href="{{ path('order') }}" class="btn btn-success btn-block">Valider mon panier</a>
         </div>
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                const wrapper = document.querySelector('.wrapper');
-                if (wrapper) {
-                    // Affiche la popup login/register
-                    wrapper.classList.add('active-popup');
+    {% else %}
+        <hr>
+        <p><b>Votre panier est vide.</b></p>
+    {% endif %}
+</div>
 
-                    // Si ton fichier script-login-register.js est déjà chargé,
-                    // les listeners d'ouverture/fermeture continueront de fonctionner normalement
-                    console.log("Popup de connexion ouverte suite à un flash login_required");
-                } else {
-                    console.warn("⚠️ Élément .wrapper non trouvé — vérifie que la popup login/register est bien incluse sur cette page.");
-                }
-            });
-        </script>
-    {% endfor %}
-
-
+{% for message in app.flashes('login_required') %}
+    <div class="alert alert-warning text-center mt-3">
+        {{ message }}
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const wrapper = document.querySelector('.wrapper');
+            if (wrapper) {
+                wrapper.classList.add('active-popup');
+                console.log("Popup de connexion ouverte suite à un flash login_required");
+            } else {
+                console.warn("⚠️ Élément .wrapper non trouvé — vérifie que la popup login/register est bien incluse sur cette page.");
+            }
+        });
+    </script>
+{% endfor %}
 {% endblock %}
