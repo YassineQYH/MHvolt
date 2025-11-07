@@ -17,47 +17,33 @@
                     <th scope="col">Produit</th>
                     <th scope="col"></th>
                     <th scope="col">Quantité</th>
-                    <th scope="col">Prix/unité</th>
-                    <th scope="col">Total</th>
+                    <th scope="col">Prix/unité HT</th>
+                    <th scope="col">Prix/unité TTC</th>
+                    <th scope="col">Total HT</th>
+                    <th scope="col">Total TTC</th>
                     <th scope="col">Poids</th>
                     <th scope="col"></th>
                 </tr>
             </thead>
             <tbody>
-                {% set prix_total_article = 0 %}
-                {% set poid_total = 0 %}
-                {% set prix_total_poid = 0 %}
-                {% set articles_panier = 0 %}
+                {% set totalHT = 0 %}
+                {% set totalTTC = 0 %}
+                {% set totalWeight = 0 %}
                 {% for item in cart %}
+                    {% set priceHT = item.product.price %}
+                    {% set tvaRate = (item.product.tva.value ?? 20) / 100 %}
+                    {% set totalItemHT = priceHT * item.quantity %}
+                    {% set totalItemTTC = totalItemHT * (1 + tvaRate) %}
+                    {% set totalWeight = totalWeight + (item.product.weight.kg * item.quantity) %}
+
                     <tr>
-                        <th>
-                            {% if item.product.imagePath %}
-                                <img class="cart-product-image" src="{{ asset(item.product.imagePath) }}" alt="{{ item.product.name }}" height="75px">
-                            {% else %}
-                                <img class="cart-product-image" src="{{ asset('img/default.png') }}" alt="image par défaut" height="75px">
-                            {% endif %}
-                        </th>
-                        <td>
-                            {{ item.product.name }} <br>
-                            <small>{{ item.product.description }}</small>
-                        </td>
-                        <td>
-                            <a href="{{ path('decrease_to_cart', {'id' : item.product.id, 'type': item.type|default('trottinette') }) }}">
-                                <img src="{{ asset('assets/img/less.png') }}" height="12px" style="color:blue" alt="-">
-                            </a>
-                            <small>x</small> {{ item.quantity }}
-                            {% if item.product.stock <= item.quantity %}
-                                <a style="color:red;">
-                                    Max <span>(rupture)</span>
-                                </a>
-                            {% else %}
-                                <a href="{{ path('add_to_cart', {'id' : item.product.id, 'type': item.type|default('trottinette') }) }}">
-                                    <img src="{{ asset('assets/img/more.png') }}" height="12px" style="color:blue" alt="+">
-                                </a>
-                            {% endif %}
-                        </td>
-                        <td>{{ (item.product.price)|number_format(2, ',','.') }} €</td>
-                        <td>{{ ((item.product.price * item.quantity))|number_format(2, ',','.') }} €</td>
+                        <td>{{ item.product.name }}</td>
+                        <td>{{ item.product.description|default('') }}</td>
+                        <td>x{{ item.quantity }}</td>
+                        <td>{{ priceHT|number_format(2, ',', '.') }} €</td>
+                        <td>{{ (priceHT * (1 + tvaRate))|number_format(2, ',', '.') }} €</td>
+                        <td>{{ totalItemHT|number_format(2, ',', '.') }} €</td>
+                        <td>{{ totalItemTTC|number_format(2, ',', '.') }} €</td>
                         <td>{{ (item.product.weight.kg * item.quantity) }} Kg</td>
                         <td>
                             <a href="{{ path('delete_to_cart', {'id' : item.product.id, 'type': item.type|default('trottinette') }) }}" style="color:blue">
@@ -65,18 +51,24 @@
                             </a>
                         </td>
                     </tr>
-                    {% set prix_total_article = prix_total_article + (item.product.price * item.quantity) %}
-                    {% set poid_total = poid_total + (item.product.weight.kg * item.quantity) %}
+
+                    {% set totalHT = totalHT + totalItemHT %}
+                    {% set totalTTC = totalTTC + totalItemTTC %}
                 {% endfor %}
+
+
+
             </tbody>
         </table>
 
         <div class="text-right mb-5">
             <b>Nombre de produits :</b> {{ quantity_product }}<br>
-            <b>Prix de mon panier :</b> {{ (prix_total_article)|number_format(2, ',','.') }} €<br>
-            <b>Poids total :</b> {{ poid_total }} kg<br>
-            <b>Prix livraison :</b> {{ (price)|number_format(2, ',','.') }} €<br>
-            <b>Prix Total :</b> {{ ((prix_total_article) + price)|number_format(2, ',','.') }} €
+            <b>Total HT :</b> {{ totalHT|number_format(2, ',', '.') }} €<br>
+            <b>Total TTC :</b> {{ totalTTC|number_format(2, ',', '.') }} €<br>
+            <b>Poids total :</b> {{ totalWeight }} kg<br>
+            <b>Prix livraison :</b> {{ price|number_format(2, ',', '.') }} €<br>
+            <b>Prix Total :</b> {{ (totalTTC + price)|number_format(2, ',', '.') }} €
+
             <a href="{{ path('order') }}" class="btn btn-success btn-block">Valider mon panier</a>
         </div>
     {% else %}
@@ -84,21 +76,4 @@
         <p><b>Votre panier est vide.</b></p>
     {% endif %}
 </div>
-
-{% for message in app.flashes('login_required') %}
-    <div class="alert alert-warning text-center mt-3">
-        {{ message }}
-    </div>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const wrapper = document.querySelector('.wrapper');
-            if (wrapper) {
-                wrapper.classList.add('active-popup');
-                console.log("Popup de connexion ouverte suite à un flash login_required");
-            } else {
-                console.warn("⚠️ Élément .wrapper non trouvé — vérifie que la popup login/register est bien incluse sur cette page.");
-            }
-        });
-    </script>
-{% endfor %}
 {% endblock %}
