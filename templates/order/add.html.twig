@@ -38,14 +38,20 @@
             </div>
 
             <div class="order-summary">
-                {% set total = 0 %}
+                {% set totalHT = 0 %}
+                {% set totalTTC = 0 %}
                 {% for key, item in cart %}
+                    {% set priceHT = item.product.price %}
+                    {% set tvaRate = (item.product.tva.value ?? 20) / 100 %}
+                    {% set totalItemHT = priceHT * item.quantity %}
+                    {% set totalItemTTC = totalItemHT * (1 + tvaRate) %}
+
                     <div class="row {% if key > 0 %}mt-2{% endif %}">
                         <div class="col-4">
                             {% if item.product.imagePath %}
-                            <img src="{{ asset(item.product.imagePath) }}" alt="{{ item.product.name }}" height="75px">
+                                <img src="{{ asset(item.product.imagePath) }}" alt="{{ item.product.name }}" height="75px">
                             {% else %}
-                            <img src="{{ asset('img/default.png') }}" alt="image par défaut" height="75px">
+                                <img src="{{ asset('img/default.png') }}" alt="image par défaut" height="75px">
                             {% endif %}
                         </div>
                         <div class="col-6 my-auto">
@@ -53,29 +59,30 @@
                             <small>{{ item.product.description }}</small><br>
                             <small>x {{ item.quantity }}</small>
                         </div>
-                        <div class="col-2 my-auto">
-                            {{ ((item.product.price * item.quantity))|number_format(2, ',', '.') }} €
+                        <div class="col-2 my-auto text-end">
+                            {{ totalItemTTC|number_format(2, ',', '.') }} €
                         </div>
                     </div>
-                    {% set total = total + (item.product.price * item.quantity) %}
+
+                    {% set totalHT = totalHT + totalItemHT %}
+                    {% set totalTTC = totalTTC + totalItemTTC %}
                 {% endfor %}
             </div>
 
             <hr>
-            <strong>Sous-total :</strong> {{ (total)|number_format(2, ',', '.') }} €<br>
-            <strong>Livraison :</strong> {{ (price)|number_format(2, ',', '.') }} €
-            <hr>
-            <strong>Total :</strong> {{ ((total) + price)|number_format(2, ',', '.') }} €
+            <strong>Total HT :</strong> {{ totalHT|number_format(2, ',', '.') }} €<br>
+            <strong>TVA :</strong> {{ (totalTTC - totalHT)|number_format(2, ',', '.') }} €<br>
+            <strong>Livraison :</strong> {{ price|number_format(2, ',', '.') }} €<br>
+            <strong>Total TTC :</strong> {{ (totalTTC + price)|number_format(2, ',', '.') }} €
 
             {% if delivery is defined and delivery is not empty %}
                 <a href="{{ path('stripe_create_session', {'reference': reference}) }}" class="btn btn-success btn-block mt-3" id="checkout-button">
-                    Payer | {{ ((total) + price)|number_format(2, ',', '.') }} €
+                    Payer | {{ (totalTTC + price)|number_format(2, ',', '.') }} €
                 </a>
             {% endif %}
         </div>
     </div>
 </div>
-
 {% endblock %}
 
 {% block script %}
