@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Ma commande : Zone-Frais{% endblock %}
+{% block title %}Ma commande : Hich-Trott{% endblock %}
 
 {% block content %}
 <div class="container mt-5" style="max-width: 80%;">
@@ -10,15 +10,15 @@
     {# 🧾 Boutons PDF - petits et espacés #}
     <div class="d-flex mt-3 mb-3">
         <a href="{{ path('account_order_invoice_web', { reference: order.reference }) }}"
-        class="btn btn-secondary btn-sm w-auto"
-        target="_blank"
-        style="margin-right: 10px;">
-        Voir la facture
+           class="btn btn-secondary btn-sm w-auto"
+           target="_blank"
+           style="margin-right: 10px;">
+            Voir la facture
         </a>
 
         <a href="{{ path('account_order_invoice', { reference: order.reference }) }}?download=1"
-        class="btn btn-primary btn-sm w-auto">
-        Télécharger la facture (PDF)
+           class="btn btn-primary btn-sm w-auto">
+            Télécharger la facture (PDF)
         </a>
     </div>
 
@@ -51,34 +51,68 @@
                 <th>Produit</th>
                 <th>Quantité</th>
                 <th>Poids</th>
-                <th>Prix unitaire HT / Total HT</th>
+                <th>Prix unitaire HT</th>
+                <th>Prix unitaire TTC</th>
+                <th>Total HT</th>
+                <th>Total TTC</th>
             </tr>
         </thead>
         <tbody>
             {% set totalHT = 0 %}
+            {% set totalTTC = 0 %}
+            {% set tvaRate = 0.20 %}
             {% for item in order.orderDetails %}
                 {% set totalItemHT = item.price * item.quantity %}
+                {% set totalItemTTC = totalItemHT + (totalItemHT * tvaRate) %}
                 <tr>
                     <td>{{ item.product }}</td>
                     <td>x{{ item.quantity }}</td>
                     <td>{{ item.weight * item.quantity }} kg</td>
-                    <td>{{ (item.price / 100)|number_format(2, ',', '.') }} € / {{ (totalItemHT / 100)|number_format(2, ',', '.') }} €</td>
+                    <td>{{ (item.price / 100)|number_format(2, ',', '.') }} €</td>
+                    <td>{{ ((item.price * (1 + tvaRate)) / 100)|number_format(2, ',', '.') }} €</td>
+                    <td>{{ (totalItemHT / 100)|number_format(2, ',', '.') }} €</td>
+                    <td>{{ (totalItemTTC / 100)|number_format(2, ',', '.') }} €</td>
                 </tr>
                 {% set totalHT = totalHT + totalItemHT %}
+                {% set totalTTC = totalTTC + totalItemTTC %}
             {% endfor %}
+        </tbody>
+
+    </table>
+
+    {# Totaux de la commande #}
+    {% set tvaAmount = totalHT * tvaRate %}
+    {% set totalProduitsTTC = totalHT + tvaAmount %}
+    {% set totalCommande = totalProduitsTTC + order.carrierPrice * 100 %}
+
+    <table class="table table-bordered mt-4" style="max-width: 400px; float: right;">
+        <tbody>
+            <tr>
+                <td><strong>Total produits HT :</strong></td>
+                <td class="text-end">{{ (totalHT / 100)|number_format(2, ',', '.') }} €</td>
+            </tr>
+            <tr>
+                <td><strong>TVA ({{ (tvaRate*100)|number_format(0) }}%) :</strong></td>
+                <td class="text-end">{{ (tvaAmount / 100)|number_format(2, ',', '.') }} €</td>
+            </tr>
+            <tr>
+                <td><strong>Total produits TTC :</strong></td>
+                <td class="text-end">{{ (totalProduitsTTC / 100)|number_format(2, ',', '.') }} €</td>
+            </tr>
+            <tr>
+                <td><strong>Frais de livraison :</strong></td>
+                <td class="text-end">{{ (order.carrierPrice)|number_format(2, ',', '.') }} €</td>
+            </tr>
+            <tr>
+                <td><strong>Total commande :</strong></td>
+                <td class="text-end">{{ (totalCommande / 100)|number_format(2, ',', '.') }} €</td>
+            </tr>
+            <tr>
+                <td><strong>Transporteur :</strong></td>
+                <td class="text-end">{{ order.carrier ?? 'Non renseigné' }}</td>
+            </tr>
         </tbody>
     </table>
 
-    {# TVA et total TTC #}
-    {% set tvaRate = 0.20 %}
-    {% set tvaAmount = totalHT * tvaRate %}
-    {% set totalTTC = (totalHT + tvaAmount + order.carrierPrice * 100) / 100 %}
-
-    <div class="text-end" style="margin-right:30px;">
-        <strong>Sous-total HT :</strong> {{ (totalHT / 100)|number_format(2, ',', '.') }} €<br>
-        <strong>TVA (20%) :</strong> {{ (tvaAmount / 100)|number_format(2, ',', '.') }} €<br>
-        <strong>Frais de livraison :</strong> {{ (order.carrierPrice)|number_format(2, ',', '.') }} €<br>
-        <strong>Total TTC :</strong> {{ totalTTC|number_format(2, ',', '.') }} €<br>
-    </div>
 </div>
 {% endblock %}
