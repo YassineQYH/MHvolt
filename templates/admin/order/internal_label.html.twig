@@ -82,14 +82,14 @@
         {% endfor %}
         {% set tvaRate = 0.20 %}
         {% set tvaAmount = totalHT * tvaRate %}
-        {% set totalPanier = totalHT + tvaAmount %}
-        {% set totalTTC = totalPanier + order.carrierPrice %}
+        {% set totalTTC = totalHT + tvaAmount %}
+        {% set totalCommande = totalTTC + order.carrierPrice %}
 
-        <tr><td>Total panier HT :</td><td>{{ totalHT|number_format(2, ',', ' ') }} €</td></tr>
+        <tr><td>Total produits HT :</td><td>{{ totalHT|number_format(2, ',', ' ') }} €</td></tr>
         <tr><td>TVA ({{ (tvaRate*100)|number_format(0) }}%) :</td><td>{{ tvaAmount|number_format(2, ',', ' ') }} €</td></tr>
-        <tr><td>Total panier TTC :</td><td>{{ totalPanier|number_format(2, ',', ' ') }} €</td></tr>
+        <tr><td>Total produits TTC :</td><td>{{ totalTTC|number_format(2, ',', ' ') }} €</td></tr>
         <tr><td>Frais de livraison :</td><td>{{ order.carrierPrice|number_format(2, ',', ' ') }} €</td></tr>
-        <tr><td>Total commande :</td><td>{{ totalTTC|number_format(2, ',', ' ') }} €</td></tr>
+        <tr><td><strong>Total commande :</strong></td><td><strong>{{ totalCommande|number_format(2, ',', ' ') }} €</strong></td></tr>
         <tr><td>Transporteur :</td><td>{{ order.carrier ?? order.carrier }}</td></tr>
     </table>
 

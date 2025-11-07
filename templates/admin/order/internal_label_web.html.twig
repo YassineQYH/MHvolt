@@ -21,14 +21,8 @@
             margin: 0;
             padding: 0;
         }
-        h1 {
-            font-size: 14px;
-            margin-bottom: 5px;
-        }
-        h2 {
-            font-size: 12px;
-            margin-top: 5px;
-        }
+        h1 { font-size: 14px; margin-bottom: 5px; }
+        h2 { font-size: 12px; margin-top: 5px; }
         table {
             width: 100%;
             border-collapse: collapse;
@@ -40,39 +34,14 @@
             padding: 3px;
             text-align: left;
         }
-        .client-qr {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-top: 5px;
-        }
-        .client-info {
-            width: 65%;
-        }
-        .qr {
-            width: 30%;
-            text-align: center;
-        }
-        .summary {
-            margin-top: 10px;
-            font-size: 11px;
-        }
-        .summary table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        .summary td {
-            border: none;
-            padding: 2px;
-        }
-        .summary .label {
-            font-weight: bold;
-        }
-        .footer {
-            font-size: 10px;
-            margin-top: 5px;
-            color: gray;
-        }
+        .client-qr { display: flex; justify-content: space-between; align-items: flex-start; margin-top: 5px; }
+        .client-info { width: 65%; }
+        .qr { width: 30%; text-align: center; }
+        .summary { margin-top: 10px; font-size: 11px; }
+        .summary table { width: 100%; border-collapse: collapse; }
+        .summary td { border: none; padding: 2px; }
+        .summary .label { font-weight: bold; }
+        .footer { font-size: 10px; margin-top: 5px; color: gray; }
     </style>
 </head>
 <body>
@@ -128,29 +97,15 @@
             {% endfor %}
             {% set tvaRate = 0.20 %}
             {% set tvaAmount = totalHT * tvaRate %}
-            {% set totalPanier = totalHT + tvaAmount %}
-            {% set totalTTC = totalPanier + order.carrierPrice %}
+            {% set totalTTC = totalHT + tvaAmount %}
+            {% set totalCommande = totalTTC + order.carrierPrice %}
 
-            <tr>
-                <td><strong>Passée le :</strong></td>
-                <td>{{ order.createdAt|date('d/m/Y H:i') }}</td>
-            </tr>
-            <tr>
-                <td><strong>Frais de livraison :</strong></td>
-                <td>{{ order.carrierPrice|number_format(2, ',', ' ') }} €</td>
-            </tr>
-            <tr>
-                <td><strong>Total panier :</strong></td>
-                <td>{{ totalPanier|number_format(2, ',', ' ') }} €</td>
-            </tr>
-            <tr>
-                <td><strong>Total commande :</strong></td>
-                <td>{{ totalTTC|number_format(2, ',', ' ') }} €</td>
-            </tr>
-            <tr>
-                <td><strong>Transporteur :</strong></td>
-                <td>{{ order.carrier ?? order.carrier }}</td>
-            </tr>
+            <tr><td>Total produits HT :</td><td>{{ totalHT|number_format(2, ',', ' ') }} €</td></tr>
+            <tr><td>TVA ({{ (tvaRate*100)|number_format(0) }}%) :</td><td>{{ tvaAmount|number_format(2, ',', ' ') }} €</td></tr>
+            <tr><td>Total produits TTC :</td><td>{{ totalTTC|number_format(2, ',', ' ') }} €</td></tr>
+            <tr><td>Frais de livraison :</td><td>{{ order.carrierPrice|number_format(2, ',', ' ') }} €</td></tr>
+            <tr><td><strong>Total commande :</strong></td><td><strong>{{ totalCommande|number_format(2, ',', ' ') }} €</strong></td></tr>
+            <tr><td>Transporteur :</td><td>{{ order.carrier ?? order.carrier }}</td></tr>
         </table>
     </div>
 
