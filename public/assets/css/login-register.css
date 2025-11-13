@@ -490,3 +490,15 @@ body.modal-open {
     background: #f0f0f0;
     /* léger fond au survol */
 }
+
+
+/* HONEY ::: Cacher le champ dans le CSS */
+
+.honeypot-field {
+    display: none !important;
+    visibility: hidden;
+    height: 0;
+    overflow: hidden;
+    position: absolute;
+    left: -9999px;
+}

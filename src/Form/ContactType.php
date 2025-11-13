@@ -2,17 +2,18 @@
 
 namespace App\Form;
 
+use App\Form\Type\HoneyPotType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\IsTrue;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Captcha\Bundle\CaptchaBundle\Form\Type\CaptchaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
-
-use Captcha\Bundle\CaptchaBundle\Form\Type\CaptchaType;
 use Captcha\Bundle\CaptchaBundle\Validator\Constraints\ValidCaptcha;
 
 class ContactType extends AbstractType
@@ -65,14 +66,10 @@ class ContactType extends AbstractType
                 'placeholder' => "J'aimerais des informations sur des trottinettes svp..."
             ]
         ])
-        ->add('agreeTerms', CheckboxType::class, [
-            'mapped' => false,
-            'constraints' => [
-                new IsTrue([
-                    'message' => 'Valider la saisie de données',
-                ]),
-            ]
-        ])
+        ->add('honeypot', HoneyPotType::class, [
+                'mapped' => false, // IMPORTANT
+            ])
+
         /* ->add('captchaCode', CaptchaType::class, array(
             'captchaConfig' => 'ExampleCaptcha'
           )); */

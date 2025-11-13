@@ -42,11 +42,17 @@ class HomeController extends AbstractController
         $formcontact->handleRequest($request);
 
         if ($formcontact->isSubmitted() && $formcontact->isValid()) {
+                $honeypot = $formcontact->get('honeypot')->getData();
+                if (!empty($honeypot)) {
+                    // 🚫 Bot détecté
+                    $this->addFlash('error', "Spam détecté, message non envoyé.");
+                    return $this->redirectToRoute('app_home');
+                }
             $this->addFlash('notice', "Merci de m'avoir contacté. Je vous répondrai dans les meilleurs délais.");
 
             $data = $formcontact->getData();
             $content = "Bonjour </br>
-                        Vous avez reçu un message depuis Pergolazur. </br>
+                        Vous avez reçu un message depuis HichTrott. </br>
                         De l'utilisateur : <strong>".$data['name']."</strong></br>
                         De la société : <strong>".$data['company']."</strong></br>
                         N° de tel : <strong>".$data['tel']."</strong></br>
@@ -56,7 +62,7 @@ class HomeController extends AbstractController
             $mail = new Mail();
             $mail->send(
                 'yassine.qyh@gmail.com',
-                'Pergolazur',
+                'HichTrott',
                 'Vous avez reçu une nouvelle demande de contact',
                 $content
             );

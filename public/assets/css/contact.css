@@ -1,9 +1,11 @@
 /* Contact */
 
+
 /* html{
     font-size: 62.5%;
 } */
-article{
+
+article {
     font-size: 62.5%;
 }
 
@@ -160,6 +162,15 @@ button.btn-contact:hover {
 
 button.btn-contact:active {
     transform: translateY(0px);
+}
+
+.honeypot-field {
+    display: none !important;
+    visibility: hidden;
+    height: 0;
+    overflow: hidden;
+    position: absolute;
+    left: -9999px;
 }
 
 @media only screen and (max-width: 1200px) {

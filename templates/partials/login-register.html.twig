@@ -155,6 +155,16 @@
                 <span class="show-password-retype">Afficher</span>
             </div>
 
+        {# Champ honeypot totalement invisible #}
+        {{ form_widget(formregister.honeypot, {
+            'label': false,
+            'attr': {
+                'class': 'honeypot-field',
+                'autocomplete': 'off',
+                'tabindex': '-1',
+                'style': 'display:none !important; visibility:hidden; height:0; overflow:hidden;'
+            }
+        }) }}
 
             {{ form_widget(formregister.submit, {'attr': {'class': 'btn'}}) }}
 

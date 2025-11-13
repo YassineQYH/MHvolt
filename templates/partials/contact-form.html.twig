@@ -3,41 +3,49 @@
         <h1>Nous contacter !</h1>
         <p>Remplissez le formulaire ci-dessous pour communiquer avec l’un des membres de notre équipe. Nous essaierons de vous répondre dans les 48 heures. Si nous ne répondons pas dans ce délai, n’hésitez pas à utiliser à nouveau le formulaire.</p>
 
-        <form class="form" name="contactez-moi" action="/" method="POST">
+        {{ form_start(formcontact, {'attr': {'class': 'form', 'name': 'contactez-moi'}}) }}
 
-            {{ form_start(formcontact) }}
-            <div class="form-group">
-                <label for="name">Nom & Prénom*</label>
-                {{ form_widget(formcontact.name) }}
-            </div>
-            <div class="form-group">
-                <label for="tel">N° de téléphone*</label>
-                {{ form_widget(formcontact.tel) }}
-            </div>
-            <div class="form-group">
-                <label for="email">Adresse E-mail*</label>
-                {{ form_widget(formcontact.email) }}
-            </div>
-            <div class="form-group">
-                <label for="company">Société</label>
-                {{ form_widget(formcontact.company) }}
-            </div>
-            <div class="form-group full">
-                <label for="message">Votre message ?</label>
-                {{ form_widget(formcontact.message) }}
-            </div>
-            <div class="submit-group">
-                <label for="agreeTerms">Confirmer la demande d'envoi</label>
-                {{ form_widget(formcontact.agreeTerms) }}
-            </div>
-            {# <div class="form-group">
-                <label for="captchaCode">Captcha</label>
-                {{ form_widget(form.captchaCode) }}
-            </div> #}
-            <div class="submit-group">
-                <input type="submit" value="Envoyer" />
-            </div>
-            {{ form_end(formcontact) }}
-        </form>
+        <div class="form-group">
+            <label for="name">Nom & Prénom*</label>
+            {{ form_widget(formcontact.name) }}
+        </div>
+
+        <div class="form-group">
+            <label for="tel">N° de téléphone*</label>
+            {{ form_widget(formcontact.tel) }}
+        </div>
+
+        <div class="form-group">
+            <label for="email">Adresse E-mail*</label>
+            {{ form_widget(formcontact.email) }}
+        </div>
+
+        <div class="form-group">
+            <label for="company">Société</label>
+            {{ form_widget(formcontact.company) }}
+        </div>
+
+        <div class="form-group full">
+            <label for="message">Votre message ?</label>
+            {{ form_widget(formcontact.message) }}
+        </div>
+
+        {# Champ honeypot totalement invisible #}
+        {{ form_widget(formcontact.honeypot, {
+            'label': false,
+            'attr': {
+                'class': 'honeypot-field',
+                'autocomplete': 'off',
+                'tabindex': '-1',
+                'style': 'display:none !important; visibility:hidden; height:0; overflow:hidden;'
+            }
+        }) }}
+
+
+        <div class="submit-group">
+            <input type="submit" value="Envoyer" />
+        </div>
+
+        {{ form_end(formcontact) }}
     </div>
 </section>

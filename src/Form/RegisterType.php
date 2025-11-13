@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\User;
 use App\Form\AddressType;
+use App\Form\Type\HoneyPotType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\Email;
@@ -115,6 +116,9 @@ class RegisterType extends AbstractType
                 ]
             ])
 
+            ->add('honeypot', HoneyPotType::class, [
+                'mapped' => false, // IMPORTANT
+            ])
 
             ->add('submit', SubmitType::class, [
                 'label' => "S'inscrire",
