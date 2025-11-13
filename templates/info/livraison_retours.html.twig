@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Livraison & Retours{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('assets/css/legal-page.css') }}">
+{% endblock %}
+
+{% block content %}
+<section class="legal-page">
+    <h1>Livraison & Retours</h1>
+
+    <h2>1. Délais de livraison</h2>
+    <p>Les commandes sont expédiées sous 24 à 72h ouvrées (hors week-ends et jours fériés). Les délais peuvent varier selon la disponibilité des produits et le transporteur choisi.</p>
+
+    <h2>2. Modes de livraison</h2>
+    <p>Nous livrons dans toute la France métropolitaine et la Belgique via nos partenaires de transport (Colissimo, Mondial Relay, Chronopost...). Les frais de livraison sont calculés automatiquement selon le poids et la destination.</p>
+
+    <h2>3. Suivi de commande</h2>
+    <p>Dès l’expédition, vous recevrez un e-mail contenant un lien de suivi vous permettant de suivre l’acheminement de votre colis.</p>
+
+    <h2>4. Retours</h2>
+    <p>Vous disposez de <strong>14 jours</strong> après réception de votre commande pour retourner tout article ne vous convenant pas. Les produits doivent être retournés dans leur emballage d’origine, non utilisés et accompagnés de la facture d’achat.</p>
+
+    <h2>5. Remboursements</h2>
+    <p>Après réception et vérification du produit retourné, nous procédons au remboursement sous 14 jours via le même mode de paiement que celui utilisé lors de la commande.</p>
+
+    <h2>6. Contact pour un retour</h2>
+    <p>Pour toute demande de retour, contactez-nous à :
+    <a href="mailto:admin@hictrott.com">admin@hictrott.com</a></p>
+</section>
+{% endblock %}

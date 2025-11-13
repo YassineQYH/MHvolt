@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Politique de Confidentialité{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('assets/css/legal-page.css') }}">
+{% endblock %}
+
+{% block content %}
+<section class="legal-page">
+    <h1>Politique de Confidentialité</h1>
+
+    <h2>1. Collecte des données</h2>
+    <p>Lors de votre navigation sur notre site, nous pouvons collecter des informations personnelles telles que votre nom, prénom, adresse e-mail, adresse de livraison et numéro de téléphone, notamment lors de la création de compte, de la commande ou via le formulaire de contact.</p>
+
+    <h2>2. Utilisation des données</h2>
+    <p>Les données collectées sont utilisées exclusivement pour :
+    - le traitement et la livraison de vos commandes,
+    - la gestion de votre compte client,
+    - la communication d’informations et d’offres promotionnelles (si vous y avez consenti).</p>
+
+    <h2>3. Partage des données</h2>
+    <p>Vos données ne sont <strong>jamais vendues</strong> ni transmises à des tiers, sauf à nos prestataires techniques (livraison, paiement) dans le strict cadre de la gestion de vos commandes.</p>
+
+    <h2>4. Sécurité</h2>
+    <p>HicTrott met en œuvre toutes les mesures nécessaires pour protéger vos données contre toute perte, altération ou accès non autorisé.</p>
+
+    <h2>5. Cookies</h2>
+    <p>Notre site utilise des cookies pour améliorer votre expérience utilisateur. Vous pouvez les gérer ou les désactiver depuis les paramètres de votre navigateur.</p>
+
+    <h2>6. Vos droits</h2>
+    <p>Conformément au RGPD, vous disposez d’un droit d’accès, de rectification, de suppression et d’opposition sur vos données personnelles.
+    Vous pouvez exercer ces droits en nous contactant à :
+    <a href="mailto:admin@hictrott.com">admin@hictrott.com</a></p>
+</section>
+{% endblock %}
