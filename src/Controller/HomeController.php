@@ -53,22 +53,39 @@ class HomeController extends AbstractController
             // 📬 Message flash utilisateur
             $this->addFlash('notice', "Merci de m'avoir contacté. Je vous répondrai dans les meilleurs délais.");
 
-            // Envoi de l'e-mail
             $data = $formcontact->getData();
-            $content = "Bonjour </br>
-                        Vous avez reçu un message depuis HichTrott. </br>
-                        De l'utilisateur : <strong>".$data['name']."</strong></br>
-                        De la société : <strong>".$data['company']."</strong></br>
-                        N° de tel : <strong>".$data['tel']."</strong></br>
-                        Adresse email : <strong style='color:black;'>".$data['email']."</strong> </br>
-                        Message : ".$data['message']."</br></br>";
-
             $mail = new Mail();
+
+            // --- Mail à l'admin ---
+            $adminContent = $this->renderView('emails/contact_admin.html.twig', [
+                'name' => $data['name'],
+                'company' => $data['company'],
+                'tel' => $data['tel'],
+                'email' => $data['email'],
+                'message' => $data['message'],
+            ]);
+
             $mail->send(
-                'yassine.qyh@gmail.com',
+                'yassine.qyh@gmail.com', // admin
                 'HichTrott',
                 'Vous avez reçu une nouvelle demande de contact',
-                $content
+                $adminContent
+            );
+
+            // --- Mail de confirmation à l'utilisateur ---
+            $userContent = $this->renderView('emails/contact_user.html.twig', [
+                'name' => $data['name'],
+                'company' => $data['company'],
+                'tel' => $data['tel'],
+                'email' => $data['email'],
+                'message' => $data['message'],
+            ]);
+
+            $mail->send(
+                $data['email'], // utilisateur
+                'HichTrott',
+                'Confirmation de votre message à HichTrott',
+                $userContent
             );
 
             // 🔄 Redirection OBLIGATOIRE pour afficher le message flash
@@ -125,15 +142,6 @@ class HomeController extends AbstractController
             ->findBy(['isBest' => 1]);
         $accessories = $this->entityManager->getRepository(Accessory::class)
             ->findBy(['isBest' => 1]);
-
-            if ($formcontact->isSubmitted()) {
-                dump("SUBMITTED");
-
-                if ($formcontact->isValid()) {
-                    dump("VALID");
-                }
-            }
-            dump($formcontact->getErrors(true));
 
         return $this->render('home/index.html.twig', [
             'headers' => $headers,
