@@ -42,14 +42,18 @@ class HomeController extends AbstractController
         $formcontact->handleRequest($request);
 
         if ($formcontact->isSubmitted() && $formcontact->isValid()) {
-                $honeypot = $formcontact->get('honeypot')->getData();
-                if (!empty($honeypot)) {
-                    // 🚫 Bot détecté
-                    $this->addFlash('error', "Spam détecté, message non envoyé.");
-                    return $this->redirectToRoute('app_home');
-                }
+
+            // 🕵️‍♂️ Honeypot anti-bot
+            $honeypot = $formcontact->get('honeypot')->getData();
+            if (!empty($honeypot)) {
+                $this->addFlash('error', "Spam détecté, message non envoyé.");
+                return $this->redirectToRoute('app_home');
+            }
+
+            // 📬 Message flash utilisateur
             $this->addFlash('notice', "Merci de m'avoir contacté. Je vous répondrai dans les meilleurs délais.");
 
+            // Envoi de l'e-mail
             $data = $formcontact->getData();
             $content = "Bonjour </br>
                         Vous avez reçu un message depuis HichTrott. </br>
@@ -66,6 +70,9 @@ class HomeController extends AbstractController
                 'Vous avez reçu une nouvelle demande de contact',
                 $content
             );
+
+            // 🔄 Redirection OBLIGATOIRE pour afficher le message flash
+            return $this->redirectToRoute('app_home');
         }
 
         // --- LOGIN ---
@@ -75,9 +82,6 @@ class HomeController extends AbstractController
         // --- INSCRIPTION ---
         $notification = null;
         $user = new User();
-
-        // ⚡ Ajouter une adresse vide par défaut pour le formulaire
-        /* $user->addAddress(new Address()); */
 
         $formregister = $this->createForm(RegisterType::class, $user, [
             'by_reference' => false
@@ -95,7 +99,6 @@ class HomeController extends AbstractController
                 $password = $encoder->hashPassword($user, $user->getPassword());
                 $user->setPassword($password);
 
-                // ⚡ Les adresses sont persistées automatiquement grâce à cascade persist
                 $this->entityManager->persist($user);
                 $this->entityManager->flush();
 
@@ -122,6 +125,15 @@ class HomeController extends AbstractController
             ->findBy(['isBest' => 1]);
         $accessories = $this->entityManager->getRepository(Accessory::class)
             ->findBy(['isBest' => 1]);
+
+            if ($formcontact->isSubmitted()) {
+                dump("SUBMITTED");
+
+                if ($formcontact->isValid()) {
+                    dump("VALID");
+                }
+            }
+            dump($formcontact->getErrors(true));
 
         return $this->render('home/index.html.twig', [
             'headers' => $headers,

@@ -3,7 +3,7 @@
         <h1>Nous contacter !</h1>
         <p>Remplissez le formulaire ci-dessous pour communiquer avec l’un des membres de notre équipe. Nous essaierons de vous répondre dans les 48 heures. Si nous ne répondons pas dans ce délai, n’hésitez pas à utiliser à nouveau le formulaire.</p>
 
-        {# ✅ Affichage des messages flash #}
+        {# 🔔 Messages flash #}
         {% for label, messages in app.flashes %}
             {% for message in messages %}
                 <div class="alert alert-{{ label }}" style="
@@ -18,6 +18,7 @@
             {% endfor %}
         {% endfor %}
 
+        {# --- FORMULAIRE --- #}
         {{ form_start(formcontact, {'attr': {'class': 'form', 'name': 'contactez-moi'}}) }}
 
         <div class="form-group">
@@ -49,7 +50,6 @@
                     'required': true
                 }
             }) }}
-            {{ form_label(formcontact.email) }}
             {{ form_errors(formcontact.email) }}
         </div>
 
@@ -65,21 +65,22 @@
             {{ form_errors(formcontact.message) }}
         </div>
 
-        {# Champ honeypot totalement invisible #}
+        {# Champ honeypot anti-bot invisible #}
         {{ form_widget(formcontact.honeypot, {
             'label': false,
             'attr': {
                 'class': 'honeypot-field',
                 'autocomplete': 'off',
                 'tabindex': '-1',
-                'style': 'display:none !important; visibility:hidden; height:0; overflow:hidden;'
+                'style': 'opacity:0; height:0; overflow:hidden; position:absolute; left:-9999px;'
             }
         }) }}
 
+        {# Bouton submit généré par Symfony #}
         <div class="submit-group">
-            <input type="submit" value="Envoyer" />
+            {{ form_widget(formcontact.submit, {'attr': {'class': 'btn-contact'}}) }}
         </div>
 
-        {{ form_end(formcontact, {'render_rest': false}) }}
+        {{ form_end(formcontact) }}
     </div>
 </section>
