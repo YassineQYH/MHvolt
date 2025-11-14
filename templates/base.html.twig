@@ -34,11 +34,22 @@
             <link rel="stylesheet" href="{{ asset('assets/css/footer.css') }}">
             <link rel="stylesheet" href="{{ asset('assets/css/invoice.css') }}">
             <link rel="stylesheet" href="{{ asset('assets/css/slide-img-product-show.css') }}">
+            <link rel="stylesheet" href="{{ asset('assets/css/msg-d-alerte.css') }}">
             {# <link rel="stylesheet" href="{{ asset('assets/css/bpost-label.css') }}"> #}
         {% endblock %}
     </head>
 
     <body>
+
+        {# 🔔 Messages flash au-dessus de la nav #}
+        <div class="flash-container">
+            {% for label, messages in app.flashes %}
+                {% for message in messages %}
+                    <div class="flash {{ label }}">{{ message }}</div>
+                {% endfor %}
+            {% endfor %}
+        </div>
+
         {# Login overlay #}
         <login>
             {% block login %}
