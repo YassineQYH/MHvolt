@@ -9,36 +9,15 @@ use Doctrine\ORM\Mapping as ORM;
 use App\Entity\TrottinetteCaracteristique;
 use App\Entity\TrottinetteDescriptionSection;
 use App\Entity\TrottinetteAccessory;
-use App\Entity\Illustration;
-use App\Entity\Weight;
-use App\Entity\Tva;
 
 #[ORM\Entity(repositoryClass: TrottinetteRepository::class)]
-class Trottinette
+class Trottinette extends Product
 {
-    #[ORM\Id, ORM\GeneratedValue, ORM\Column(type: "integer")]
-    private ?int $id = null;
-
-    #[ORM\Column(type:"string", length:255)]
-    private ?string $name = null;
-
     #[ORM\Column(type:"string", length:255, nullable:true)]
     private ?string $nameShort = null;
 
-    #[ORM\Column(type:"string", length:255)]
-    private ?string $slug = null;
-
-    #[ORM\Column(type:"text")]
-    private ?string $description = null;
-
     #[ORM\Column(type:"text", nullable:true)]
     private ?string $descriptionShort = null;
-
-    #[ORM\Column(type:"string", length:255)]
-    private ?string $image = null;
-
-    #[ORM\Column(type:"boolean")]
-    private ?bool $isBest = null;
 
     #[ORM\Column(type:"boolean")]
     private bool $isHeader = false;
@@ -49,23 +28,7 @@ class Trottinette
     #[ORM\Column(type:"string", length:255, nullable:true)]
     private ?string $headerBtnTitle = null;
 
-    #[ORM\Column(type:"integer")]
-    private ?int $stock = 0;
-
-    #[ORM\Column(type:"float")]
-    private ?float $price = null;
-
-    #[ORM\ManyToOne(targetEntity: Weight::class, inversedBy: "trottinettes")]
-    private ?Weight $weight = null;
-
-    #[ORM\ManyToOne(inversedBy: "trottinettes")]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Tva $tva = null;
-
     // ------------------- Relations -------------------
-
-    #[ORM\OneToMany(mappedBy: "trottinette", targetEntity: Illustration::class, cascade: ["persist", "remove"])]
-    private Collection $illustration;
 
     #[ORM\OneToMany(mappedBy: "trottinette", targetEntity: TrottinetteCaracteristique::class, cascade: ["persist", "remove"])]
     private Collection $trottinetteCaracteristiques;
@@ -78,46 +41,21 @@ class Trottinette
 
     public function __construct()
     {
-        $this->illustration = new ArrayCollection();
+        parent::__construct();
         $this->trottinetteCaracteristiques = new ArrayCollection();
         $this->trottinetteAccessories = new ArrayCollection();
         $this->descriptionSections = new ArrayCollection();
     }
 
-    public function __toString(): string
-    {
-        return $this->name ?? '';
-    }
-
-    public function getImagePath(): string
-    {
-        return '/uploads/trottinettes/' . $this->image;
-    }
+    public function __toString(): string { return $this->name ?? ''; }
 
     // ------------------- GETTERS & SETTERS -------------------
-
-    public function getId(): ?int { return $this->id; }
-
-    public function getName(): ?string { return $this->name; }
-    public function setName(string $name): self { $this->name = $name; return $this; }
 
     public function getNameShort(): ?string { return $this->nameShort; }
     public function setNameShort(?string $nameShort): self { $this->nameShort = $nameShort; return $this; }
 
-    public function getSlug(): ?string { return $this->slug; }
-    public function setSlug(string $slug): self { $this->slug = $slug; return $this; }
-
-    public function getDescription(): ?string { return $this->description; }
-    public function setDescription(string $description): self { $this->description = $description; return $this; }
-
     public function getDescriptionShort(): ?string { return $this->descriptionShort; }
     public function setDescriptionShort(?string $descriptionShort): self { $this->descriptionShort = $descriptionShort; return $this; }
-
-    public function getImage(): ?string { return $this->image; }
-    public function setImage(string $image): self { $this->image = $image; return $this; }
-
-    public function getIsBest(): ?bool { return $this->isBest; }
-    public function setIsBest(bool $isBest): self { $this->isBest = $isBest; return $this; }
 
     public function getIsHeader(): bool { return $this->isHeader; }
     public function setIsHeader(bool $isHeader): self { $this->isHeader = $isHeader; return $this; }
@@ -127,36 +65,6 @@ class Trottinette
 
     public function getHeaderBtnTitle(): ?string { return $this->headerBtnTitle; }
     public function setHeaderBtnTitle(?string $headerBtnTitle): self { $this->headerBtnTitle = $headerBtnTitle; return $this; }
-
-    public function getStock(): ?int { return $this->stock; }
-    public function setStock(int $stock): self { $this->stock = $stock; return $this; }
-
-    public function getPrice(): ?float { return $this->price; }
-    public function setPrice(float $price): self { $this->price = $price; return $this; }
-
-    public function getWeight(): ?Weight { return $this->weight; }
-    public function setWeight(?Weight $weight): self { $this->weight = $weight; return $this; }
-
-    public function getTva(): ?Tva { return $this->tva; }
-    public function setTva(?Tva $tva): self { $this->tva = $tva; return $this; }
-
-    /** @return Collection<int, Illustration> */
-    public function getIllustration(): Collection { return $this->illustration; }
-    public function addIllustration(Illustration $illustration): self {
-        if (!$this->illustration->contains($illustration)) {
-            $this->illustration[] = $illustration;
-            $illustration->setTrottinette($this);
-        }
-        return $this;
-    }
-    public function removeIllustration(Illustration $illustration): self {
-        if ($this->illustration->removeElement($illustration)) {
-            if ($illustration->getTrottinette() === $this) {
-                $illustration->setTrottinette(null);
-            }
-        }
-        return $this;
-    }
 
     /** @return Collection<int, TrottinetteCaracteristique> */
     public function getTrottinetteCaracteristiques(): Collection { return $this->trottinetteCaracteristiques; }
@@ -169,7 +77,7 @@ class Trottinette
     }
     public function removeTrottinetteCaracteristique(TrottinetteCaracteristique $tc): self {
         if ($this->trottinetteCaracteristiques->removeElement($tc)) {
-            if ($tc->getTrottinette() === $this) $tc->setTrottinette(null);
+            $tc->setTrottinette(null);
         }
         return $this;
     }
@@ -185,12 +93,10 @@ class Trottinette
     }
     public function removeTrottinetteAccessory(TrottinetteAccessory $ta): self {
         if ($this->trottinetteAccessories->removeElement($ta)) {
-            if ($ta->getTrottinette() === $this) $ta->setTrottinette(null);
+            $ta->setTrottinette(null);
         }
         return $this;
     }
-
-    public function getAccessories(): Collection { return $this->getTrottinetteAccessories(); }
 
     /** @return Collection<int, TrottinetteDescriptionSection> */
     public function getDescriptionSections(): Collection { return $this->descriptionSections; }
@@ -203,7 +109,7 @@ class Trottinette
     }
     public function removeDescriptionSection(TrottinetteDescriptionSection $section): self {
         if ($this->descriptionSections->removeElement($section)) {
-            if ($section->getTrottinette() === $this) $section->setTrottinette(null);
+            $section->setTrottinette(null);
         }
         return $this;
     }

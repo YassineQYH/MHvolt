@@ -33,11 +33,14 @@
                 {% for item in accessoires %}
                     <div class="pergo-list-box" data-aos="fade" data-aos-duration="2000">
                         <a href="{{ path('accessory_show', { 'slug' : item.slug }) }}">
-                            <img src="/uploads/accessoires/{{ item.image }}" alt="{{ item.name }}">
+                            {% set image = item.illustrations|first %}
+                            <img src="/uploads/accessoires/{{ image ? image.image : 'default.jpg' }}" alt="{{ item.name }}">
                         </a>
                         <p>{{ item.name }}</p>
                     </div>
                 {% endfor %}
+
+
             {% else %}
                 <p style="text-align:center;">Aucun accessoire disponible pour cette trottinette.</p>
             {% endif %}

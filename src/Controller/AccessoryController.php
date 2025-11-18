@@ -4,11 +4,11 @@ namespace App\Controller;
 
 use App\Classe\Cart;
 use App\Entity\Accessory;
+use App\Entity\Illustration;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class AccessoryController extends BaseController
@@ -25,14 +25,11 @@ class AccessoryController extends BaseController
     {
         $accessories = $this->entityManager->getRepository(Accessory::class)->findAll();
 
-        // -------------------------------
-        // 🧍 Formulaire d’inscription
-        // -------------------------------
         $formregister = $this->createRegisterForm($request, $encoder);
 
         return $this->render('accessoires/show.html.twig', [
             'accessories' => $accessories,
-            'formregister' => $formregister->createView(), // nécessaire pour ton include
+            'formregister' => $formregister->createView(),
         ]);
     }
 
@@ -41,7 +38,7 @@ class AccessoryController extends BaseController
         string $slug,
         Request $request,
         UserPasswordHasherInterface $encoder,
-        Cart $cartService // 🛒 injecte le service
+        Cart $cartService
     ): Response
     {
         $accessory = $this->entityManager->getRepository(Accessory::class)
@@ -51,7 +48,9 @@ class AccessoryController extends BaseController
             throw $this->createNotFoundException('Cet accessoire n’existe pas.');
         }
 
-        $illustrations = $accessory->getIllustrationaccess();
+        // 🔹 Récupère toutes les illustrations liées à cet accessoire via Product
+        $illustrations = $this->entityManager->getRepository(Illustration::class)
+            ->findBy(['product' => $accessory]);
 
         $formregister = $this->createRegisterForm($request, $encoder);
 
@@ -59,10 +58,9 @@ class AccessoryController extends BaseController
             'accessory' => $accessory,
             'illustrations' => $illustrations,
             'formregister' => $formregister->createView(),
-            'cart' => $cartService, // 💡 passer le service à Twig
+            'cart' => $cartService,
         ]);
     }
-
 
     #[Route('/accessoire/{slug}/trottinettes', name: 'accessoire_trottinettes')]
     public function showTrottinettes(string $slug, Request $request, UserPasswordHasherInterface $encoder): Response
@@ -79,9 +77,6 @@ class AccessoryController extends BaseController
             $trottinettes[] = $pivot->getTrottinette();
         }
 
-        // -------------------------------
-        // 🧍 Formulaire d’inscription
-        // -------------------------------
         $formregister = $this->createRegisterForm($request, $encoder);
 
         return $this->render('accessoires/show-all-trott.html.twig', [

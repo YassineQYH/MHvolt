@@ -15,15 +15,15 @@ class TrottinetteAccessory
     #[ORM\JoinColumn(nullable: false)]
     private ?Trottinette $trottinette = null;
 
-    #[ORM\ManyToOne(targetEntity: Accessory::class, inversedBy: "trottinetteAccessories")]
+    #[ORM\ManyToOne(targetEntity: Product::class)]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Accessory $accessory = null;
+    private ?Product $accessory = null;
 
     public function getId(): ?int { return $this->id; }
 
     public function getTrottinette(): ?Trottinette { return $this->trottinette; }
     public function setTrottinette(?Trottinette $trottinette): self { $this->trottinette = $trottinette; return $this; }
 
-    public function getAccessory(): ?Accessory { return $this->accessory; }
-    public function setAccessory(?Accessory $accessory): self { $this->accessory = $accessory; return $this; }
+    public function getAccessory(): ?Product { return $this->accessory; }
+    public function setAccessory(?Product $accessory): self { $this->accessory = $accessory; return $this; }
 }

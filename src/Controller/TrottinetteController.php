@@ -68,10 +68,9 @@ class TrottinetteController extends BaseController
         // -------------------------------
         // 🔗 Relations
         // -------------------------------
-        $accessoires = $trottinette->getAccessories();
-        $illustrations = $this->entityManager
-            ->getRepository(Illustration::class)
-            ->findByTrottinette($trottinette);
+        $accessoires = array_map(fn($ta) => $ta->getAccessory(), $trottinette->getTrottinetteAccessories()->toArray());
+        $illustrations = $trottinette->getIllustrations();
+
 
         $caracteristiques = $trottinette->getTrottinetteCaracteristiques();
         $sections = $trottinette->getDescriptionSections();

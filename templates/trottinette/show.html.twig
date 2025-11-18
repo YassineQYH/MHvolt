@@ -17,12 +17,16 @@
       <div class="glide__track" data-glide-el="track">
         <ul class="glide__slides">
 
-          <!-- Image principale -->
+          {% set images = illustrations %}
+          {% set firstImage = images|first %}
+
+          {# Image principale #}
+          {% if firstImage %}
           <li class="glide__slide">
             <div class="arrival">
               <div class="cart__like">
                 <div class="image__holder">
-                  <img src="/uploads/trottinettes/{{ trottinette.image }}" alt="{{ trottinette.name }}">
+                  <img src="/uploads/trottinettes/{{ firstImage.image }}" alt="{{ trottinette.name }}">
                 </div>
                 <div class="cart__details">
                   <h1>{{ trottinette.name }}</h1>
@@ -31,38 +35,37 @@
               </div>
             </div>
           </li>
+          {% endif %}
 
-          <!-- Images supplémentaires -->
-          {% for item in illustrations %}
-            <li class="glide__slide">
-              <div class="arrival">
-                <div class="cart__like">
-                  <div class="image__holder">
-                    <img src="/uploads/trottinettes/{{ item.image }}" alt="{{ trottinette.name }}">
-                  </div>
-                  <div class="cart__details">
-                    <h1>{{ trottinette.name }}</h1>
-                    <p>{{ trottinette.descriptionShort ?? 'Aucune description courte disponible.' }}</p>
-                  </div>
+          {# Autres images #}
+          {% for item in images|slice(1) %}
+          <li class="glide__slide">
+            <div class="arrival">
+              <div class="cart__like">
+                <div class="image__holder">
+                  <img src="/uploads/trottinettes/{{ item.image }}" alt="{{ trottinette.name }}">
+                </div>
+                <div class="cart__details">
+                  <h1>{{ trottinette.name }}</h1>
+                  <p>{{ trottinette.descriptionShort ?? 'Aucune description courte disponible.' }}</p>
                 </div>
               </div>
-            </li>
+            </div>
+          </li>
           {% endfor %}
         </ul>
       </div>
 
-      <!-- Flèches et miniatures restent inchangées -->
+      {# Flèches #}
       <div class="glide__arrows" data-glide-el="controls">
         <button class="glide__arrow glide__arrow--left" data-glide-dir="<">Précédent</button>
         <button class="glide__arrow glide__arrow--right" data-glide-dir=">">Suivant</button>
       </div>
 
+      {# Miniatures #}
       <div class="glide__bullets" data-glide-el="controls[nav]">
-        <button class="glide__bullet" data-glide-dir="=0">
-          <img src="/uploads/trottinettes/{{ trottinette.image }}" alt="{{ trottinette.name }}">
-        </button>
-        {% for key, item in illustrations %}
-          <button class="glide__bullet" data-glide-dir="={{ key + 1 }}">
+        {% for key, item in images %}
+          <button class="glide__bullet" data-glide-dir="={{ key }}">
             <img src="/uploads/trottinettes/{{ item.image }}" alt="{{ trottinette.name }}">
           </button>
         {% endfor %}
@@ -76,42 +79,29 @@
         {% set quantity_in_cart = cart_data['trottinette'][product_id]|default(0) %}
 
         {% if trottinette.stock < 1 %}
-            {# Aucun stock, on affiche seulement "Bientôt de retour" #}
             <a class="buy-btn">Bientôt de retour</a>
-
         {% else %}
-            {# Toujours afficher le stock disponible #}
             <a class="buy-btn">Stock disponible : {{ trottinette.stock }}</a><br>
-
             {% if quantity_in_cart == 0 %}
-                {# Produit pas encore ajouté au panier #}
                 <a href="{{ path('add_to_cart', {'id': product_id, 'type': 'trottinette'}) }}" class="buy-btn">Ajouter</a>
-
             {% elseif quantity_in_cart < trottinette.stock %}
-                {# Produit ajouté mais pas au max du stock #}
                 <a class="buy-btn">Quantité : {{ quantity_in_cart }}</a><br>
                 <a href="{{ path('add_to_cart', {'id': product_id, 'type': 'trottinette'}) }}" class="buy-btn">Ajouter</a>
                 <a href="{{ path('decrease_to_cart', {'id': product_id, 'type': 'trottinette'}) }}" class="buy-btn">Diminuer</a><br>
-
             {% else %}
-                {# Produit au maximum du stock #}
                 <a class="buy-btn">Quantité : {{ quantity_in_cart }}</a><br>
                 <a href="{{ path('decrease_to_cart', {'id': product_id, 'type': 'trottinette'}) }}" class="buy-btn">Diminuer</a><br>
                 <a class="buy-btn" style="color:red;">Max (rupture)</a>
             {% endif %}
 
-            {# Ajout du prix TTC #}
             {% set tvaRate = (trottinette.tva.value ?? 20) / 100 %}
             {% set priceTTC = trottinette.price * (1 + tvaRate) %}
             <a class="buy-btn" style="margin-top:5px;">Prix TTC : {{ priceTTC|number_format(2, ',', '.') }} €</a>
         {% endif %}
     </div>
 
-
-
   </div>
 </section>
-
 
 <!-- SECTION 2 : CARACTÉRISTIQUES -->
 <section class="trottinette-caracteristiques container">
