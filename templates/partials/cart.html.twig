@@ -24,13 +24,21 @@
                                 </div>
 
                                 <div class="col-md-3 my-auto">
-                                    {% if item.product.imagePath %}
-                                        <img class="cart-product-image" src="{{ asset(item.product.imagePath) }}" alt="{{ item.product.name }}">
+                                    {# Nouvelle gestion des images avec l'entité Illustration #}
+                                    {% set illustration = item.product.illustrations|first %}
+
+                                    {% if illustration %}
+                                        {# Si une illustration existe, on l'affiche normalement #}
+                                        <img class="cart-product-image"
+                                            src="/uploads/{{ item.product.uploadDirectory }}/{{ illustration.image }}"
+                                            alt="{{ item.product.name }}">
                                     {% else %}
-                                        <img class="cart-product-image" src="{{ asset('img/default.png') }}" alt="image par défaut">
+                                        {# Si aucune illustration : ICI correction -> on met une image par défaut #}
+                                        <img class="cart-product-image"
+                                            src="/uploads/{{ item.product.uploadDirectory }}/default.jpg"
+                                            alt="image par défaut">
                                     {% endif %}
                                 </div>
-
                                 <div class="col-md-9">
                                     <small class="d-block text-sm">
                                         Prix unité TTC : <strong>{{ priceTTC|number_format(2, ',', '.') }} €</strong>

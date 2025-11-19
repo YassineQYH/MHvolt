@@ -29,6 +29,17 @@
             </thead>
             <tbody>
                 {% for order in orders %}
+                    {# Calcul précis à partir des orderDetails (on suppose item.tva présent) #}
+                    {% set productsHT = 0 %}
+                    {% set productsTTC = 0 %}
+                    {% for item in order.orderDetails %}
+                        {% set lineHT = item.price * item.quantity %}
+                        {% set tvaRate = (item.tva is not empty ? (item.tva / 100) : 0) %}
+                        {% set lineTTC = lineHT * (1 + tvaRate) %}
+                        {% set productsHT = productsHT + lineHT %}
+                        {% set productsTTC = productsTTC + lineTTC %}
+                    {% endfor %}
+
                     <tr>
                         <td><span class="badge badge-secondary">{{ order.reference }}</span></td>
                         <td>
@@ -46,8 +57,13 @@
                         </td>
                         <td>{{ order.createdAt|date('d/m/Y') }}</td>
                         <td>{{ order.carrierPrice|number_format(2, ',', '.') }} €</td>
-                        <td>{{ (order.total / 100)|number_format(2, ',', '.') }} €</td>
-                        <td>{{ ((order.total / 100) + order.carrierPrice)|number_format(2, ',', '.') }} €</td>
+
+                        {# Total Panier = produits TTC #}
+                        <td>{{ productsTTC|number_format(2, ',', '.') }} €</td>
+
+                        {# Total Commande = produits TTC + frais de livraison #}
+                        <td>{{ (productsTTC + order.carrierPrice)|number_format(2, ',', '.') }} €</td>
+
                         <td class="text-right">
                             <a href="{{ path('account_order_show', { 'reference': order.reference }) }}" style="color:black;">
                                 Voir ma commande

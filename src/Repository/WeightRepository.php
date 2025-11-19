@@ -33,7 +33,7 @@ class WeightRepository extends ServiceEntityRepository
             ->getSingleResult()
         ;
         }catch(\Exception $e){
-            return new Weight();
+            return new Weight(0, 0); // ou des valeurs par défaut que tu juges appropriées
         }
 
     }

@@ -18,6 +18,13 @@ class Accessory extends Product
     #[ORM\OneToMany(mappedBy: "accessory", targetEntity: TrottinetteAccessory::class, cascade: ["persist", "remove"])]
     private Collection $trottinetteAccessories;
 
+    // Spécifique aux accessoires
+    public function getUploadDirectory(): string
+    {
+        return 'accessoires';
+    }
+
+
     public function __construct()
     {
         parent::__construct();

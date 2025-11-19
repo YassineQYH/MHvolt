@@ -39,6 +39,12 @@ class Trottinette extends Product
     #[ORM\OneToMany(mappedBy: "trottinette", targetEntity: TrottinetteDescriptionSection::class, cascade: ["persist", "remove"])]
     private Collection $descriptionSections;
 
+    // Spécifique aux trottinettes
+    public function getUploadDirectory(): string
+    {
+        return 'trottinettes';
+    }
+
     public function __construct()
     {
         parent::__construct();

@@ -57,6 +57,13 @@ class Product
     #[ORM\Column(type:"datetime")]
     protected \DateTimeInterface $updatedAt;
 
+    // Permet de récupérer automatiquement le bon dossier uploads
+    public function getUploadDirectory(): string
+    {
+        // valeur par défaut (si jamais un produit n'est ni trottinette ni accessoire)
+        return 'produits';
+    }
+
     public function __construct()
     {
         $this->illustrations = new ArrayCollection();

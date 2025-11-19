@@ -15,7 +15,6 @@
             <thead class="thead-dark">
                 <tr>
                     <th scope="col">Produit</th>
-                    <th scope="col"></th>
                     <th scope="col">Quantité</th>
                     <th scope="col">Total TTC</th>
                     <th scope="col">Poids</th>
@@ -25,6 +24,7 @@
             <tbody>
                 {% set totalTTC = 0 %}
                 {% set totalWeight = 0 %}
+
                 {% for item in cart %}
                     {% set priceHT = item.product.price %}
                     {% set tvaRate = (item.product.tva.value ?? 20) / 100 %}
@@ -32,15 +32,49 @@
                     {% set totalItemTTC = priceTTC * item.quantity %}
                     {% set totalWeight = totalWeight + (item.product.weight.kg * item.quantity) %}
 
+                    {# récupération de la première illustration #}
+                    {% set illustration = item.product.illustrations|first %}
+
                     <tr>
-                        <td>{{ item.product.name }}</td>
-                        <td>{{ item.product.description|default('') }}</td>
-                        <td>x{{ item.quantity }}</td>
-                        <td>{{ totalItemTTC|number_format(2, ',', '.') }} €</td>
-                        <td>{{ (item.product.weight.kg * item.quantity) }} Kg</td>
                         <td>
-                            <a href="{{ path('delete_to_cart', {'id' : item.product.id, 'type': item.type|default('trottinette') }) }}" style="color:blue">
-                                <img src="{{ asset('assets/img/delete.png') }}" height="18px" alt="Supprimer">
+                            <div style="display:flex; align-items:center; gap:10px;">
+                                {# Conteneur fixe pour l'image #}
+                                <div style="width:60px; flex-shrink:0; text-align:center;">
+                                    <a href="{{ path(item.type == 'accessory' ? 'accessory_show' : 'trottinette_show', {
+                                        slug: item.product.slug
+                                    }) }}">
+                                        {% if illustration %}
+                                            <img src="/uploads/{{ item.product.uploadDirectory }}/{{ illustration.image }}"
+                                                alt="{{ item.product.name }}"
+                                                style="height:50px; width:auto;">
+                                        {% else %}
+                                            <img src="/uploads/{{ item.product.uploadDirectory }}/default.jpg"
+                                                alt="image par défaut"
+                                                style="height:50px; width:auto;">
+                                        {% endif %}
+                                    </a>
+                                </div>
+
+                                {# Texte du produit avec largeur flexible #}
+                                <span style="max-width:300px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                                    {{ item.product.name }}
+                                </span>
+                            </div>
+                        </td>
+
+
+                        <td>x{{ item.quantity }}</td>
+
+                        <td>{{ totalItemTTC|number_format(2, ',', '.') }} €</td>
+
+                        <td>{{ (item.product.weight.kg * item.quantity) }} Kg</td>
+
+                        <td>
+                            <a href="{{ path('delete_to_cart', {
+                                'id' : item.product.id,
+                                'type': item.type|default('trottinette')
+                            }) }}">
+                                <img src="{{ asset('img/delete.png') }}" height="18px" alt="Supprimer">
                             </a>
                         </td>
                     </tr>
@@ -49,6 +83,9 @@
                 {% endfor %}
             </tbody>
         </table>
+
+
+
 
         <div class="text-right mb-5">
             <b>Nombre de produits :</b> {{ quantity_product }}<br>

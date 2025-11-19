@@ -40,11 +40,18 @@
 
                         <div class="row {% if key > 0 %}mt-2{% endif %}">
                             <div class="col-4">
-                                {% if item.product.imagePath %}
-                                    <img src="{{ asset(item.product.imagePath) }}" alt="{{ item.product.name }}" height="75px">
+                                {% set illustration = item.product.illustrations|first %}
+
+                                {% if illustration %}
+                                    <img src="/uploads/{{ item.product.uploadDirectory }}/{{ illustration.image }}"
+                                        alt="{{ item.product.name }}"
+                                        height="75px">
                                 {% else %}
-                                    <img src="{{ asset('img/default.png') }}" alt="image par défaut" height="75px">
+                                    <img src="/uploads/{{ item.product.uploadDirectory }}/default.jpg"
+                                        alt="image par défaut"
+                                        height="75px">
                                 {% endif %}
+
                             </div>
                             <div class="col-6 my-auto">
                                 {{ item.product.name }} — {{ priceTTC|number_format(2, ',', '.') }} € TTC</br>

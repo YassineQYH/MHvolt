@@ -20,8 +20,8 @@ class StripeController extends AbstractController
     #[Route('/commande/create-session/{reference}', name: 'stripe_create_session')]
     public function index(EntityManagerInterface $entityManager, Cart $panier, string $reference): RedirectResponse|JsonResponse
     {
+        $YOUR_DOMAIN = 'http://127.0.0.1:8000'; // Remplace par ton domaine réel en prod
         $product_for_stripe = [];
-        $YOUR_DOMAIN = 'http://127.0.0.1:8000';
 
         /** @var User|null $user */
         $user = $this->getUser();
@@ -32,50 +32,45 @@ class StripeController extends AbstractController
 
         // 🔎 Récupération de la commande
         $order = $entityManager->getRepository(Order::class)->findOneBy(['reference' => $reference]);
-
         if (!$order) {
             return new JsonResponse(['error' => 'order not found'], 404);
         }
 
         // 🧾 Parcours des produits de la commande
-        foreach ($order->getOrderDetails()->getValues() as $product) {
-            $productName = $product->getProduct();
-            $productImage = null;
-
-            // 🔍 Recherche du produit dans Trottinette
-            $product_object = $entityManager->getRepository(Trottinette::class)->findOneBy(['name' => $productName]);
-
-            // 🔁 Sinon, recherche dans Accessory
+        foreach ($order->getOrderDetails()->getValues() as $item) {
+            $product_object = $entityManager->getRepository(Trottinette::class)->findOneBy(['name' => $item->getProduct()]);
             if (!$product_object) {
-                $product_object = $entityManager->getRepository(Accessory::class)->findOneBy(['name' => $productName]);
+                $product_object = $entityManager->getRepository(Accessory::class)->findOneBy(['name' => $item->getProduct()]);
             }
 
-            // 🖼️ Détection correcte de l'image du produit
-            if ($product_object && method_exists($product_object, 'getImagePath') && $product_object->getImagePath()) {
-                $productImage = $YOUR_DOMAIN . '/' . $product_object->getImagePath();
-            } elseif ($product_object && $product_object->getImage()) {
-                $productImage = $YOUR_DOMAIN . '/uploads/' . $product_object->getImage();
-            } else {
-                $productImage = $YOUR_DOMAIN . '/img/default.png';
+            // 🖼️ Détection de l'image
+            $productImage = $YOUR_DOMAIN . '/img/default.png'; // fallback
+            if ($product_object) {
+                $illustration = method_exists($product_object, 'getIllustrations') ? $product_object->getIllustrations()->first() : null;
+                if ($illustration) {
+                    // ⚠️ ici mettre l'URL publique finale
+                    $productImage = $YOUR_DOMAIN . '/uploads/'
+                        . $product_object->getUploadDirectory()
+                        . '/' . $illustration->getImage();
+                }
             }
 
-            // 💶 Préparation des produits pour Stripe
-            $priceTTC = $product->getPrice() * (1 + ($product->getTva() / 100));
+            $priceTTC = $item->getPrice() * (1 + ($item->getTva() / 100));
+
             $product_for_stripe[] = [
                 'price_data' => [
                     'currency' => 'eur',
                     'unit_amount' => round($priceTTC * 100),
                     'product_data' => [
-                        'name' => $productName,
+                        'name' => $item->getProduct(),
                         'images' => [$productImage],
                     ],
                 ],
-                'quantity' => $product->getQuantity(),
+                'quantity' => $item->getQuantity(),
             ];
-
         }
 
-        // 🚚 Frais de livraison
+        // 🚚 Ajouter les frais de livraison
         $product_for_stripe[] = [
             'price_data' => [
                 'currency' => 'eur',
@@ -93,7 +88,7 @@ class StripeController extends AbstractController
 
         // 🧾 Création de la session Stripe
         $checkout_session = Session::create([
-            'customer_email' => $user->getEmail(), // ✅ plus d’erreur rouge
+            'customer_email' => $user->getEmail(),
             'payment_method_types' => ['card'],
             'line_items' => $product_for_stripe,
             'mode' => 'payment',
@@ -105,7 +100,6 @@ class StripeController extends AbstractController
         $order->setStripeSessionId($checkout_session->id);
         $entityManager->flush();
 
-        // 🚀 Redirection vers Stripe
         return $this->redirect($checkout_session->url);
     }
 }
