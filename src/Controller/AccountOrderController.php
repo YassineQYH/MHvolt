@@ -47,7 +47,7 @@ class AccountOrderController extends AbstractController
     }
 
     #[Route('/compte/mes-commandes/{reference}', name: 'account_order_show')]
-    public function show(string $reference, WeightRepository $weightRepository, Cart $cart): \Symfony\Component\HttpFoundation\Response
+    public function show(string $reference): \Symfony\Component\HttpFoundation\Response
     {
         $order = $this->entityManager->getRepository(Order::class)->findOneByReference($reference);
 
@@ -55,29 +55,18 @@ class AccountOrderController extends AbstractController
             return $this->redirectToRoute('account_order');
         }
 
-        $cartItems = $cart->getFull();
-
-        $poid = 0.0;
-        $quantityProduct = 0;
-
-        foreach ($cartItems as $element) {
-            $poidAndQuantity = $element['product']->getWeight()->getKg() * $element['quantity'];
-            $quantityProduct += $element['quantity'];
-            $poid += $poidAndQuantity;
+        // Calcul du poids total de la commande
+        $totalWeight = 0;
+        foreach ($order->getOrderDetails() as $item) {
+            $totalWeight += $item->getWeight() * $item->getQuantity();
         }
-
-        $weightEntity = $weightRepository->findByKgPrice($poid);
-        $prix = $weightEntity ? $weightEntity->getPrice() : 0.0;
 
         return $this->render('account/order_show.html.twig', [
             'order' => $order,
-            'quantity_product' => $quantityProduct,
-            'poid' => $poid,
-            'price' => $prix,
-            'totalLivraison' => null,
-            'panier' => $cartItems,
+            'totalWeight' => $totalWeight,
         ]);
     }
+
 
     public function fillPriceList(WeightRepository $weightRepository): array
     {

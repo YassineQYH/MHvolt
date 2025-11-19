@@ -141,7 +141,8 @@ class OrderController extends AbstractController
 
                 $orderDetails = new OrderDetails();
                 $orderDetails->setMyOrder($order);
-                $orderDetails->setProduct($produit->getName());
+                $orderDetails->setProduct($produit->getName()); // nom produit en string
+                $orderDetails->setProductEntity($produit); // <-- Lien vers l'entité Product
                 $orderDetails->setWeight($produit->getWeight() ? (string) $produit->getWeight()->getKg() : '0');
                 $orderDetails->setQuantity($quantite);
                 $orderDetails->setPrice($produit->getPrice());
@@ -153,6 +154,7 @@ class OrderController extends AbstractController
 
                 $this->entityManager->persist($orderDetails);
             }
+
 
             $this->entityManager->flush();
 

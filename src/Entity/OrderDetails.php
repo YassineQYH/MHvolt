@@ -2,8 +2,9 @@
 
 namespace App\Entity;
 
-use App\Repository\OrderDetailsRepository;
+use App\Entity\Product;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\OrderDetailsRepository;
 
 #[ORM\Entity(repositoryClass: OrderDetailsRepository::class)]
 class OrderDetails
@@ -19,6 +20,10 @@ class OrderDetails
 
     #[ORM\Column(type: 'string', length: 255)]
     private ?string $product = null;
+
+    #[ORM\ManyToOne(targetEntity: Product::class)]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?Product $productEntity = null;
 
     #[ORM\Column(type: 'integer')]
     private ?int $quantity = null;
@@ -47,6 +52,9 @@ class OrderDetails
 
     public function getProduct(): ?string { return $this->product; }
     public function setProduct(string $product): self { $this->product = $product; return $this; }
+
+    public function getProductEntity(): ?Product { return $this->productEntity; }
+    public function setProductEntity(?Product $productEntity): self { $this->productEntity = $productEntity; return $this; }
 
     public function getQuantity(): ?int { return $this->quantity; }
     public function setQuantity(int $quantity): self { $this->quantity = $quantity; return $this; }

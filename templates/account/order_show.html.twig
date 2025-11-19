@@ -64,8 +64,24 @@
             {% for item in order.orderDetails %}
                 {% set totalItemHT = item.price * item.quantity %}
                 {% set totalItemTTC = totalItemHT + (totalItemHT * tvaRate) %}
+
                 <tr>
-                    <td>{{ item.product }}</td>
+                    <td>
+                        {% if item.productEntity is defined and item.productEntity %}
+                            {% set illustration = item.productEntity.illustrations|first %}
+                            {% if illustration %}
+                                <img src="/uploads/{{ item.productEntity.uploadDirectory }}/{{ illustration.image }}"
+                                    alt="{{ item.product }}"
+                                    style="width:50px; height:auto; margin-right:10px;">
+                            {% else %}
+                                <img src="/uploads/{{ item.productEntity.uploadDirectory }}/default.jpg"
+                                    alt="image par défaut"
+                                    style="width:50px; height:auto; margin-right:10px;">
+                            {% endif %}
+                        {% endif %}
+                        {{ item.product }}
+                    </td>
+
                     <td>x{{ item.quantity }}</td>
                     <td>{{ item.weight * item.quantity }} kg</td>
                     <td>{{ (item.price)|number_format(2, ',', '.') }} €</td>
@@ -73,10 +89,12 @@
                     <td>{{ (totalItemHT)|number_format(2, ',', '.') }} €</td>
                     <td>{{ (totalItemTTC)|number_format(2, ',', '.') }} €</td>
                 </tr>
+
                 {% set totalHT = totalHT + totalItemHT %}
                 {% set totalTTC = totalTTC + totalItemTTC %}
             {% endfor %}
         </tbody>
+
 
     </table>
 
