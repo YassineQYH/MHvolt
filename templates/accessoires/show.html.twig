@@ -92,8 +92,16 @@
                 <a class="buy-btn" style="color:red;">Max (rupture)</a>
             {% endif %}
 
-            {% set tvaRate = (accessory.tva.value ?? 20) / 100 %}
+            {# TVA dynamique depuis la BDD #}
+            {% if accessory.tva %}
+                {% set tvaRate = accessory.tva.value / 100 %}
+            {% else %}
+                {% set tvaRate = 0 %}
+            {% endif %}
+
+            {# Calcul TTC #}
             {% set priceTTC = accessory.price * (1 + tvaRate) %}
+
             <a class="buy-btn" style="margin-top:5px;">Prix TTC : {{ priceTTC|number_format(2, ',', '.') }} €</a>
         {% endif %}
     </div>

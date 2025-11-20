@@ -20,7 +20,7 @@ class StripeController extends AbstractController
     #[Route('/commande/create-session/{reference}', name: 'stripe_create_session')]
     public function index(EntityManagerInterface $entityManager, Cart $panier, string $reference): RedirectResponse|JsonResponse
     {
-        $YOUR_DOMAIN = 'http://127.0.0.1:8000'; // Remplace par ton domaine réel en prod
+        $YOUR_DOMAIN = 'http://127.0.0.1:8000'; // Remplace par ton domaine réel en production
         $product_for_stripe = [];
 
         /** @var User|null $user */
@@ -38,29 +38,41 @@ class StripeController extends AbstractController
 
         // 🧾 Parcours des produits de la commande
         foreach ($order->getOrderDetails()->getValues() as $item) {
-            $product_object = $entityManager->getRepository(Trottinette::class)->findOneBy(['name' => $item->getProduct()]);
+
+            // On tente de récupérer le produit par son nom (Trottinette ou Accessoire)
+            $product_object = $entityManager->getRepository(Trottinette::class)
+                ->findOneBy(['name' => $item->getProduct()]);
+
             if (!$product_object) {
-                $product_object = $entityManager->getRepository(Accessory::class)->findOneBy(['name' => $item->getProduct()]);
+                $product_object = $entityManager->getRepository(Accessory::class)
+                ->findOneBy(['name' => $item->getProduct()]);
             }
 
             // 🖼️ Détection de l'image
-            $productImage = $YOUR_DOMAIN . '/img/default.png'; // fallback
+            $productImage = $YOUR_DOMAIN . '/img/default.png'; // fallback si pas d'image
+
             if ($product_object) {
-                $illustration = method_exists($product_object, 'getIllustrations') ? $product_object->getIllustrations()->first() : null;
+                $illustration = method_exists($product_object, 'getIllustrations')
+                    ? $product_object->getIllustrations()->first()
+                    : null;
+
                 if ($illustration) {
-                    // ⚠️ ici mettre l'URL publique finale
-                    $productImage = $YOUR_DOMAIN . '/uploads/'
-                        . $product_object->getUploadDirectory()
-                        . '/' . $illustration->getImage();
+                    $productImage =
+                        $YOUR_DOMAIN .
+                        '/uploads/' .
+                        $product_object->getUploadDirectory() .
+                        '/' . $illustration->getImage();
                 }
             }
 
+            // 💶 Calcul TTC : basé sur les valeurs stockées dans la commande (prix HT + TVA)
             $priceTTC = $item->getPrice() * (1 + ($item->getTva() / 100));
 
+            // 🧾 Format Stripe
             $product_for_stripe[] = [
                 'price_data' => [
                     'currency' => 'eur',
-                    'unit_amount' => round($priceTTC * 100),
+                    'unit_amount' => round($priceTTC * 100), // Stripe attend des centimes
                     'product_data' => [
                         'name' => $item->getProduct(),
                         'images' => [$productImage],
@@ -70,7 +82,7 @@ class StripeController extends AbstractController
             ];
         }
 
-        // 🚚 Ajouter les frais de livraison
+        // 🚚 Ajout des frais de livraison
         $product_for_stripe[] = [
             'price_data' => [
                 'currency' => 'eur',
@@ -96,7 +108,7 @@ class StripeController extends AbstractController
             'cancel_url' => $YOUR_DOMAIN . '/commande/erreur/{CHECKOUT_SESSION_ID}',
         ]);
 
-        // 💾 Sauvegarde ID Stripe
+        // 💾 Sauvegarde de l'ID de session Stripe
         $order->setStripeSessionId($checkout_session->id);
         $entityManager->flush();
 

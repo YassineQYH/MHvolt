@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Mon compte : Zone-Frais{% endblock %}
+{% block title %}Mon compte : HichTrott{% endblock %}
 
 {% block content %} <br><br><br><br><br><br><br>
     <div class="container">
@@ -9,7 +9,7 @@
         {% if is_granted('ROLE_ADMIN') %}
         <small><a href="/admin">Accéder au BackOffice</a></small></br>
         {% endif %}
-        
+
         Bonjour {{ app.user.firstname }} , bienvenu dans votre compte.</br>
         C'est ici que vous allez pouvoir gérer toutes vos informations personnelles.
         <hr>

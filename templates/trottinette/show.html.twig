@@ -94,8 +94,16 @@
                 <a class="buy-btn" style="color:red;">Max (rupture)</a>
             {% endif %}
 
-            {% set tvaRate = (trottinette.tva.value ?? 20) / 100 %}
+            {# TVA dynamique depuis la BDD #}
+            {% if trottinette.tva %}
+                {% set tvaRate = trottinette.tva.value / 100 %}
+            {% else %}
+                {% set tvaRate = 0 %}
+            {% endif %}
+
+            {# Calcul TTC #}
             {% set priceTTC = trottinette.price * (1 + tvaRate) %}
+
             <a class="buy-btn" style="margin-top:5px;">Prix TTC : {{ priceTTC|number_format(2, ',', '.') }} €</a>
         {% endif %}
     </div>

@@ -60,10 +60,10 @@
         <tbody>
             {% set totalHT = 0 %}
             {% set totalTTC = 0 %}
-            {% set tvaRate = 0.20 %}
             {% for item in order.orderDetails %}
                 {% set totalItemHT = item.price * item.quantity %}
-                {% set totalItemTTC = totalItemHT + (totalItemHT * tvaRate) %}
+                {% set tvaItem = totalItemHT * (item.tva / 100) %}
+                {% set totalItemTTC = totalItemHT + tvaItem %}
 
                 <tr>
                     <td>
@@ -84,16 +84,17 @@
 
                     <td>x{{ item.quantity }}</td>
                     <td>{{ item.weight * item.quantity }} kg</td>
-                    <td>{{ (item.price)|number_format(2, ',', '.') }} €</td>
-                    <td>{{ ((item.price * (1 + tvaRate)))|number_format(2, ',', '.') }} €</td>
-                    <td>{{ (totalItemHT)|number_format(2, ',', '.') }} €</td>
-                    <td>{{ (totalItemTTC)|number_format(2, ',', '.') }} €</td>
+                    <td>{{ item.price|number_format(2, ',', '.') }} €</td>
+                    <td>{{ (item.price * (1 + item.tva / 100))|number_format(2, ',', '.') }} €</td>
+                    <td>{{ totalItemHT|number_format(2, ',', '.') }} €</td>
+                    <td>{{ totalItemTTC|number_format(2, ',', '.') }} €</td>
                 </tr>
 
                 {% set totalHT = totalHT + totalItemHT %}
                 {% set totalTTC = totalTTC + totalItemTTC %}
             {% endfor %}
         </tbody>
+
 
 
     </table>

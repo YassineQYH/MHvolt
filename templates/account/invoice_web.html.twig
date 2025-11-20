@@ -5,7 +5,7 @@
 {% block content %}
 <div class="facture" style="width:105mm; padding:5mm; border:1px solid #000; font-family:Arial, sans-serif; font-size:12px; margin:0 auto;">
 
-    <h1>Facture - {{ order.reference }}</h1>
+    <h1 style="font-size:14px; margin-bottom:5px;">Facture - {{ order.reference }}</h1>
 
     <div>
         <strong>Vendeur :</strong> Hich-Trott<br>
@@ -29,6 +29,7 @@
                 <th style="border:1px solid #000; padding:2px;">Prix unitaire HT</th>
                 <th style="border:1px solid #000; padding:2px;">Total HT</th>
                 <th style="border:1px solid #000; padding:2px;">TVA</th>
+                <th style="border:1px solid #000; padding:2px;">Total TTC</th>
             </tr>
         </thead>
         <tbody>
@@ -37,13 +38,15 @@
             {% for item in order.orderDetails %}
                 {% set totalItemHT = item.price * item.quantity %}
                 {% set tvaItem = totalItemHT * (item.tva / 100) %}
+                {% set totalItemTTC = totalItemHT + tvaItem %}
                 <tr>
                     <td style="border:1px solid #000; padding:2px;">{{ item.product }}</td>
                     <td style="border:1px solid #000; padding:2px;">x{{ item.quantity }}</td>
                     <td style="border:1px solid #000; padding:2px;">{{ item.weight * item.quantity }} kg</td>
-                    <td style="border:1px solid #000; padding:2px;">{{ (item.price / 100)|number_format(2, ',', '.') }} €</td>
-                    <td style="border:1px solid #000; padding:2px;">{{ (totalItemHT / 100)|number_format(2, ',', '.') }} €</td>
-                    <td style="border:1px solid #000; padding:2px;">{{ (tvaItem / 100)|number_format(2, ',', '.') }} €</td>
+                    <td style="border:1px solid #000; padding:2px;">{{ item.price|number_format(2, ',', '.') }} €</td>
+                    <td style="border:1px solid #000; padding:2px;">{{ totalItemHT|number_format(2, ',', '.') }} €</td>
+                    <td style="border:1px solid #000; padding:2px;">{{ tvaItem|number_format(2, ',', '.') }} €</td>
+                    <td style="border:1px solid #000; padding:2px;">{{ totalItemTTC|number_format(2, ',', '.') }} €</td>
                 </tr>
                 {% set totalHT = totalHT + totalItemHT %}
                 {% set totalTVA = totalTVA + tvaItem %}
@@ -51,16 +54,33 @@
         </tbody>
     </table>
 
-    {% set totalTTC = (totalHT + totalTVA + order.carrierPrice * 100) / 100 %}
+    {% set totalTTCProduits = totalHT + totalTVA %}
+    {% set totalTTCFinal = totalTTCProduits + order.carrierPrice %}
 
     <table style="width:100%; border-collapse:collapse; font-size:11px; margin-top:5px;">
         <tbody>
-            <tr><td>Sous-total HT :</td><td>{{ (totalHT / 100)|number_format(2, ',', '.') }} €</td></tr>
-            <tr><td>TVA :</td><td>{{ (totalTVA / 100)|number_format(2, ',', '.') }} €</td></tr>
-            <tr><td>Frais de livraison :</td><td>{{ (order.carrierPrice)|number_format(2, ',', '.') }} €</td></tr>
-            <tr><td><strong>Total TTC :</strong></td><td><strong>{{ totalTTC|number_format(2, ',', '.') }} €</strong></td></tr>
+            <tr>
+                <td>Sous-total HT :</td>
+                <td>{{ totalHT|number_format(2, ',', '.') }} €</td>
+            </tr>
+            <tr>
+                <td>TVA :</td>
+                <td>{{ totalTVA|number_format(2, ',', '.') }} €</td>
+            </tr>
+            <tr>
+                <td><strong>Total TTC produits :</strong></td>
+                <td>{{ totalTTCProduits|number_format(2, ',', '.') }} €</td> {# Sous-total TTC produits #}
+            <tr>
+                <td>Frais de livraison :</td>
+                <td>{{ order.carrierPrice|number_format(2, ',', '.') }} €</td>
+            </tr>
+            <tr>
+                <td><strong>Total TTC :</strong></td>
+                <td><strong>{{ totalTTCFinal|number_format(2, ',', '.') }} €</strong></td>
+            </tr>
         </tbody>
     </table>
+
 
     <div class="footer" style="font-size:10px; margin-top:5px; color:gray;">
         Merci pour votre commande !<br>

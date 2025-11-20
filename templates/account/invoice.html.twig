@@ -8,22 +8,36 @@
             font-family: Arial, sans-serif;
             font-size: 12px;
             margin: 0;
-            padding: 5px;
+            padding: 5mm;
         }
         .facture {
-            width: 105mm; /* A6 portrait */
-            height: auto;
+            width: 150mm;
             padding: 5mm;
             border: 1px solid #000;
             box-sizing: border-box;
         }
-        h1, h2, h3 { margin: 0; padding: 0; }
+        .facture div {
+            margin-bottom: 8px; /* ajoute de l'espace entre chaque bloc d'infos */
+        }
         h1 { font-size: 14px; margin-bottom: 5px; }
-        h2 { font-size: 12px; margin-top: 5px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 11px; }
-        th, td { border: 1px solid #000; padding: 2px; text-align: left; }
+        table { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 5px; }
+        th, td {
+            border: 1px solid #000;
+            padding: 5px;
+            text-align: left;
+        }
+        /* colonnes montant avec € aligné, mais autorise le texte à revenir à la ligne si nécessaire */
+        th:nth-child(4), td:nth-child(4),
+        th:nth-child(5), td:nth-child(5),
+        th:nth-child(6), td:nth-child(6),
+        th:nth-child(7), td:nth-child(7) {
+            min-width: 60px;
+            white-space: nowrap; /* uniquement sur le montant pour garder € à côté */
+        }
+        .totals td { border: none; padding: 5px; }
         .footer { font-size: 10px; margin-top: 5px; color: gray; }
     </style>
+
 </head>
 <body>
 <div class="facture">
@@ -51,6 +65,7 @@
                 <th>Prix unitaire HT</th>
                 <th>Total HT</th>
                 <th>TVA</th>
+                <th>Total TTC</th>
             </tr>
         </thead>
         <tbody>
@@ -59,13 +74,15 @@
             {% for item in order.orderDetails %}
                 {% set totalItemHT = item.price * item.quantity %}
                 {% set tvaItem = totalItemHT * (item.tva / 100) %}
+                {% set totalItemTTC = totalItemHT + tvaItem %}
                 <tr>
                     <td>{{ item.product }}</td>
-                    <td>x{{ item.quantity }}</td>
+                    <td>{{ item.quantity }}</td>
                     <td>{{ item.weight * item.quantity }} kg</td>
-                    <td>{{ (item.price / 100)|number_format(2, ',', '.') }} €</td>
-                    <td>{{ (totalItemHT / 100)|number_format(2, ',', '.') }} €</td>
-                    <td>{{ (tvaItem / 100)|number_format(2, ',', '.') }} €</td>
+                    <td>{{ item.price|number_format(2, ',', '.') }} €</td>
+                    <td>{{ totalItemHT|number_format(2, ',', '.') }} €</td>
+                    <td>{{ tvaItem|number_format(2, ',', '.') }} €</td>
+                    <td>{{ totalItemTTC|number_format(2, ',', '.') }} €</td>
                 </tr>
                 {% set totalHT = totalHT + totalItemHT %}
                 {% set totalTVA = totalTVA + tvaItem %}
@@ -73,14 +90,32 @@
         </tbody>
     </table>
 
-    {% set totalTTC = (totalHT + totalTVA + order.carrierPrice * 100) / 100 %}
+    {% set totalTTCProduits = totalHT + totalTVA %}
+    {% set totalTTCFinal = totalTTCProduits + order.carrierPrice %}
 
-    <table style="margin-top:5px;">
+    <!-- Totaux dans tableau comme version web -->
+    <table style="width:100%; border-collapse:collapse; font-size:11px; margin-top:5px;">
         <tbody>
-            <tr><td>Sous-total HT :</td><td>{{ (totalHT / 100)|number_format(2, ',', '.') }} €</td></tr>
-            <tr><td>TVA :</td><td>{{ (totalTVA / 100)|number_format(2, ',', '.') }} €</td></tr>
-            <tr><td>Frais de livraison :</td><td>{{ (order.carrierPrice)|number_format(2, ',', '.') }} €</td></tr>
-            <tr><td><strong>Total TTC :</strong></td><td><strong>{{ totalTTC|number_format(2, ',', '.') }} €</strong></td></tr>
+            <tr>
+                <td>Sous-total HT :</td>
+                <td>{{ totalHT|number_format(2, ',', '.') }} €</td>
+            </tr>
+            <tr>
+                <td>TVA :</td>
+                <td>{{ totalTVA|number_format(2, ',', '.') }} €</td>
+            </tr>
+            <tr>
+                <td><strong>Total TTC produits :</strong></td>
+                <td>{{ totalTTCProduits|number_format(2, ',', '.') }} €</td>
+            </tr>
+            <tr>
+                <td>Frais de livraison :</td>
+                <td>{{ order.carrierPrice|number_format(2, ',', '.') }} €</td>
+            </tr>
+            <tr>
+                <td><strong>Total TTC :</strong></td>
+                <td><strong>{{ totalTTCFinal|number_format(2, ',', '.') }} €</strong></td>
+            </tr>
         </tbody>
     </table>
 

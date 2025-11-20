@@ -33,8 +33,16 @@
                 <div class="order-summary">
                     {% set totalTTC = 0 %}
                     {% for key, item in cart %}
-                        {% set tvaRate = item.product.tva.value ?? 20 %}
-                        {% set priceTTC = item.product.price * (1 + (tvaRate / 100)) %}
+                    {# TVA dynamique depuis la BDD #}
+                    {% if item.product.tva %}
+                        {% set tvaRate = item.product.tva.value / 100 %}
+                    {% else %}
+                        {% set tvaRate = 0 %}
+                    {% endif %}
+
+                    {# Calcul TTC #}
+                    {% set priceTTC = item.product.price * (1 + tvaRate) %}
+
                         {% set totalItemTTC = priceTTC * item.quantity %}
                         {% set totalTTC = totalTTC + totalItemTTC %}
 
