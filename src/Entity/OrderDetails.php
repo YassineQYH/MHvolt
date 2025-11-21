@@ -40,6 +40,10 @@ class OrderDetails
     #[ORM\Column(type: 'float', nullable: true)]
     private ?float $tva = null;
 
+    #[ORM\Column(type: 'float')]
+    private ?float $priceTTC = null;
+
+
     public function __toString(): string
     {
         return $this->getProduct().' x'.$this->getQuantity().' - Taille '.$this->getWeight();
@@ -70,4 +74,8 @@ class OrderDetails
 
     public function getTva(): ?float{return $this->tva;}
     public function setTva(?float $tva): self{$this->tva = $tva;return $this;}
+
+    public function getPriceTTC(): ?float{return $this->priceTTC;}
+    public function setPriceTTC(float $priceTTC): self{$this->priceTTC = $priceTTC;return $this;}
+
 }

@@ -167,14 +167,14 @@ class OrderController extends AbstractController
                 $tvaValue = $produit->getTva() ? $produit->getTva()->getValue() : 0;
                 $orderDetails->setTva($tvaValue);
 
+                // ----- CALCUL DU TTC -----
+                $priceTTC = $produit->getPrice() * (1 + ($tvaValue / 100));
+                $orderDetails->setPriceTTC($priceTTC);
+
                 $this->entityManager->persist($orderDetails);
             }
 
             $this->entityManager->flush();
-
-            // --- Réinitialisation du panier et des promos ---
-            $cart->remove();       // vide le panier
-            $cart->clearPromos();  // supprime code promo et remise
 
             return $this->render('order/add.html.twig', [
                 'cart' => $cart->getFull(),

@@ -45,18 +45,23 @@ class StripeController extends AbstractController
             return new JsonResponse(['error' => 'order not found'], 404);
         }
 
-        // Récupération du code promo en session
+        // Lecture du code promo en session
         $session = $requestStack->getSession();
         $promoCode = $session->get('promo_code');
         $promo = $promoCode ? $entityManager->getRepository(Promotion::class)->findOneBy(['code' => $promoCode]) : null;
 
-        // Montant total de la réduction (pour info / back-office)
-        $reductionTotale = 0;
+        // Montant total du panier (avant réduction)
+        $totalPanier = 0.0;
+        foreach ($order->getOrderDetails() as $item) {
+            $totalPanier += $item->getPriceTTC() * $item->getQuantity();
+        }
 
-        // Parcours des produits
+        $reductionTotale = $panier->getReduction();
+        $adjustment = 0;
+
         foreach ($order->getOrderDetails()->getValues() as $item) {
 
-            // On tente de récupérer le produit réel
+            // Récupération produit réel
             $product_object = $entityManager->getRepository(Trottinette::class)
                 ->findOneBy(['name' => $item->getProduct()]);
             if (!$product_object) {
@@ -64,50 +69,56 @@ class StripeController extends AbstractController
                     ->findOneBy(['name' => $item->getProduct()]);
             }
 
-            // Image du produit
+            // Image produit
             $productImage = $YOUR_DOMAIN . '/img/default.png';
             if ($product_object) {
                 $illustration = method_exists($product_object, 'getIllustrations')
                     ? $product_object->getIllustrations()->first()
                     : null;
+
                 if ($illustration) {
                     $productImage = $YOUR_DOMAIN . '/uploads/' . $product_object->getUploadDirectory() . '/' . $illustration->getImage();
                 }
             }
 
-            // Calcul TTC
-            $priceTTC = $item->getPrice() * (1 + ($item->getTva() / 100));
+            $quantity = $item->getQuantity();
+            $unitPrice = $item->getPriceTTC();
 
-            // Application promotion
-            if ($promo && $product_object) {
-                try {
-                    $newPrice = $promotionService->applyPromotion($promo, $priceTTC, $product_object);
-                    $reductionTotale += ($priceTTC - $newPrice);
-                    $priceTTC = $newPrice;
-                } catch (\Exception $e) {
-                    // Promo non applicable → prix normal
-                }
-            }
+            // Répartition proportionnelle de la réduction
+            $unitReduction = ($totalPanier > 0 && $reductionTotale > 0)
+                ? ($unitPrice * $quantity / $totalPanier) * $reductionTotale
+                : 0;
 
-            // Ajout produit à Stripe
+            // Prix total de la ligne après réduction
+            $lineTotal = $unitPrice * $quantity - $unitReduction;
+
+            // ⚠️ Arrondi en centimes pour Stripe
+            $lineTotalCents = round($lineTotal * 100);
+            $adjustment += ($lineTotal * 100) - $lineTotalCents;
+
             $product_for_stripe[] = [
                 'price_data' => [
                     'currency' => 'eur',
-                    'unit_amount' => round($priceTTC * 100),
+                    'unit_amount' => $lineTotalCents,
                     'product_data' => [
                         'name' => $item->getProduct(),
                         'images' => [$productImage],
                     ],
                 ],
-                'quantity' => $item->getQuantity(),
+                'quantity' => 1, // on met 1 car on a déjà multiplié par la quantité
             ];
         }
 
-        // Frais de livraison (non remisés)
+        // Appliquer l'ajustement final sur la première ligne pour que le total exact corresponde
+        if ($adjustment !== 0 && count($product_for_stripe) > 0) {
+            $product_for_stripe[0]['price_data']['unit_amount'] += round($adjustment);
+        }
+
+        // 🚚 Livraison (jamais remisée)
         $product_for_stripe[] = [
             'price_data' => [
                 'currency' => 'eur',
-                'unit_amount' => $order->getCarrierPrice() * 100,
+                'unit_amount' => round($order->getCarrierPrice() * 100),
                 'product_data' => [
                     'name' => 'Livraison',
                     'images' => [$YOUR_DOMAIN . '/img/delivery.jpg'],
@@ -116,20 +127,20 @@ class StripeController extends AbstractController
             'quantity' => 1,
         ];
 
-        // Clé API Stripe
+        // 🔑 Stripe : clé API
         Stripe::setApiKey('sk_test_51KNdRaBMBArCOnoiBGyovclE3rWKPO9X8dngKjHXezHj9SXaWeC3HrqOz7LCZAtXpVrJQzbx3PBPucDocAP8anBu00ZjyOIrSx');
 
-        // Création session Stripe
+        // 🧾 Création de la session Checkout
         $checkout_session = Session::create([
             'customer_email' => $user->getEmail(),
             'payment_method_types' => ['card'],
             'line_items' => $product_for_stripe,
             'mode' => 'payment',
             'success_url' => $YOUR_DOMAIN . '/commande/merci/{CHECKOUT_SESSION_ID}',
-            'cancel_url' => $YOUR_DOMAIN . '/commande/erreur/{CHECKOUT_SESSION_ID}',
+            'cancel_url'  => $YOUR_DOMAIN . '/commande/erreur/{CHECKOUT_SESSION_ID}',
         ]);
 
-        // Mise à jour de la commande avec l'ID Stripe
+        // Sauvegarde dans la BDD
         $order->setStripeSessionId($checkout_session->id);
         $entityManager->flush();
 

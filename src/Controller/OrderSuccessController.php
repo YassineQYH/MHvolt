@@ -41,8 +41,9 @@ class OrderSuccessController extends AbstractController
         }
 
         if ($order->getPaymentState() === 0) {
-            // Vider la session "cart" après le paiement
-            $panier->remove();
+            // --- Réinitialisation du panier et des promos ---
+            $panier->remove();       // vide le panier
+            $panier->clearPromos();  // supprime code promo et remise
 
             // Modifier le statut de la commande
             $order->setPaymentState(1); // Payée
