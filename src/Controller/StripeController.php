@@ -39,74 +39,57 @@ class StripeController extends AbstractController
             return $this->redirectToRoute('cart');
         }
 
-        // 🔎 Récupération de la commande
+        // Récupération de la commande
         $order = $entityManager->getRepository(Order::class)->findOneBy(['reference' => $reference]);
         if (!$order) {
             return new JsonResponse(['error' => 'order not found'], 404);
         }
 
-        // 👉 Récupération d'un éventuel code promo en session
+        // Récupération du code promo en session
         $session = $requestStack->getSession();
         $promoCode = $session->get('promo_code');
+        $promo = $promoCode ? $entityManager->getRepository(Promotion::class)->findOneBy(['code' => $promoCode]) : null;
 
-        $promo = null;
-        if ($promoCode) {
-            $promo = $entityManager->getRepository(Promotion::class)->findOneBy(['code' => $promoCode]);
-        }
-
-        // -----------------------------
-        // 🧮 APPLICATION DU CODE PROMO
-        // -----------------------------
+        // Montant total de la réduction (pour info / back-office)
         $reductionTotale = 0;
 
-        // 🧾 Parcours des produits de la commande
+        // Parcours des produits
         foreach ($order->getOrderDetails()->getValues() as $item) {
 
-            // On tente de récupérer le produit par son nom
+            // On tente de récupérer le produit réel
             $product_object = $entityManager->getRepository(Trottinette::class)
                 ->findOneBy(['name' => $item->getProduct()]);
-
             if (!$product_object) {
                 $product_object = $entityManager->getRepository(Accessory::class)
                     ->findOneBy(['name' => $item->getProduct()]);
             }
 
-            // 🖼️ Détection de l'image
+            // Image du produit
             $productImage = $YOUR_DOMAIN . '/img/default.png';
-
             if ($product_object) {
                 $illustration = method_exists($product_object, 'getIllustrations')
                     ? $product_object->getIllustrations()->first()
                     : null;
-
                 if ($illustration) {
-                    $productImage = $YOUR_DOMAIN .
-                        '/uploads/' .
-                        $product_object->getUploadDirectory() .
-                        '/' . $illustration->getImage();
+                    $productImage = $YOUR_DOMAIN . '/uploads/' . $product_object->getUploadDirectory() . '/' . $illustration->getImage();
                 }
             }
 
-            // 💶 Calcul TTC avant réduction
+            // Calcul TTC
             $priceTTC = $item->getPrice() * (1 + ($item->getTva() / 100));
 
-            // 💥 Application réduction si promo active
+            // Application promotion
             if ($promo && $product_object) {
                 try {
                     $newPrice = $promotionService->applyPromotion($promo, $priceTTC, $product_object);
-
-                    // On ajoute la réduction appliquée
                     $reductionTotale += ($priceTTC - $newPrice);
-
-                    // On remplace le priceTTC par le prix remisé
                     $priceTTC = $newPrice;
-
                 } catch (\Exception $e) {
                     // Promo non applicable → prix normal
                 }
             }
 
-            // -------- STRIPE --------
+            // Ajout produit à Stripe
             $product_for_stripe[] = [
                 'price_data' => [
                     'currency' => 'eur',
@@ -120,7 +103,7 @@ class StripeController extends AbstractController
             ];
         }
 
-        // 🚚 Frais de livraison (non remisés)
+        // Frais de livraison (non remisés)
         $product_for_stripe[] = [
             'price_data' => [
                 'currency' => 'eur',
@@ -133,10 +116,10 @@ class StripeController extends AbstractController
             'quantity' => 1,
         ];
 
-        // 🔑 Clé API Stripe
+        // Clé API Stripe
         Stripe::setApiKey('sk_test_51KNdRaBMBArCOnoiBGyovclE3rWKPO9X8dngKjHXezHj9SXaWeC3HrqOz7LCZAtXpVrJQzbx3PBPucDocAP8anBu00ZjyOIrSx');
 
-        // 🧾 Création session Stripe
+        // Création session Stripe
         $checkout_session = Session::create([
             'customer_email' => $user->getEmail(),
             'payment_method_types' => ['card'],
@@ -146,7 +129,7 @@ class StripeController extends AbstractController
             'cancel_url' => $YOUR_DOMAIN . '/commande/erreur/{CHECKOUT_SESSION_ID}',
         ]);
 
-        // Mise à jour commande
+        // Mise à jour de la commande avec l'ID Stripe
         $order->setStripeSessionId($checkout_session->id);
         $entityManager->flush();
 

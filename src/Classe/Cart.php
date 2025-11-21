@@ -150,11 +150,32 @@ class Cart
     public function setReduction(float $montant): void
     {
         $this->reduction = $montant;
+
+        // 👉 On stocke aussi en session pour ne pas perdre la valeur
+        if ($this->session) {
+            $this->session->set('promo_reduction', $montant);
+        }
     }
 
     public function getReduction(): float
     {
+        // 👉 Si une réduction existe en session, on la renvoie
+        if ($this->session) {
+            return (float) $this->session->get('promo_reduction', 0);
+        }
+
         return $this->reduction;
+    }
+
+    // ------------------- Réinitialiser code promo et réduction -------------------
+    public function clearPromos(): void
+    {
+        if ($this->session) {
+            $this->session->remove('promo_code');
+            $this->session->remove('promo_reduction');
+        }
+
+        $this->reduction = 0;
     }
 
     // ------------------- Quantité totale -------------------

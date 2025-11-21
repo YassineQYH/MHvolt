@@ -33,23 +33,22 @@
                 <div class="order-summary">
                     {% set totalTTC = 0 %}
                     {% for key, item in cart %}
-                    {# TVA dynamique depuis la BDD #}
-                    {% if item.product.tva %}
-                        {% set tvaRate = item.product.tva.value / 100 %}
-                    {% else %}
-                        {% set tvaRate = 0 %}
-                    {% endif %}
 
-                    {# Calcul TTC #}
-                    {% set priceTTC = item.product.price * (1 + tvaRate) %}
+                        {# TVA dynamique depuis la BDD #}
+                        {% if item.product.tva %}
+                            {% set tvaRate = item.product.tva.value / 100 %}
+                        {% else %}
+                            {% set tvaRate = 0 %}
+                        {% endif %}
 
+                        {# Calcul TTC #}
+                        {% set priceTTC = item.product.price * (1 + tvaRate) %}
                         {% set totalItemTTC = priceTTC * item.quantity %}
                         {% set totalTTC = totalTTC + totalItemTTC %}
 
                         <div class="row {% if key > 0 %}mt-2{% endif %}">
                             <div class="col-4">
                                 {% set illustration = item.product.illustrations|first %}
-
                                 {% if illustration %}
                                     <img src="/uploads/{{ item.product.uploadDirectory }}/{{ illustration.image }}"
                                         alt="{{ item.product.name }}"
@@ -59,25 +58,51 @@
                                         alt="image par défaut"
                                         height="75px">
                                 {% endif %}
-
                             </div>
+
                             <div class="col-6 my-auto">
                                 {{ item.product.name }} — {{ priceTTC|number_format(2, ',', '.') }} € TTC</br>
                                 <small>{{ item.product.description }}</small>
                             </div>
+
                             <div class="col-2 my-auto">
                                 x {{ item.quantity }}
                             </div>
                         </div></br>
+
                     {% endfor %}
                 </div>
 
                 <hr>
+
                 <div class="text-right">
+
+                    {# Prix standard #}
                     <b>Panier :</b> {{ totalTTC|number_format(2, ',', '.') }} €<br>
                     <b>Livraison :</b> {{ price|number_format(2, ',', '.') }} €<br>
-                    <b>Total TTC :</b> {{ (totalTTC + price)|number_format(2, ',', '.') }} €
+
+                    {% set totalWithShipping = totalTTC + price %}
+                    <b>Total TTC :</b> {{ totalWithShipping|number_format(2, ',', '.') }} €<br>
+
+                    {# === Partie CODE PROMO === #}
+                    {% set promoDiscount = promoDiscount|default(0) %}
+                    {% set promoCode = promoCode|default(null) %}
+
+                    {% if promoDiscount > 0 %}
+                        <div style="margin-top: 15px; padding: 10px; border: 1px solid #28a745; border-radius: 5px; background: #ebffef;">
+                            <b>Code promo appliqué :</b> <span style="color:#28a745;">{{ promoCode }}</span><br>
+                            <b>Réduction :</b> <span style="color:#dc3545;">-{{ promoDiscount|number_format(2, ',', '.') }} €</span><br>
+
+                            <b>Total après réduction :</b>
+                            <span style="font-weight:bold;">
+                                {{ (totalWithShipping - promoDiscount)|number_format(2, ',', '.') }} €
+                            </span>
+                        </div>
+                    {% endif %}
+                    {# === Fin CODE PROMO === #}
+
                 </div>
+
                 </br></br>
             </div>
         </div>

@@ -12,6 +12,9 @@
 
 {% block content %}
 <div class="container my-5 py-5">
+{% set promoDiscount = promoDiscount|default(0) %}
+{% set promoCode = promoCode|default('') %}
+
     <h2>Mon récapitulatif</h2>
     <p>Vérifiez vos informations avant de payer votre commande.</p>
     <hr>
@@ -84,15 +87,19 @@
 
             <hr>
             <strong>Total produits :</strong> {{ totalTTC|number_format(2, ',', '.') }} €<br>
+            {% if promoDiscount > 0 %}
+                <strong>Réduction ({{ promoCode }}):</strong> -{{ promoDiscount|number_format(2, ',', '.') }} €<br>
+            {% endif %}
             <strong>Livraison :</strong> {{ price|number_format(2, ',', '.') }} €<br>
-            <strong>Total à payer :</strong> {{ (totalTTC + price)|number_format(2, ',', '.') }} €<br>
+            <strong>Total à payer :</strong> {{ (totalTTC - promoDiscount + price)|number_format(2, ',', '.') }} €<br>
             <small class="text-muted">TVA incluse</small>
 
             {% if delivery is defined and delivery is not empty %}
                 <a href="{{ path('stripe_create_session', {'reference': reference}) }}" class="btn btn-success btn-block mt-3" id="checkout-button">
-                    Payer | {{ (totalTTC + price)|number_format(2, ',', '.') }} €
+                    Payer | {{ (totalTTC - promoDiscount + price)|number_format(2, ',', '.') }} €
                 </a>
             {% endif %}
+
         </div>
     </div>
 </div>

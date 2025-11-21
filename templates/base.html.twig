@@ -64,16 +64,16 @@
 
             {# ✅ Messages d’inscription (erreur et succès) #}
             {% for message in app.flashes('register_error') %}
-                <div class="register-alert register-error">{{ message }}</div>
+                <div class="info-alert register-error">{{ message }}</div>
             {% endfor %}
             {% for message in app.flashes('register_success') %}
-                <div class="register-alert register-success">{{ message }}</div>
+                <div class="info-alert register-success">{{ message }}</div>
             {% endfor %}
 
             {% block carrousel %}{% endblock %}
 
             <style>
-                .register-alert {
+                .info-alert {
                     padding: 12px 20px;
                     font-weight: bold;
                     text-align: center;
@@ -81,6 +81,10 @@
                     font-size: 1rem;
                     animation: fadeInDown 0.6s ease;
                     z-index: 9999;
+
+                    background-color: #fff3cd; /* jaune clair */
+                    color: #856404; /* orange foncé */
+                    border: 1px solid #ffeeba;
                 }
 
                 .register-error {

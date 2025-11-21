@@ -38,12 +38,12 @@ class OrderController extends AbstractController
         $user = $this->getUser();
 
         if (!$user) {
-            $this->addFlash('login_required', 'Vous devez être connecté pour valider votre panier.');
+            $this->addFlash('info-alert', 'Vous devez être connecté pour valider votre panier.');
             return $this->redirectToRoute('cart');
         }
 
         if ($user->getAddresses()->isEmpty()) {
-            $this->addFlash('info', 'Veuillez ajouter une adresse avant de passer commande.');
+            $this->addFlash('info-alert', 'Veuillez ajouter une adresse avant de passer commande.');
             return $this->redirectToRoute('account_address_add');
         }
 
@@ -63,11 +63,26 @@ class OrderController extends AbstractController
         $poidsTarif = $weightRepository->findByKgPrice($poidsTotal);
         $prixLivraison = $poidsTarif ? $poidsTarif->getPrice() : 0.0;
 
+        // Récupération réduction & code promo depuis l'objet Cart (si disponible)
+        $promoDiscount = 0.0;
+        $promoCode = null;
+
+        if (method_exists($cart, 'getReduction')) {
+            $promoDiscount = (float) $cart->getReduction();
+        }
+
+        if (method_exists($cart, 'getPromoCode')) {
+            $promoCode = $cart->getPromoCode();
+        }
+
         return $this->render('order/index.html.twig', [
             'form' => $form->createView(),
             'cart' => $cart->getFull(),
             'categories' => $categories,
-            'price' => $prixLivraison, // <--- ajouté
+            'price' => $prixLivraison,
+            'cartObject' => $cart,
+            'promoDiscount' => $promoDiscount,
+            'promoCode' => $promoCode,
         ]);
     }
 
@@ -155,22 +170,27 @@ class OrderController extends AbstractController
                 $this->entityManager->persist($orderDetails);
             }
 
-
             $this->entityManager->flush();
+
+            // --- Réinitialisation du panier et des promos ---
+            $cart->remove();       // vide le panier
+            $cart->clearPromos();  // supprime code promo et remise
 
             return $this->render('order/add.html.twig', [
                 'cart' => $cart->getFull(),
+                'cartObject' => $cart,
                 'delivery' => $deliveryContent,
                 'reference' => $order->getReference(),
                 'price' => $prixLivraison,
                 'totalLivraison' => null,
                 'categories' => $categories,
+                'promoDiscount' => $cart->getReduction(),
+                'promoCode' => $cart->getPromoCode(),
             ]);
         }
 
         return $this->redirectToRoute('cart');
     }
-
 
     #[Route('/account/order/{reference}/facture', name: 'account_order_invoice', methods: ['GET'])]
     public function generateInvoice(string $reference, Request $request): Response

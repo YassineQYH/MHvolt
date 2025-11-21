@@ -81,49 +81,38 @@
             </tbody>
         </table>
 
-        {% set totalAfterPromo = totalTTC + price %}
-        {% set promoDiscount = cartObject.getReduction() %}
-        {% set promoCode = cartObject.getPromoCode() %}
+{% set totalAfterPromo = totalTTC + price %}
+{% set promoDiscount = cartObject.getReduction() %}
+{% set promoCode = cartObject.getPromoCode() %}
 
-        <div class="text-right mb-5">
-            <b>Nombre de produits :</b> {{ quantity_product }}<br>
-            <b>Total TTC :</b> {{ totalTTC|number_format(2, ',', '.') }} €<br>
-            <b>Poids total :</b> {{ totalWeight }} kg<br>
-            <b>Prix livraison :</b> {{ price|number_format(2, ',', '.') }} €<br>
+<div class="text-right mb-5">
+    <b>Nombre de produits :</b> {{ quantity_product }}<br>
+    <b>Total TTC :</b> {{ totalTTC|number_format(2, ',', '.') }} €<br>
+    <b>Poids total :</b> {{ totalWeight }} kg<br>
+    <b>Prix livraison :</b> {{ price|number_format(2, ',', '.') }} €<br>
 
-            <b>Prix Total :</b>
-            <span id="totalOriginal" {% if promoDiscount > 0 %}style="text-decoration: line-through;"{% endif %}>
-                {{ totalAfterPromo|number_format(2, ',', '.') }} €
-            </span><br>
+    <b>Prix Total :</b>
+    <span id="totalOriginal" {% if promoDiscount > 0 %}style="text-decoration: line-through;"{% endif %}>
+        {{ totalAfterPromo|number_format(2, ',', '.') }} €
+    </span><br>
 
-            {% if promoDiscount > 0 %}
-                <b>Prix Total remisé :</b>
-                <span id="totalRemise">{{ (totalAfterPromo - promoDiscount)|number_format(2, ',', '.') }} €</span><br>
-                <b>Réduction promo :</b>
-                <span id="reductionPromo">-{{ promoDiscount|number_format(2, ',', '.') }} €</span><br>
-            {% else %}
-                <div id="totalRemiseContainer" style="display:none;">
-                    <b>Réduction promo :</b>
-                    <span id="reductionPromo"></span><br>
-                    <b>Prix Total remisé :</b>
-                    <span id="totalRemise"></span><br>
+    {# Bloc promo (toujours présent dans le DOM) #}
+    <div id="totalRemiseContainer" style="display: {% if promoDiscount > 0 %}block{% else %}none{% endif %}; margin-top: 15px; padding: 10px; border: 1px solid #28a745; border-radius: 5px; background: #ebffef; max-width:300px; margin-left:auto;">
+        <b>Code promo appliqué :</b> <span id="appliedPromoCode" style="color:green;">{{ promoCode }}</span><br>
+        <b>Réduction :</b> <span id="reductionPromo" style="color:red;">{% if promoDiscount > 0 %}-{{ promoDiscount|number_format(2, ',', '.') }} €{% endif %}</span><br>
+        <b>Total après réduction :</b>
+        <span id="totalRemise" style="font-weight:bold; color:black;">{% if promoDiscount > 0 %}{{ (totalAfterPromo - promoDiscount)|number_format(2, ',', '.') }} €{% endif %}</span>
+    </div>
 
-                </div>
-            {% endif %}
+    {# Formulaire pour entrer un nouveau code promo #}
+    <form id="promoForm" action="{{ path('cart_apply_promo') }}" method="POST" class="d-flex mt-2" style="max-width:300px; margin-left:auto;">
+        <input type="text" name="promo_code" id="promoCode" class="form-control me-2" placeholder="Code promo" value="{{ promoCode ?? '' }}">
+        <button class="btn btn-primary" type="submit">Appliquer</button>
+    </form>
+    <small id="promoMessage" class="text-danger"></small>
 
-            <small class="text-muted">TVA incluse</small>
-
-            <div style="text-align:right; margin-top:10px; max-width:300px; margin-left:auto;">
-                <form id="promoForm" action="{{ path('cart_apply_promo') }}" method="POST" class="d-flex">
-                    <input type="text" name="promo_code" id="promoCode" class="form-control me-2" placeholder="Code promo" value="{{ promoCode ?? '' }}">
-                    <button class="btn btn-primary" type="submit">Appliquer</button>
-                </form>
-                <small id="promoMessage" class="text-danger"></small>
-            </div>
-
-            <a href="{{ path('order') }}" class="btn btn-success btn-block mt-3">Valider mon panier</a>
-        </div>
-
+    <a href="{{ path('order') }}" class="btn btn-success btn-block mt-3">Valider mon panier</a>
+</div>
 
     {% else %}
         <hr>

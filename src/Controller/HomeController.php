@@ -51,7 +51,7 @@ class HomeController extends AbstractController
             }
 
             // 📬 Message flash utilisateur
-            $this->addFlash('notice', "Merci de m'avoir contacté. Je vous répondrai dans les meilleurs délais.");
+            $this->addFlash('info-alert', "Merci de m'avoir contacté. Je vous répondrai dans les meilleurs délais.");
 
             $data = $formcontact->getData();
             $mail = new Mail();

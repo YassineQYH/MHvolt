@@ -66,10 +66,10 @@ class SecurityController extends AbstractController
             } else {
                 if ($existingUser) {
                     // Email déjà utilisé
-                    $this->addFlash('register_error', "⚠️ L'adresse e-mail est déjà utilisée.");
+                    $this->addFlash('info-alert', "⚠️ L'adresse e-mail est déjà utilisée.");
                 } else {
                     // Formulaire invalide
-                    $this->addFlash('register_error', "⚠️ L’inscription n’a pas pu aboutir. Veuillez vérifier vos informations.");
+                    $this->addFlash('info-alert', "⚠️ L’inscription n’a pas pu aboutir. Veuillez vérifier vos informations.");
                 }
             }
         }
