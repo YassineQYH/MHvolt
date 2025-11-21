@@ -6,6 +6,7 @@ use App\Classe\Cart;
 use App\Classe\Mail;
 use App\Entity\Order;
 use App\Entity\Product;
+use App\Entity\Promotion;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -23,16 +24,30 @@ class OrderSuccessController extends AbstractController
     #[Route('/commande/merci/{stripeSessionId}', name: 'order_validate')]
     public function index(Cart $panier, string $stripeSessionId): Response
     {
-        // Gestion automatique du stock
+        // --- Gestion automatique du stock des PRODUITS ---
         foreach ($panier->getFull() as $element) {
             $product = $element['product'];
             $quantityInCart = $element['quantity'];
 
-            $product->setStock($product->getStock() - $quantityInCart);
+            $product->setStock(max(0, $product->getStock() - $quantityInCart));
             $this->entityManager->persist($product);
         }
+
+        // --- Gestion automatique de l'utilisation des PROMOTIONS ---
+        if ($panier->getPromoCode()) {
+            $promo = $this->entityManager->getRepository(Promotion::class)->findOneBy([
+                'code' => $panier->getPromoCode()
+            ]);
+
+            if ($promo && $promo->canBeUsed()) {
+                $promo->incrementUsed();
+                $this->entityManager->persist($promo);
+            }
+        }
+
         $this->entityManager->flush();
 
+        // --- Récupération de la commande ---
         $order = $this->entityManager->getRepository(Order::class)
             ->findOneBy(['stripeSessionId' => $stripeSessionId]);
 
@@ -41,15 +56,13 @@ class OrderSuccessController extends AbstractController
         }
 
         if ($order->getPaymentState() === 0) {
-            // --- Réinitialisation du panier et des promos ---
             $panier->remove();       // vide le panier
             $panier->clearPromos();  // supprime code promo et remise
 
-            // Modifier le statut de la commande
             $order->setPaymentState(1); // Payée
             $this->entityManager->flush();
 
-            // Envoyer un email au client
+            // Email client
             $mail = new Mail();
             $content = "Bonjour " . $order->getUser()->getFirstname() . "</br>"
                 . "SY-Shop vous remercie pour votre commande n°<strong>" . $order->getReference() . "</strong> "
@@ -58,11 +71,11 @@ class OrderSuccessController extends AbstractController
             $mail->send(
                 $order->getUser()->getEmail(),
                 $order->getUser()->getFirstname(),
-                "Votre commande n° " . $order->getReference() . " est bien validée. Vous serez averti par mail lors de la préparation et de l'envoi.",
+                "Votre commande n° " . $order->getReference() . " est bien validée.",
                 $content
             );
 
-            // Envoyer un email à l'admin
+            // Email admin
             $mailAdmin = new Mail();
             $subject = "Nouvelle commande validée et payée";
             $contentAdmin = "Bonjour, </br>La commande n°<strong>" . $order->getReference() . "</strong> "
