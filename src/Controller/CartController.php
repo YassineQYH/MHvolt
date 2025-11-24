@@ -81,10 +81,13 @@ class CartController extends BaseController
         $promo = $promotionRepository->findOneBy(['code' => $code]);
 
         if (!$promo || !$promo->canBeUsed()) {
+            // Supprime le code promo stocké si invalide
+            $cart->setReduction(0);
+            $cart->setPromoCode(null);
             return new JsonResponse(['error' => 'Code promo invalide ou expiré.']);
         }
 
-        // Calcul du total TTC du panier
+        // Calcul du total TTC uniquement sur les produits
         $totalTTC = 0;
         foreach ($cart->getFull() as $item) {
             $prixHT = $item['product']->getPrice();
@@ -92,17 +95,15 @@ class CartController extends BaseController
             $totalTTC += $prixHT * (1 + $tvaRate) * $item['quantity'];
         }
 
-        // Total TTC + frais de livraison
-        $totalWithShipping = $totalTTC + $cart->getLivraisonPrice($weightRepository);
-
-        // Calcul de la réduction
+        // Calcul de la réduction uniquement sur les produits
         $discount = $promo->getDiscountPercent() !== null
-            ? $totalWithShipping * ($promo->getDiscountPercent() / 100)
+            ? $totalTTC * ($promo->getDiscountPercent() / 100)
             : $promo->getDiscountAmount();
 
-        $totalAfterPromo = $totalWithShipping - $discount;
+        // Total final = produits après réduction + livraison
+        $totalAfterPromo = $totalTTC - $discount + $cart->getLivraisonPrice($weightRepository);
 
-        // Stocke la réduction et le code promo dans le panier pour le paiement final
+        // Stocke la réduction et le code promo pour le paiement final
         $cart->setReduction($discount);
         $cart->setPromoCode($code);
 
@@ -111,6 +112,7 @@ class CartController extends BaseController
             'totalAfterPromo' => $totalAfterPromo
         ]);
     }
+
 
 
     #[Route('/cart/add/{id}/{type}', name: 'add_to_cart', defaults: ['type' => 'trottinette'], methods: ['GET', 'POST'])]
