@@ -76,6 +76,7 @@ class Order
     public function getTotal(): float
     {
         $total = 0.0;
+        /** @var OrderDetails $product */
         foreach ($this->getOrderDetails() as $product) {
             $total += $product->getPrice() * $product->getQuantity();
         }
