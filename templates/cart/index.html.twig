@@ -7,6 +7,7 @@
 
 {% block javascripts %}
     {# Scripts code-promo.js #}
+    {{ parent() }}
     <script src="{{ asset('assets/js/code-promo.js') }}"></script>
 {% endblock %}
 
