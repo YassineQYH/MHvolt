@@ -41,12 +41,6 @@ class AccessoryCrudController extends AbstractCrudController
             AssociationField::new('weight', 'Poids'),
             AssociationField::new('category', 'Catégorie'),
 
-            CollectionField::new('illustrationaccess', 'Illustrations')
-                ->allowAdd()
-                ->allowDelete()
-                ->setEntryType(Illustrationaccess::class)
-                ->setFormTypeOption('by_reference', false),
-
             CollectionField::new('trottinetteAccessories', 'Trottinettes associées')
                 ->allowAdd()
                 ->allowDelete()

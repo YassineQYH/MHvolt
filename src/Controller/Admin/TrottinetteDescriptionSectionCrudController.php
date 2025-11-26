@@ -20,7 +20,9 @@ class TrottinetteDescriptionSectionCrudController extends AbstractCrudController
             AssociationField::new('trottinette'),
             TextField::new('title'),
             TextEditorField::new('content'),
-            IntegerField::new('sectionOrder'),
+            IntegerField::new('sectionOrder', 'Ordre')
+                ->setHelp('Détermine l’ordre d’affichage des sections')
+                ->setSortable(true),
         ];
     }
 }

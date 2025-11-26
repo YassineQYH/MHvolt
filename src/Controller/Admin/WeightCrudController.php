@@ -3,11 +3,12 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Weight;
-use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
-use EasyCorp\Bundle\EasyAdminBundle\Field\{
-    IdField, TextField, NumberField
-};
+use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
+use EasyCorp\Bundle\EasyAdminBundle\Filter\NumericFilter;
 
 class WeightCrudController extends AbstractCrudController
 {
@@ -29,10 +30,19 @@ class WeightCrudController extends AbstractCrudController
     {
         return [
             IdField::new('id')->onlyOnIndex(),
-            TextField::new('name', 'Nom'),
-            NumberField::new('value', 'Valeur (kg)')
+            NumberField::new('kg', 'Poids (kg)')
                 ->setNumDecimals(2)
                 ->setHelp('Saisissez la valeur en kilogrammes'),
+            NumberField::new('price', 'Prix (€)')
+                ->setNumDecimals(2)
+                ->setHelp('Saisissez le prix associé au poids'),
         ];
+    }
+
+    public function configureFilters(Filters $filters): Filters
+    {
+        return $filters
+            ->add(NumericFilter::new('kg', 'Poids (kg)'))
+            ->add(NumericFilter::new('price', 'Prix (€)'));
     }
 }

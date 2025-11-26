@@ -17,11 +17,24 @@ class TrottinetteCaracteristiqueCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
-    return [
-        AssociationField::new('trottinette'),
-        AssociationField::new('categorie'),
-        AssociationField::new('caracteristique'),
-        TextField::new('value')
-    ];
+        return [
+            IdField::new('id')->hideOnForm(),
+
+            AssociationField::new('trottinette', 'Trottinette')
+                ->setRequired(true)       // obligatoire
+                ->hideOnIndex(),          // visible uniquement dans le formulaire
+
+            AssociationField::new('categorie', 'Catégorie')
+                ->hideOnIndex(),          // visible uniquement dans le formulaire
+
+            AssociationField::new('caracteristique', 'Caractéristique')
+                ->setRequired(true),      // obligatoire
+
+            TextField::new('title', 'Titre personnalisé')
+                ->hideOnIndex(),          // optionnel, seulement dans le formulaire
+
+            TextField::new('value', 'Valeur')
+                ->setRequired(true),      // obligatoire
+        ];
     }
 }

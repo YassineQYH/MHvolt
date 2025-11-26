@@ -2,15 +2,18 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\Tva;
 use App\Entity\User;
 use App\Entity\Order;
 use App\Entity\Weight;
+use App\Entity\Product;
 use App\Entity\Accessory;
+use App\Entity\Promotion;
 use App\Entity\Trottinette;
 use App\Entity\Illustration;
-use App\Entity\Caracteristique;
-use App\Entity\Illustrationaccess;
 use App\Entity\OrderDetails;
+use App\Entity\ProductHistory;
+use App\Entity\Caracteristique;
 use App\Entity\TrottinetteAccessory;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\TrottinetteCaracteristique;
@@ -51,7 +54,7 @@ class AdminDashboardController extends AbstractDashboardController
     {
         yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
 
-         //-- Users --//
+        //-- Users --//
         yield MenuItem::section('Utilisateurs');
         yield MenuItem::linkToCrud('Users', 'fas fa-user', User::class);
 
@@ -62,9 +65,16 @@ class AdminDashboardController extends AbstractDashboardController
 
         //-- Poids --//
         yield MenuItem::section('Tableau tarifaire des Poids');
-        yield MenuItem::linkToCrud('Poids', 'fas fa-home', Weight::class);
+        yield MenuItem::linkToCrud('Poids', 'fas fa-weight', Weight::class);
 
         // --- CRUD Produits ---
+        yield MenuItem::section('Produits');
+        yield MenuItem::linkToCrud('Produits', 'fas fa-box', Product::class);
+        yield MenuItem::linkToCrud('Historique Produits', 'fas fa-history', ProductHistory::class);
+        yield MenuItem::linkToCrud('Promotions', 'fas fa-tags', Promotion::class);
+        yield MenuItem::linkToCrud('TVA', 'fas fa-percentage', Tva::class);
+
+        // --- CRUD Trottinettes ---
         yield MenuItem::section('Trottinettes');
         yield MenuItem::linkToCrud('Trottinettes', 'fas fa-folder', Trottinette::class);
         yield MenuItem::linkToCrud('Sections Description', 'fas fa-align-left', TrottinetteDescriptionSection::class);
@@ -80,13 +90,13 @@ class AdminDashboardController extends AbstractDashboardController
         //-- Illustrations --//
         yield MenuItem::section('Illustrations');
         yield MenuItem::linkToCrud('Illustrations Trottinettes', 'fas fa-image', Illustration::class);
-        yield MenuItem::linkToCrud('Illustration Accessoires', 'fas fa-image', Illustrationaccess::class);
 
         // --- Statistiques / Graphiques ---
         yield MenuItem::section('Stats');
         yield MenuItem::linkToRoute('Répartition Accessoires', 'fa fa-chart-pie', 'admin_graph_accessories');
         yield MenuItem::linkToRoute('Trottinettes par catégorie', 'fa fa-chart-bar', 'admin_graph_trottinettes');
     }
+
 
     // -------------------------------
     // Méthodes pour récupérer les données graphiques

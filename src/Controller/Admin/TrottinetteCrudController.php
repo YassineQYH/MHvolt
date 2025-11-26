@@ -3,8 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Trottinette;
-use App\Entity\TrottinetteCaracteristique;
-use App\Entity\TrottinetteDescriptionSection;
+use App\Entity\Illustration;
 use App\Form\TrottinetteCaracteristiqueType;
 use App\Form\TrottinetteDescriptionSectionType;
 use App\Form\TrottinetteAccessoryType;
@@ -27,29 +26,30 @@ class TrottinetteCrudController extends AbstractCrudController
 
             TextField::new('name'),
             TextField::new('nameShort'),
-            TextField::new('slug'),
+            TextField::new('slug')->setFormTypeOption('disabled', true),
 
             TextEditorField::new('description'),
             TextEditorField::new('descriptionShort'),
 
-            ImageField::new('image')
-                ->setUploadDir('public/uploads/trottinettes')
-                ->setBasePath('/uploads/trottinettes')
-                ->setRequired(false),
-
-            BooleanField::new('isBest'),
-            BooleanField::new('isHeader'),
-
+            // ---------------- Image principale ----------------
             ImageField::new('headerImage')
                 ->setUploadDir('public/uploads/trottinettes')
                 ->setBasePath('/uploads/trottinettes')
                 ->setRequired(false),
 
             TextField::new('headerBtnTitle'),
+            BooleanField::new('isBest'),
+            BooleanField::new('isHeader'),
 
-            // ----------------------
-            // Relations
-            // ----------------------
+            // ---------------- Collections ----------------
+
+            // Illustrations (embedded form)
+            CollectionField::new('illustrations', 'Illustrations')
+                ->allowAdd()
+                ->allowDelete()
+                ->setEntryType(\App\Form\IllustrationType::class)
+                ->setFormTypeOption('by_reference', false)
+                ->onlyOnForms(), // visible uniquement dans le formulaire
 
             // Caractéristiques pivot
             CollectionField::new('trottinetteCaracteristiques')
@@ -70,7 +70,9 @@ class TrottinetteCrudController extends AbstractCrudController
                 ->allowAdd()
                 ->allowDelete()
                 ->setEntryType(TrottinetteAccessoryType::class)
-                ->setFormTypeOption('by_reference', false),
+                ->setFormTypeOption('by_reference', false)
+                ->setEntryIsComplex(true) // permet d’éditer le champ complexe (association)
+                ->onlyOnForms(), // si tu veux que ce soit éditable uniquement dans le formulaire
         ];
     }
 }

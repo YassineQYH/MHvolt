@@ -12,7 +12,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Field\{
-    IdField, TextField, ArrayField, MoneyField, ChoiceField, DateTimeField, TextEditorField
+    IdField, TextField, ArrayField, MoneyField, ChoiceField, DateTimeField, TextEditorField, FormField
 };
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Symfony\Component\HttpFoundation\Response;
@@ -214,11 +214,21 @@ class OrderCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
-        return [
+        // ---------------------- Général ----------------------
+        $general = [
+            FormField::addPanel('Informations générales')->collapsible(),
             IdField::new('id')->onlyOnIndex(),
             DateTimeField::new('createdAt', 'Passée le'),
             TextField::new('user', 'Utilisateur')->onlyOnDetail(),
             TextEditorField::new('delivery', 'Adresse de livraison')->onlyOnDetail(),
+            ArrayField::new('orderDetails', 'Produits achetés')
+                ->setTemplatePath('admin/fields/order_details.html.twig')
+                ->onlyOnDetail(),
+        ];
+
+        // ---------------------- Paiement & Livraison ----------------------
+        $paymentDelivery = [
+            FormField::addPanel('Paiement & Livraison')->collapsible(),
             MoneyField::new('total', 'Total produit')->setCurrency('EUR')->setStoredAsCents(false),
             MoneyField::new('carrierPrice', 'Frais de livraison')->setCurrency('EUR')->setStoredAsCents(false),
             ChoiceField::new('paymentState', 'Paiement')->setChoices([
@@ -241,9 +251,24 @@ class OrderCrudController extends AbstractCrudController
             ]),
             TextField::new('carrier', 'Transporteur')->onlyOnDetail(),
             TextField::new('trackingNumber', 'Numéro de suivi')->onlyOnDetail(),
-            ArrayField::new('orderDetails', 'Produits achetés')
-                ->setTemplatePath('admin/fields/order_details.html.twig')
-                ->onlyOnDetail(),
         ];
+
+        // ---------------------- Transport secondaire ----------------------
+        $secondaryTransport = [
+            FormField::addPanel('Transport secondaire')->collapsible(),
+            TextField::new('secondaryCarrier', 'Transporteur secondaire')->onlyOnDetail(),
+            TextField::new('secondaryCarrierTrackingNumber', 'N° suivi secondaire')->onlyOnDetail(),
+        ];
+
+        // ---------------------- Promo ----------------------
+        $promo = [
+            FormField::addPanel('Promotion')->collapsible(),
+            TextField::new('promoCode', 'Code promo')->onlyOnDetail(),
+            MoneyField::new('promoReduction', 'Réduction promo')->setCurrency('EUR')->setStoredAsCents(false)->onlyOnDetail(),
+        ];
+
+        // ---------------------- Fusion ----------------------
+        return array_merge($general, $paymentDelivery, $secondaryTransport, $promo);
     }
+
 }

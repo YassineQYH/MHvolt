@@ -17,7 +17,11 @@ class TrottinetteAccessoryCrudController extends AbstractCrudController
     {
         return [
             AssociationField::new('trottinette'),
-            AssociationField::new('accessory'),
+            AssociationField::new('accessory')
+                ->setFormTypeOption('query_builder', function($repo) {
+                    return $repo->createQueryBuilder('p')
+                                ->andWhere('p INSTANCE OF App\Entity\Accessory');
+                }),
         ];
     }
 }

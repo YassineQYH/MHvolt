@@ -16,12 +16,20 @@ class IllustrationCrudController extends AbstractCrudController
     public function configureFields(string $pageName): iterable
     {
         return [
+
+            // ID (caché en création/édition)
             IdField::new('id')->hideOnForm(),
-            ImageField::new('image')
+
+            // Champ image
+            ImageField::new('image', 'Illustration')
                 ->setUploadDir('public/uploads/illustrations')
                 ->setBasePath('/uploads/illustrations'),
-            AssociationField::new('trottinette')
-                ->setFormTypeOption('placeholder', 'Choisir une trottinette'), // ⚡ ici
+
+            // Association product OU accessory selon ton entité Illustration
+            AssociationField::new('product', 'Produit associé')
+                ->setFormTypeOption('placeholder', 'Sélectionner un produit'),
         ];
     }
+
+
 }
