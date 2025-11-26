@@ -83,7 +83,7 @@
         </table>
 
 {% set totalAfterPromo = totalTTC + price %}
-{% set promoDiscount = cartObject.getReduction() %}
+{% set promoDiscount = cartObject.getReduction(promoService) %}
 {% set promoCode = cartObject.getPromoCode() %}
 
 <div class="text-right mb-5">

@@ -8,57 +8,69 @@ use App\Entity\Product;
 class PromotionService
 {
     /**
-     * Applique une promotion sur un prix donné
+     * Calcule la réduction totale applicable sur un panier complet
      *
-     * La logique a été modifiée :
-     * - Le targetType "TARGET_CATEGORY_ACCESS" vérifie désormais que
-     *   le type Doctrine du produit est "accessoire"
+     * @param array $cartFull Tableau du panier complet (comme retourné par Cart::getFull())
+     * @param Promotion|null $promo La promotion à appliquer
+     * @return float Montant total de la réduction
      */
-    public function applyPromotion(Promotion $promo, float $price, Product $product = null): float
+    public function calculateReduction(array $cartFull, ?Promotion $promo = null): float
     {
-        if (!$promo->canBeUsed()) {
-            throw new \LogicException("Promotion '{$promo->getCode()}' is not active or available.");
+        if (!$promo || !$promo->canBeUsed() || !$promo->isDiscountValid()) {
+            return 0;
         }
 
-        // Vérifie que le produit correspond au targetType
-        switch ($promo->getTargetType()) {
+        $totalReduction = 0;
 
-            case Promotion::TARGET_ALL:
-                // aucune restriction
-                break;
+        foreach ($cartFull as $item) {
+            $product = $item['product'];
+            $quantity = $item['quantity'];
+            $linePrice = $product->getPrice() * $quantity;
 
-            case Promotion::TARGET_CATEGORY_ACCESS:
-                // IMPORTANT :
-                // On vérifie maintenant le type du produit via Doctrine (discriminator)
-                // Accessoire → "accessoire"
-                    if (!$product || $product->getType() !== 'accessoire') {
-                        throw new \LogicException("Cette promotion n'est valable que sur les accessoires.");
+            switch ($promo->getTargetType()) {
+                case Promotion::TARGET_ALL:
+                    // S'applique sur tout le panier
+                    $reduction = $promo->getDiscountAmount() ?? $linePrice * ($promo->getDiscountPercent() / 100 ?? 0);
+                    $totalReduction += $reduction;
+                    break;
+
+                case Promotion::TARGET_CATEGORY_ACCESS:
+                    // Vérifie type "accessoire" + bonne catégorie
+                    if (
+                        $product->getType() === 'accessoire'
+                        && $product->getCategory() === $promo->getCategoryAccess()
+                    ) {
+                        // 💡 Appliquer la réduction pour CHAQUE quantité
+                        $totalReduction += $promo->getDiscountAmount() * $item['quantity'];
                     }
                     break;
 
-            case Promotion::TARGET_PRODUCT:
-                if (!$product || $product !== $promo->getProduct()) {
-                    throw new \LogicException("Promotion '{$promo->getCode()}' is not valid for this product.");
-                }
-                break;
 
-            case Promotion::TARGET_PRODUCT_LIST:
-                if (!$product || !$promo->getProducts()->contains($product)) {
-                    throw new \LogicException("Promotion '{$promo->getCode()}' is not valid for this product.");
-                }
-                break;
+                case Promotion::TARGET_PRODUCT:
+                    if ($product === $promo->getProduct()) {
+                        $reduction = $promo->getDiscountAmount() ?? $linePrice * ($promo->getDiscountPercent() / 100 ?? 0);
+                        $totalReduction += $reduction;
+                    }
+                    break;
+
+                case Promotion::TARGET_PRODUCT_LIST:
+                    if ($promo->getProducts()->contains($product)) {
+                        $reduction = $promo->getDiscountAmount() ?? $linePrice * ($promo->getDiscountPercent() / 100 ?? 0);
+                        $totalReduction += $reduction;
+                    }
+                    break;
+            }
         }
 
-        // Application de la remise
-        if ($promo->getDiscountAmount() !== null) {
-            // Remise en valeur (€)
-            $price -= $promo->getDiscountAmount();
-        } elseif ($promo->getDiscountPercent() !== null) {
-            // Remise en %
-            $price -= $price * ($promo->getDiscountPercent() / 100);
-        }
+        return max(0, $totalReduction);
+    }
 
-        // Sécurité : prix minimum = 0
-        return max(0, $price);
+    /**
+     * Applique une promotion sur un prix unitaire d'un produit
+     * (utile pour recalculer le prix affiché d'une ligne)
+     */
+    public function applyPromotion(Promotion $promo, float $price, Product $product): float
+    {
+        return max(0, $price - $this->calculateReduction([['product' => $product, 'quantity' => 1]], $promo));
     }
 }

@@ -44,7 +44,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Soumission du formulaire
     promoForm.addEventListener('submit', function(e) {
         e.preventDefault();
         const code = promoCodeInput.value.trim();
@@ -55,19 +54,43 @@ document.addEventListener('DOMContentLoaded', function() {
         applyPromo(code);
     });
 
-    // Réappliquer automatiquement le code promo si déjà présent dans le panier
+    // Réappliquer le code promo si présent au chargement
     const currentCode = promoCodeInput.value.trim();
     if (currentCode) {
         applyPromo(currentCode);
     }
 
-    // Écouter les modifications du panier (suppression / ajout / quantité)
+    // Fonction globale pour réappliquer la promo après modification du panier
+    window.reapplyPromo = function() {
+        const code = promoCodeInput.value.trim();
+        if (code) {
+            applyPromo(code);
+        } else {
+            reductionPromo.textContent = '';
+            totalRemiseContainer.style.display = 'none';
+            totalOriginal.style.textDecoration = '';
+            appliedPromoCode.textContent = '';
+        }
+    };
+
+    // ---- Modification du panier ----
+    // Pour chaque bouton d'action (add, decrease, delete)
     document.querySelectorAll('.cart-action').forEach(button => {
         button.addEventListener('click', function() {
-            setTimeout(() => {
-                const code = promoCodeInput.value.trim();
-                if (code) applyPromo(code);
-            }, 500); // délai pour laisser le backend mettre à jour le panier
+            const id = button.dataset.id;
+            const type = button.dataset.type;
+            const action = button.dataset.action; // ex: add, decrease, delete
+
+            fetch(`/cart/${action}/${type}/${id}`) // adapte cette URL selon ton backend
+                .then(res => res.json())
+                .then(data => {
+                    // Mise à jour du mini-panier si tu as un callback
+                    if (typeof updateMiniCart === 'function') updateMiniCart(data);
+
+                    // Recalcule automatiquement la promo
+                    window.reapplyPromo();
+                })
+                .catch(err => console.error(err));
         });
     });
 });

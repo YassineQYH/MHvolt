@@ -26,7 +26,8 @@ class CartController extends BaseController
         Request $requete,
         UserPasswordHasherInterface $encodeur,
         Cart $panier,
-        WeightRepository $weightRepository
+        WeightRepository $weightRepository,
+        PromotionService $promotionService
     ): Response {
 
         $articlesPanier = $panier->getFull();
@@ -60,6 +61,7 @@ class CartController extends BaseController
             'quantity_product' => $quantite_produits,
             'totalLivraison' => $prixLivraison,
             'formregister' => $formregister->createView(),
+            'promoService' => $promotionService,
         ]);
     }
 
@@ -68,7 +70,8 @@ class CartController extends BaseController
         Request $request,
         Cart $cart,
         PromotionRepository $promotionRepository,
-        WeightRepository $weightRepository
+        WeightRepository $weightRepository,
+        PromotionService $promotionService // <-- injecté
     ): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
@@ -82,29 +85,32 @@ class CartController extends BaseController
 
         if (!$promo || !$promo->canBeUsed()) {
             // Supprime le code promo stocké si invalide
-            $cart->setReduction(0);
-            $cart->setPromoCode(null);
+            $cart->clearPromos();
             return new JsonResponse(['error' => 'Code promo invalide ou expiré.']);
         }
 
-        // Calcul du total TTC uniquement sur les produits
-        $totalTTC = 0;
-        foreach ($cart->getFull() as $item) {
-            $prixHT = $item['product']->getPrice();
-            $tvaRate = $item['product']->getTva() ? $item['product']->getTva()->getValue() / 100 : 0;
-            $totalTTC += $prixHT * (1 + $tvaRate) * $item['quantity'];
+        // Calcul de la réduction avec le service dédié
+        $discount = $cart->getReduction($promotionService, $promo);
+        // 🔍 Vérification : si la promo ne s'applique à AUCUN article
+        if ($discount <= 0) {
+            // 👉 Je supprime toute promo stockée en session
+            $cart->clearPromos();
+
+            // 👉 Je renvoie une erreur spécifique
+            return new JsonResponse([
+                'error' => "Ce code promo ne s'applique pas à votre panier."
+            ]);
         }
+        
+        // Total final = produits + livraison - réduction
+        $totalTTC = array_reduce($cart->getFull(), fn($carry, $item) =>
+            $carry + $item['product']->getPrice() * (1 + ($item['product']->getTva()?->getValue()/100 ?? 0)) * $item['quantity'],
+            0
+        );
 
-        // Calcul de la réduction uniquement sur les produits
-        $discount = $promo->getDiscountPercent() !== null
-            ? $totalTTC * ($promo->getDiscountPercent() / 100)
-            : $promo->getDiscountAmount();
-
-        // Total final = produits après réduction + livraison
         $totalAfterPromo = $totalTTC - $discount + $cart->getLivraisonPrice($weightRepository);
 
-        // Stocke la réduction et le code promo pour le paiement final
-        $cart->setReduction($discount);
+        // Stocke uniquement le code promo
         $cart->setPromoCode($code);
 
         return new JsonResponse([
@@ -112,6 +118,7 @@ class CartController extends BaseController
             'totalAfterPromo' => $totalAfterPromo
         ]);
     }
+
 
 
 

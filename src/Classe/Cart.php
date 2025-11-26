@@ -2,8 +2,10 @@
 
 namespace App\Classe;
 
-use App\Entity\Trottinette;
 use App\Entity\Accessory;
+use App\Entity\Promotion;
+use App\Entity\Trottinette;
+use App\Service\PromotionService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -146,8 +148,8 @@ class Cart
         return $totalWeight;
     }
 
-    // ------------------- Réduction -------------------
-    public function setReduction(float $montant): void
+    // ------------------- Réduction ------------------- Plus besoin de setReduction(), la valeur est toujours recalculée
+    /* public function setReduction(float $montant): void
     {
         $this->reduction = $montant;
 
@@ -155,16 +157,25 @@ class Cart
         if ($this->session) {
             $this->session->set('promo_reduction', $montant);
         }
-    }
+    } */
 
-    public function getReduction(): float
+    // Calcule la réduction actuelle selon le panier et la promo en session
+    public function getReduction(PromotionService $promoService, ?Promotion $promo = null): float
     {
-        // 👉 Si une réduction existe en session, on la renvoie
-        if ($this->session) {
-            return (float) $this->session->get('promo_reduction', 0);
+        $cartFull = $this->getFull();
+
+        // Si aucun promo fourni, on regarde le code en session
+        if (!$promo) {
+            $promoCode = $this->getPromoCode();
+            if (!$promoCode) return 0;
+
+            $promo = $this->entityManager->getRepository(Promotion::class)
+                ->findOneBy(['code' => $promoCode]);
+
+            if (!$promo) return 0;
         }
 
-        return $this->reduction;
+        return $promoService->calculateReduction($cartFull, $promo);
     }
 
     // ------------------- Réinitialiser code promo et réduction -------------------
@@ -172,10 +183,7 @@ class Cart
     {
         if ($this->session) {
             $this->session->remove('promo_code');
-            $this->session->remove('promo_reduction');
         }
-
-        $this->reduction = 0;
     }
 
     // ------------------- Quantité totale -------------------
