@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : ven. 21 nov. 2025 à 16:34
+-- Généré le : jeu. 27 nov. 2025 à 15:03
 -- Version du serveur : 10.4.32-MariaDB
 -- Version de PHP : 8.2.12
 
@@ -171,7 +171,9 @@ CREATE TABLE `doctrine_migration_versions` (
 INSERT INTO `doctrine_migration_versions` (`version`, `executed_at`, `execution_time`) VALUES
 ('DoctrineMigrations\\Version20251119155034', '2025-11-19 16:50:37', 1708),
 ('DoctrineMigrations\\Version20251120155512', '2025-11-20 16:55:21', 238),
-('DoctrineMigrations\\Version20251121142003', '2025-11-21 15:20:19', 255);
+('DoctrineMigrations\\Version20251121142003', '2025-11-21 15:20:19', 255),
+('DoctrineMigrations\\Version20251124092951', '2025-11-24 10:30:24', 11),
+('DoctrineMigrations\\Version20251127140006', '2025-11-27 15:03:04', 119);
 
 -- --------------------------------------------------------
 
@@ -286,55 +288,61 @@ CREATE TABLE `order` (
   `tracking_number` varchar(255) DEFAULT NULL,
   `carrier` varchar(255) DEFAULT NULL,
   `secondary_carrier_tracking_number` varchar(255) DEFAULT NULL,
-  `secondary_carrier` varchar(255) DEFAULT NULL
+  `secondary_carrier` varchar(255) DEFAULT NULL,
+  `promo_code` varchar(50) DEFAULT NULL,
+  `promo_reduction` double DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `order`
 --
 
-INSERT INTO `order` (`id`, `user_id`, `created_at`, `carrier_price`, `delivery`, `reference`, `stripe_session_id`, `payment_state`, `delivery_state`, `tracking_number`, `carrier`, `secondary_carrier_tracking_number`, `secondary_carrier`) VALUES
-(1, 1, '2025-10-21 14:27:06', 23.22, 'Yass Qay 06.11.55.22.51 51 Rue de Konoha 63200 angleur<br>Franc', '21102025-68f77c1a7c6dd', NULL, 0, 0, '13211311123113112211', 'bpost', NULL, NULL),
-(2, 1, '2025-10-21 14:29:08', 23.22, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '21102025-68f77c9423c2c', NULL, 0, 0, '31131211131221', 'bpost', NULL, NULL),
-(3, 1, '2025-10-21 14:29:28', 23.22, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '21102025-68f77ca83d2a7', NULL, 0, 0, '1113213211', 'bpost', NULL, NULL),
-(4, 1, '2025-10-21 14:31:59', 23.22, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '21102025-68f77d3f4629b', 'cs_test_b1IFG5Q9gll0ZuAgc3zlYqDKvwrd6uJOHwJcWVZSGbXo8AewDIYVEWUcv9', 0, 0, 'CC088942925FR', 'bpost', NULL, NULL),
-(5, 1, '2025-10-21 14:32:57', 23.22, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '21102025-68f77d799ff9b', 'cs_test_b1hL2avKtpCc9IokW6GFqrzSV3jEvMmzBlqosbd8TBlykrOREGjpR1c7YE', 1, 1, '6G61316524338', 'bpost', NULL, NULL),
-(6, 1, '2025-10-21 16:34:49', 22.35, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '21102025-68f79a09bd15f', NULL, 1, 1, '6G61366363482', 'bpost', NULL, NULL),
-(7, 1, '2025-10-21 16:35:23', 22.35, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '21102025-68f79a2bbf571', NULL, 1, 3, '6G61397378424', 'colissimo', NULL, NULL),
-(8, 1, '2025-10-21 16:37:04', 19.8, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '21102025-68f79a902672b', 'cs_test_b11AmvahjrP8RuTIhMPNCtqZwyg6T0fJQ81CLWFBzisnEATWsvQWmN8fSD', 1, 1, '6G61397895822', 'colissimo', NULL, NULL),
-(9, 1, '2025-10-22 09:35:14', 19.8, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '22102025-68f88932a6b2e', 'cs_test_b1MfDJ2kREupjottpXlscZl1IhorILdWvOFmrGBHtokfu5bVWFuqXapsYo', 1, 2, '6G61398207501', 'colissimo', NULL, NULL),
-(10, 4, '2025-10-22 16:28:00', 20.65, 'Yass Qay<br>+33641515128<br>17 marie marving<br>63200 riom<br>FR', '22102025-68f8e9f1541e1', 'cs_test_b16TGqtnQO05GSgFvVzu0G8kdkwP4QvAaAaCwIZ289xG8H11x0UVaRWmMH', 1, 3, 'CC084147325FR', 'colissimo', NULL, NULL),
-(11, 1, '2025-10-24 16:05:28', 18.95, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '24102025-68fb87a892a1e', 'cs_test_b1WyzxbI3cyBvwK3HaidvFnWnn9KC5Jcw7aihkIPGyNNW9iLukn8DDkEii', 1, 2, '6G61398207501', 'bpost', NULL, NULL),
-(12, 1, '2025-11-07 16:17:59', 24.68, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '07112025-690e0da74f3bb', NULL, 0, 0, NULL, 'bpost', NULL, NULL),
-(13, 1, '2025-11-07 16:18:34', 24.68, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '07112025-690e0dcac0a47', NULL, 0, 0, NULL, 'bpost', NULL, NULL),
-(14, 1, '2025-11-07 16:19:23', 24.68, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '07112025-690e0dfb84c42', 'cs_test_b1dBawcIBxgReWwFYdp09zUSRn0vimwwlZwUe6m2CXGlYsTdow69zvzqmT', 0, 0, NULL, 'bpost', NULL, NULL),
-(15, 1, '2025-11-12 11:12:15', 21.5, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '12112025-69145d7f8c9aa', NULL, 0, 0, NULL, 'bpost', NULL, NULL),
-(16, 1, '2025-11-12 11:19:26', 21.5, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '12112025-69145f2e7cd25', NULL, 0, 0, NULL, 'bpost', NULL, NULL),
-(17, 1, '2025-11-12 14:20:27', 21.5, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '12112025-6914899bf088f', 'cs_test_b16icOL3eKCOGSrpXI3joO157yTvlZIKVeDH6eR9PGlS0syx3O2afkwIbk', 0, 0, NULL, 'bpost', NULL, NULL),
-(18, 1, '2025-11-12 14:24:54', 21.5, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '12112025-69148aa67739b', 'cs_test_b16mYHKZuSZ7gTMJK7Ww3962lF1lGARoS7euwCkcFAjjPjhi7NwoQNSr22', 1, 0, NULL, 'bpost', NULL, NULL),
-(19, 1, '2025-11-19 11:15:04', 32.28, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '19112025-691d98a8a849f', NULL, 0, 0, NULL, 'bpost', NULL, NULL),
-(20, 1, '2025-11-19 11:16:03', 32.28, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '19112025-691d98e3552fb', 'cs_test_b1iOr5roGWuli6Qegu7XxdSlHYXZdbyiyH5N63YSlfHA2PbRdCVjWmzLMW', 1, 0, NULL, 'bpost', NULL, NULL),
-(21, 1, '2025-11-20 09:54:18', 22.35, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '20112025-691ed73ac2b2c', NULL, 0, 0, NULL, 'bpost', NULL, NULL),
-(22, 1, '2025-11-20 09:58:27', 22.35, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '20112025-691ed833da4c8', NULL, 0, 0, NULL, 'bpost', NULL, NULL),
-(23, 1, '2025-11-20 10:01:07', 22.35, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '20112025-691ed8d3d4876', 'cs_test_b1SIqJGeIaesZnuUNln1hbcdEjBp3cnFCknphr3nqV9RApBwtgEF9mYedD', 1, 0, NULL, 'bpost', NULL, NULL),
-(24, 1, '2025-11-21 10:25:24', 24.68, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '21112025-69203004670c1', NULL, 0, 0, NULL, 'bpost', NULL, NULL),
-(25, 1, '2025-11-21 14:30:01', 22.35, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '21112025-69206959f2044', NULL, 0, 0, NULL, 'bpost', NULL, NULL),
-(26, 1, '2025-11-21 14:39:14', 0, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '21112025-69206b82550be', NULL, 0, 0, NULL, 'bpost', NULL, NULL),
-(27, 1, '2025-11-21 14:41:07', 22.35, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '21112025-69206bf310820', NULL, 0, 0, NULL, 'bpost', NULL, NULL),
-(28, 1, '2025-11-21 14:53:14', 22.35, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '21112025-69206eca7e072', NULL, 0, 0, NULL, 'bpost', NULL, NULL),
-(29, 1, '2025-11-21 14:55:09', 22.35, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '21112025-69206f3d0c3b8', NULL, 0, 0, NULL, 'bpost', NULL, NULL),
-(30, 1, '2025-11-21 14:56:32', 22.35, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '21112025-69206f902430d', NULL, 0, 0, NULL, 'bpost', NULL, NULL),
-(31, 1, '2025-11-21 14:59:52', 22.35, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '21112025-69207058e8b2a', NULL, 0, 0, NULL, 'bpost', NULL, NULL),
-(32, 1, '2025-11-21 15:02:11', 22.35, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '21112025-692070e3087a8', NULL, 0, 0, NULL, 'bpost', NULL, NULL),
-(33, 1, '2025-11-21 15:02:36', 22.35, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '21112025-692070fc1a2fa', NULL, 0, 0, NULL, 'bpost', NULL, NULL),
-(34, 1, '2025-11-21 15:02:43', 22.35, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '21112025-69207103b245e', NULL, 0, 0, NULL, 'bpost', NULL, NULL),
-(35, 1, '2025-11-21 15:03:19', 22.35, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '21112025-69207127c5cb7', 'cs_test_b1CToltoIUvDc7BiAvOuuTnrBa4jMYxRJFKqnyK5n0jRhMzFUQpyi97Q56', 0, 0, NULL, 'bpost', NULL, NULL),
-(36, 1, '2025-11-21 15:10:55', 22.35, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '21112025-692072efc7298', 'cs_test_b11PX2F0pIqPXdxOfw7AEl9E6NxEnrIgxTaOH933jv76lQMgLVRHEdcXc7', 0, 0, NULL, 'bpost', NULL, NULL),
-(38, 1, '2025-11-21 15:20:26', 22.35, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '21112025-6920752a758ca', 'cs_test_b15QApSnckG00aqtR2lB3s8K71dX93r7E6LCcstV3P8ASBpTWlxaJsDzxd', 0, 0, NULL, 'bpost', NULL, NULL),
-(39, 1, '2025-11-21 15:24:31', 22.35, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '21112025-6920761fea2de', 'cs_test_b1wcjF2o3ohl1H4bLvAo6ckSMtq5LD8BFVwCiBdPjtc4Z7xI2AV4DjPmzP', 0, 0, NULL, 'bpost', NULL, NULL),
-(40, 1, '2025-11-21 15:27:09', 22.35, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '21112025-692076bd78bbd', 'cs_test_b1NcmTfawrvu2DoO6U9ftJHLlynN7gwgBRdq8Xe4Xz0Gf5Za1DESLomH03', 0, 0, NULL, 'bpost', NULL, NULL),
-(41, 1, '2025-11-21 15:31:29', 22.35, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '21112025-692077c14302c', 'cs_test_b1V8UOdDZ1LdEZag7qyT716AnuAwbUbdzCpy0SG6UNxFCvJ8vAOhR7U5gv', 1, 0, NULL, 'bpost', NULL, NULL),
-(42, 1, '2025-11-21 16:28:46', 22.35, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '21112025-6920852ee7076', 'cs_test_b1X4XMyohiuCr1k9Ee129fJgLjCrKv7lrafxmbSM9i7UYVnds0OIWcju3j', 1, 0, NULL, 'bpost', NULL, NULL);
+INSERT INTO `order` (`id`, `user_id`, `created_at`, `carrier_price`, `delivery`, `reference`, `stripe_session_id`, `payment_state`, `delivery_state`, `tracking_number`, `carrier`, `secondary_carrier_tracking_number`, `secondary_carrier`, `promo_code`, `promo_reduction`) VALUES
+(1, 1, '2025-10-21 14:27:06', 23.22, 'Yass Qay 06.11.55.22.51 51 Rue de Konoha 63200 angleur<br>Franc', '21102025-68f77c1a7c6dd', NULL, 0, 0, '13211311123113112211', 'bpost', NULL, NULL, NULL, NULL),
+(2, 1, '2025-10-21 14:29:08', 23.22, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '21102025-68f77c9423c2c', NULL, 0, 0, '31131211131221', 'bpost', NULL, NULL, NULL, NULL),
+(3, 1, '2025-10-21 14:29:28', 23.22, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '21102025-68f77ca83d2a7', NULL, 0, 0, '1113213211', 'bpost', NULL, NULL, NULL, NULL),
+(4, 1, '2025-10-21 14:31:59', 23.22, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '21102025-68f77d3f4629b', 'cs_test_b1IFG5Q9gll0ZuAgc3zlYqDKvwrd6uJOHwJcWVZSGbXo8AewDIYVEWUcv9', 0, 0, 'CC088942925FR', 'bpost', NULL, NULL, NULL, NULL),
+(5, 1, '2025-10-21 14:32:57', 23.22, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '21102025-68f77d799ff9b', 'cs_test_b1hL2avKtpCc9IokW6GFqrzSV3jEvMmzBlqosbd8TBlykrOREGjpR1c7YE', 1, 1, '6G61316524338', 'bpost', NULL, NULL, NULL, NULL),
+(6, 1, '2025-10-21 16:34:49', 22.35, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '21102025-68f79a09bd15f', NULL, 1, 1, '6G61366363482', 'bpost', NULL, NULL, NULL, NULL),
+(7, 1, '2025-10-21 16:35:23', 22.35, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '21102025-68f79a2bbf571', NULL, 1, 3, '6G61397378424', 'colissimo', NULL, NULL, NULL, NULL),
+(8, 1, '2025-10-21 16:37:04', 19.8, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '21102025-68f79a902672b', 'cs_test_b11AmvahjrP8RuTIhMPNCtqZwyg6T0fJQ81CLWFBzisnEATWsvQWmN8fSD', 1, 1, '6G61397895822', 'colissimo', NULL, NULL, NULL, NULL),
+(9, 1, '2025-10-22 09:35:14', 19.8, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '22102025-68f88932a6b2e', 'cs_test_b1MfDJ2kREupjottpXlscZl1IhorILdWvOFmrGBHtokfu5bVWFuqXapsYo', 1, 2, '6G61398207501', 'colissimo', NULL, NULL, NULL, NULL),
+(10, 4, '2025-10-22 16:28:00', 20.65, 'Yass Qay<br>+33641515128<br>17 marie marving<br>63200 riom<br>FR', '22102025-68f8e9f1541e1', 'cs_test_b16TGqtnQO05GSgFvVzu0G8kdkwP4QvAaAaCwIZ289xG8H11x0UVaRWmMH', 1, 3, 'CC084147325FR', 'colissimo', NULL, NULL, NULL, NULL),
+(11, 1, '2025-10-24 16:05:28', 18.95, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '24102025-68fb87a892a1e', 'cs_test_b1WyzxbI3cyBvwK3HaidvFnWnn9KC5Jcw7aihkIPGyNNW9iLukn8DDkEii', 1, 2, '6G61398207501', 'bpost', NULL, NULL, NULL, NULL),
+(12, 1, '2025-11-07 16:17:59', 24.68, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '07112025-690e0da74f3bb', NULL, 0, 0, NULL, 'bpost', NULL, NULL, NULL, NULL),
+(13, 1, '2025-11-07 16:18:34', 24.68, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '07112025-690e0dcac0a47', NULL, 0, 0, NULL, 'bpost', NULL, NULL, NULL, NULL),
+(14, 1, '2025-11-07 16:19:23', 24.68, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '07112025-690e0dfb84c42', 'cs_test_b1dBawcIBxgReWwFYdp09zUSRn0vimwwlZwUe6m2CXGlYsTdow69zvzqmT', 0, 0, NULL, 'bpost', NULL, NULL, NULL, NULL),
+(15, 1, '2025-11-12 11:12:15', 21.5, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '12112025-69145d7f8c9aa', NULL, 0, 0, NULL, 'bpost', NULL, NULL, NULL, NULL),
+(16, 1, '2025-11-12 11:19:26', 21.5, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '12112025-69145f2e7cd25', NULL, 0, 0, NULL, 'bpost', NULL, NULL, NULL, NULL),
+(17, 1, '2025-11-12 14:20:27', 21.5, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '12112025-6914899bf088f', 'cs_test_b16icOL3eKCOGSrpXI3joO157yTvlZIKVeDH6eR9PGlS0syx3O2afkwIbk', 0, 0, NULL, 'bpost', NULL, NULL, NULL, NULL),
+(18, 1, '2025-11-12 14:24:54', 21.5, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '12112025-69148aa67739b', 'cs_test_b16mYHKZuSZ7gTMJK7Ww3962lF1lGARoS7euwCkcFAjjPjhi7NwoQNSr22', 1, 0, NULL, 'bpost', NULL, NULL, NULL, NULL),
+(19, 1, '2025-11-19 11:15:04', 32.28, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '19112025-691d98a8a849f', NULL, 0, 0, NULL, 'bpost', NULL, NULL, NULL, NULL),
+(20, 1, '2025-11-19 11:16:03', 32.28, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '19112025-691d98e3552fb', 'cs_test_b1iOr5roGWuli6Qegu7XxdSlHYXZdbyiyH5N63YSlfHA2PbRdCVjWmzLMW', 1, 0, NULL, 'bpost', NULL, NULL, NULL, NULL),
+(21, 1, '2025-11-20 09:54:18', 22.35, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '20112025-691ed73ac2b2c', NULL, 0, 0, NULL, 'bpost', NULL, NULL, NULL, NULL),
+(22, 1, '2025-11-20 09:58:27', 22.35, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '20112025-691ed833da4c8', NULL, 0, 0, NULL, 'bpost', NULL, NULL, NULL, NULL),
+(23, 1, '2025-11-20 10:01:07', 22.35, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '20112025-691ed8d3d4876', 'cs_test_b1SIqJGeIaesZnuUNln1hbcdEjBp3cnFCknphr3nqV9RApBwtgEF9mYedD', 1, 0, NULL, 'bpost', NULL, NULL, NULL, NULL),
+(24, 1, '2025-11-21 10:25:24', 24.68, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '21112025-69203004670c1', NULL, 0, 0, NULL, 'bpost', NULL, NULL, NULL, NULL),
+(25, 1, '2025-11-21 14:30:01', 22.35, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '21112025-69206959f2044', NULL, 0, 0, NULL, 'bpost', NULL, NULL, NULL, NULL),
+(26, 1, '2025-11-21 14:39:14', 0, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '21112025-69206b82550be', NULL, 0, 0, NULL, 'bpost', NULL, NULL, NULL, NULL),
+(27, 1, '2025-11-21 14:41:07', 22.35, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '21112025-69206bf310820', NULL, 0, 0, NULL, 'bpost', NULL, NULL, NULL, NULL),
+(28, 1, '2025-11-21 14:53:14', 22.35, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '21112025-69206eca7e072', NULL, 0, 0, NULL, 'bpost', NULL, NULL, NULL, NULL),
+(29, 1, '2025-11-21 14:55:09', 22.35, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '21112025-69206f3d0c3b8', NULL, 0, 0, NULL, 'bpost', NULL, NULL, NULL, NULL),
+(30, 1, '2025-11-21 14:56:32', 22.35, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '21112025-69206f902430d', NULL, 0, 0, NULL, 'bpost', NULL, NULL, NULL, NULL),
+(31, 1, '2025-11-21 14:59:52', 22.35, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '21112025-69207058e8b2a', NULL, 0, 0, NULL, 'bpost', NULL, NULL, NULL, NULL),
+(32, 1, '2025-11-21 15:02:11', 22.35, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '21112025-692070e3087a8', NULL, 0, 0, NULL, 'bpost', NULL, NULL, NULL, NULL),
+(33, 1, '2025-11-21 15:02:36', 22.35, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '21112025-692070fc1a2fa', NULL, 0, 0, NULL, 'bpost', NULL, NULL, NULL, NULL),
+(34, 1, '2025-11-21 15:02:43', 22.35, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '21112025-69207103b245e', NULL, 0, 0, NULL, 'bpost', NULL, NULL, NULL, NULL),
+(35, 1, '2025-11-21 15:03:19', 22.35, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '21112025-69207127c5cb7', 'cs_test_b1CToltoIUvDc7BiAvOuuTnrBa4jMYxRJFKqnyK5n0jRhMzFUQpyi97Q56', 0, 0, NULL, 'bpost', NULL, NULL, NULL, NULL),
+(36, 1, '2025-11-21 15:10:55', 22.35, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '21112025-692072efc7298', 'cs_test_b11PX2F0pIqPXdxOfw7AEl9E6NxEnrIgxTaOH933jv76lQMgLVRHEdcXc7', 0, 0, NULL, 'bpost', NULL, NULL, NULL, NULL),
+(38, 1, '2025-11-21 15:20:26', 22.35, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '21112025-6920752a758ca', 'cs_test_b15QApSnckG00aqtR2lB3s8K71dX93r7E6LCcstV3P8ASBpTWlxaJsDzxd', 0, 0, NULL, 'bpost', NULL, NULL, NULL, NULL),
+(39, 1, '2025-11-21 15:24:31', 22.35, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '21112025-6920761fea2de', 'cs_test_b1wcjF2o3ohl1H4bLvAo6ckSMtq5LD8BFVwCiBdPjtc4Z7xI2AV4DjPmzP', 0, 0, NULL, 'bpost', NULL, NULL, NULL, NULL),
+(40, 1, '2025-11-21 15:27:09', 22.35, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '21112025-692076bd78bbd', 'cs_test_b1NcmTfawrvu2DoO6U9ftJHLlynN7gwgBRdq8Xe4Xz0Gf5Za1DESLomH03', 0, 0, NULL, 'bpost', NULL, NULL, NULL, NULL),
+(41, 1, '2025-11-21 15:31:29', 22.35, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '21112025-692077c14302c', 'cs_test_b1V8UOdDZ1LdEZag7qyT716AnuAwbUbdzCpy0SG6UNxFCvJ8vAOhR7U5gv', 1, 0, NULL, 'bpost', NULL, NULL, NULL, NULL),
+(42, 1, '2025-11-21 16:28:46', 22.35, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '21112025-6920852ee7076', 'cs_test_b1X4XMyohiuCr1k9Ee129fJgLjCrKv7lrafxmbSM9i7UYVnds0OIWcju3j', 1, 0, NULL, 'bpost', NULL, NULL, NULL, NULL),
+(43, 1, '2025-11-24 10:15:46', 18.95, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '24112025-69242242dea4c', 'cs_test_b1F7mdk5W0C4z4pUgC9IddZHtxKj1FXdVj1tYDjxFvpkmerJi4Y46pAfP9', 1, 0, NULL, 'bpost', NULL, NULL, NULL, NULL),
+(44, 1, '2025-11-24 10:17:52', 18.95, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '24112025-692422c03dc77', 'cs_test_b1QgCwSkD1p4kJ4m8P8LJAnW0VYK9lTtVaGnRzKR9iDu3Kf2eABBrq9DIr', 1, 0, NULL, 'bpost', NULL, NULL, NULL, NULL),
+(45, 1, '2025-11-24 10:39:45', 18.95, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '24112025-692427e179c6d', 'cs_test_b1BPppiDPYl3bcHHfCEGQEBkq7g6t8pFBWbLzPtfETE3bCliuWu1xYMCIX', 1, 0, NULL, 'bpost', NULL, NULL, NULL, 0),
+(46, 1, '2025-11-24 10:42:17', 18.95, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '24112025-692428791d7d4', 'cs_test_b1g4259dT5UwNA6BHVulQSAPPZyFUaGVkYTQMJlRfE8wAniMIbl7nTEH7N', 1, 0, NULL, 'bpost', NULL, NULL, 'family-25', 212.8575);
 
 -- --------------------------------------------------------
 
@@ -458,7 +466,15 @@ INSERT INTO `order_details` (`id`, `my_order_id`, `product_entity_id`, `product`
 (96, 41, 1, 'Trottinette électrique honey whale m5 max avec siège', 1, 599, 599, '14', 21, 724.79),
 (97, 41, 5, 'roues etoiles', 1, 45, 45, '4', 21, 54.45),
 (98, 42, 1, 'Trottinette électrique honey whale m5 max avec siège', 1, 599, 599, '14', 21, 724.79),
-(99, 42, 5, 'roues etoiles', 1, 45, 45, '4', 21, 54.45);
+(99, 42, 5, 'roues etoiles', 1, 45, 45, '4', 21, 54.45),
+(100, 43, 1, 'Trottinette électrique honey whale m5 max avec siège', 1, 599, 599, '14', 21, 724.79),
+(101, 43, 10, 'roues gold', 1, 89, 89, '0.5', 21, 107.69),
+(102, 44, 1, 'Trottinette électrique honey whale m5 max avec siège', 1, 599, 599, '14', 21, 724.79),
+(103, 44, 10, 'roues gold', 1, 89, 89, '0.5', 21, 107.69),
+(104, 45, 1, 'Trottinette électrique honey whale m5 max avec siège', 1, 599, 599, '14', 21, 724.79),
+(105, 45, 10, 'roues gold', 1, 89, 89, '0.5', 21, 107.69),
+(106, 46, 1, 'Trottinette électrique honey whale m5 max avec siège', 1, 599, 599, '14', 21, 724.79),
+(107, 46, 10, 'roues gold', 1, 89, 89, '0.5', 21, 107.69);
 
 -- --------------------------------------------------------
 
@@ -486,8 +502,8 @@ CREATE TABLE `product` (
 --
 
 INSERT INTO `product` (`id`, `weight_id`, `tva_id`, `name`, `slug`, `description`, `price`, `stock`, `is_best`, `created_at`, `updated_at`, `type`) VALUES
-(1, 25, 1, 'Trottinette électrique honey whale m5 max avec siège', 'Trottinette-électrique-honey-whale-m5-max-avec-siège', '【Performance puissante】...', 599, 6, 1, '2025-11-18 16:19:20', '2025-11-21 16:32:40', 'trottinette'),
-(2, 22, 1, 'KUGOO Kukirin C1 Pro', 'KUGOO-Kukirin-C1-Pro', 'Aperçu du produit : Vitesse maximale 45 km/h Charge max. 120 kg Autonomie 100 km Puissance continue 500 W Siège', 1299, 0, 1, '2025-11-18 16:19:20', '2025-11-18 16:19:20', 'trottinette'),
+(1, 25, 1, 'Trottinette électrique honey whale m5 max avec siège', 'Trottinette-électrique-honey-whale-m5-max-avec-siège', '【Performance puissante】...', 599, 5, 1, '2025-11-18 16:19:20', '2025-11-24 10:42:47', 'trottinette'),
+(2, 22, 1, 'KUGOO Kukirin C1 Pro', 'KUGOO-Kukirin-C1-Pro', 'Aperçu du produit : Vitesse maximale 45 km/h Charge max. 120 kg Autonomie 100 km Puissance continue 500 W Siège', 1299, 4, 1, '2025-11-18 16:19:20', '2025-11-18 16:19:20', 'trottinette'),
 (3, 28, 1, 'Bogist M5 Pro', 'Bogist-M5-Pro', 'Moteur puissant de 500 W pour des vitesses élevées...', 754, 2, 1, '2025-11-18 16:19:20', '2025-11-19 11:30:29', 'trottinette'),
 (4, 3, 1, 'Xtreme Siege', 'Xtreme-Siege', 'Siege pour trott', 15, 2, 1, '2025-11-18 16:19:20', '2025-11-18 16:19:20', 'accessoire'),
 (5, 8, 1, 'roues etoiles', 'roues-etoiles', 'Roue pour trott', 45, 6, 1, '2025-11-18 16:19:20', '2025-11-21 16:32:40', 'accessoire'),
@@ -495,7 +511,7 @@ INSERT INTO `product` (`id`, `weight_id`, `tva_id`, `name`, `slug`, `description
 (7, 1, 1, 'Frein Jaune', 'freinfreins-jaune', 'Frein pour trott', 19, 0, 0, '2025-11-18 16:19:20', '2025-11-18 16:19:20', 'accessoire'),
 (8, 5, 1, 'etrier de frein', 'etrier-de-frein', 'etrier-de-frein', 56, 2, 0, '2025-11-18 16:19:20', '2025-11-18 16:19:20', 'accessoire'),
 (9, 3, 1, 'Roues freestyle', 'Roues-freestyle', 'Roues-freestyle', 1, 1, 1, '2025-11-18 16:19:20', '2025-11-18 16:19:20', 'accessoire'),
-(10, 2, 1, 'roues gold', 'roues-gold', 'roues-gold', 89, 5, 1, '2025-11-18 16:19:20', '2025-11-18 16:19:20', 'accessoire'),
+(10, 2, 1, 'roues gold', 'roues-gold', 'roues-gold', 89, 5, 1, '2025-11-18 16:19:20', '2025-11-24 10:42:47', 'accessoire'),
 (11, 4, 1, 'roues stunt', 'roues-stunt', 'roues-stunt', 55, 4, 0, '2025-11-18 16:19:20', '2025-11-18 16:19:20', 'accessoire'),
 (12, 2, 1, 'freins rouge', 'freins-rouge', 'freins-rouge', 26, 1, 1, '2025-11-18 16:19:20', '2025-11-18 16:19:20', 'accessoire'),
 (13, 4, 1, 'siege double', 'siege-double', 'siege-double', 21, 2, 0, '2025-11-18 16:19:20', '2025-11-18 16:19:20', 'accessoire'),
@@ -538,15 +554,24 @@ CREATE TABLE `promotion` (
   `start_date` datetime NOT NULL,
   `end_date` datetime DEFAULT NULL,
   `quantity` int(11) NOT NULL,
-  `used` int(11) NOT NULL
+  `used` int(11) NOT NULL,
+  `titre` varchar(255) DEFAULT NULL,
+  `auto_apply` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `promotion`
 --
 
-INSERT INTO `promotion` (`id`, `category_access_id`, `product_id`, `code`, `target_type`, `discount_amount`, `discount_percent`, `start_date`, `end_date`, `quantity`, `used`) VALUES
-(5, NULL, NULL, 'family-25', 'TARGET_ALL', NULL, 25, '2025-11-20 16:09:25', NULL, 5, 1);
+INSERT INTO `promotion` (`id`, `category_access_id`, `product_id`, `code`, `target_type`, `discount_amount`, `discount_percent`, `start_date`, `end_date`, `quantity`, `used`, `titre`, `auto_apply`) VALUES
+(5, NULL, NULL, 'family-25', 'all', NULL, 25, '2025-11-20 16:09:00', NULL, 5, 3, NULL, 0),
+(6, 4, NULL, 'promo-roues', 'category_access', 5, NULL, '2025-11-26 14:25:00', NULL, 3, 0, NULL, 0),
+(7, NULL, 2, 'promo-kugoo', 'product', 200, NULL, '2025-11-26 16:16:00', NULL, 3, 0, NULL, 0),
+(8, NULL, NULL, 'promo-rouge', 'product_list', 10, NULL, '2025-11-17 16:34:00', '2025-11-25 23:59:00', 3, 0, NULL, 0),
+(9, NULL, NULL, 'family-25-', 'all', 25, NULL, '2025-11-26 16:59:00', NULL, 4, 0, NULL, 0),
+(10, 4, NULL, 'promo-roues-', 'category_access', NULL, 10, '2025-11-26 17:00:00', NULL, 2, 0, NULL, 0),
+(11, NULL, 2, 'promo-kugoo-', 'product', NULL, 10, '2025-11-26 17:11:00', NULL, 2, 0, NULL, 0),
+(12, NULL, NULL, 'promo-rouge-', 'product_list', NULL, 10, '2025-11-26 17:13:00', NULL, 1, 0, NULL, 0);
 
 -- --------------------------------------------------------
 
@@ -558,6 +583,16 @@ CREATE TABLE `promotion_product` (
   `promotion_id` int(11) NOT NULL,
   `product_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Déchargement des données de la table `promotion_product`
+--
+
+INSERT INTO `promotion_product` (`promotion_id`, `product_id`) VALUES
+(8, 12),
+(8, 14),
+(12, 12),
+(12, 14);
 
 -- --------------------------------------------------------
 
@@ -1021,13 +1056,13 @@ ALTER TABLE `messenger_messages`
 -- AUTO_INCREMENT pour la table `order`
 --
 ALTER TABLE `order`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
 
 --
 -- AUTO_INCREMENT pour la table `order_details`
 --
 ALTER TABLE `order_details`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=100;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=108;
 
 --
 -- AUTO_INCREMENT pour la table `product`
@@ -1045,7 +1080,7 @@ ALTER TABLE `product_history`
 -- AUTO_INCREMENT pour la table `promotion`
 --
 ALTER TABLE `promotion`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT pour la table `reset_password`

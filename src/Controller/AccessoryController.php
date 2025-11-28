@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Classe\Cart;
 use App\Entity\Accessory;
 use App\Entity\Illustration;
+use App\Service\PromotionFinderService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -38,7 +39,8 @@ class AccessoryController extends BaseController
         string $slug,
         Request $request,
         UserPasswordHasherInterface $encoder,
-        Cart $cartService
+        Cart $cartService,
+        PromotionFinderService $promoFinder
     ): Response
     {
         $accessory = $this->entityManager->getRepository(Accessory::class)
@@ -54,11 +56,27 @@ class AccessoryController extends BaseController
 
         $formregister = $this->createRegisterForm($request, $encoder);
 
+        // -------------------------------------
+        // 🔥 gestion promotion auto
+        // -------------------------------------
+        $promotion = $promoFinder->FindBestForProduct($accessory);
+
+        // 💰 Prix original
+        $originalPrice = $accessory->getPrice();
+
+        // 💸 Prix réduit si promo dispo
+        $promoPrice = $promotion ? $promoFinder->calculateDiscountedPrice($accessory, $promotion) : null;
+
+
         return $this->render('accessoires/show.html.twig', [
             'accessory' => $accessory,
             'illustrations' => $illustrations,
             'formregister' => $formregister->createView(),
             'cart' => $cartService,
+            // 🔥 On envoie les infos au template
+            'promotion' => $promotion,
+            'originalPrice' => $originalPrice,
+            'promoPrice' => $promoPrice,
         ]);
     }
 

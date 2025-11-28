@@ -6,7 +6,7 @@ use App\Entity\Promotion;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Field\{
-    IdField, TextField, ChoiceField, DateTimeField, IntegerField, AssociationField, CollectionField, MoneyField, NumberField
+    IdField, TextField, ChoiceField, DateTimeField, IntegerField, AssociationField, CollectionField, MoneyField, NumberField, BooleanField
 };
 
 class PromotionCrudController extends AbstractCrudController
@@ -26,7 +26,11 @@ class PromotionCrudController extends AbstractCrudController
     {
         return [
             IdField::new('id')->hideOnForm(),
-            TextField::new('code', 'Code promo'),
+            TextField::new('titre', 'Titre de la promotion')
+                ->setHelp('Permet d’identifier facilement la promo et éventuellement l’afficher sur le site'),
+            BooleanField::new('autoApply', 'Appliquer automatiquement ?'),
+            TextField::new('code', 'Code promo')
+                ->setRequired(false),
             ChoiceField::new('targetType', 'Type de cible')
                 ->setChoices([
                     'Tout le site' => Promotion::TARGET_ALL,

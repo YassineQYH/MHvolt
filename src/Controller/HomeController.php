@@ -5,11 +5,12 @@ namespace App\Controller;
 use App\Classe\Cart;
 use App\Classe\Mail;
 use App\Entity\User;
-use App\Entity\Accessory;
-use App\Entity\Trottinette;
 use App\Entity\Address;
+use App\Entity\Accessory;
 use App\Form\ContactType;
 use App\Form\RegisterType;
+use App\Entity\Trottinette;
+use App\Service\PromotionFinderService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -32,7 +33,8 @@ class HomeController extends AbstractController
         Request $request,
         UserPasswordHasherInterface $encoder,
         Cart $cart,
-        AuthenticationUtils $authenticationUtils
+        AuthenticationUtils $authenticationUtils,
+        PromotionFinderService $promoFinder
     ): Response
     {
         $cart = $cart->getFull();
@@ -143,6 +145,9 @@ class HomeController extends AbstractController
         $accessories = $this->entityManager->getRepository(Accessory::class)
             ->findBy(['isBest' => 1]);
 
+        // Trouver la promo à afficher sur la home (auto ou non)
+        $homepagePromo = $promoFinder->findHomepagePromo();
+
         return $this->render('home/index.html.twig', [
             'headers' => $headers,
             'trottinettes' => $trottinettes,
@@ -154,6 +159,7 @@ class HomeController extends AbstractController
             'error' => $error,
             'notification' => $notification,
             'trottinettes_menu' => $trottinettesMenu,
+            'homepagePromo' => $homepagePromo
         ]);
     }
 }

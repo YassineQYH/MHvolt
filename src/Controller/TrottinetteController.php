@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Classe\Cart;
 use App\Entity\Trottinette;
 use App\Entity\Illustration;
+use App\Service\PromotionFinderService;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -53,7 +54,8 @@ class TrottinetteController extends BaseController
         string $slug,
         Request $request,
         UserPasswordHasherInterface $encoder,
-        Cart $cartService // 🛒 On injecte ton service Cart ici
+        Cart $cartService, // 🛒 On injecte ton service Cart ici
+        PromotionFinderService $promoFinder
     ): Response {
         // -------------------------------
         // 🛴 Récupération de la trottinette
@@ -80,6 +82,18 @@ class TrottinetteController extends BaseController
         // -------------------------------
         $formregister = $this->createRegisterForm($request, $encoder);
 
+        // -------------------------------------
+        // 🔥 gestion promotion auto
+        // -------------------------------------
+        $promotion = $promoFinder->FindBestForProduct($trottinette);
+
+        // 💰 Prix original
+        $originalPrice = $trottinette->getPrice();
+
+        // 💸 Prix réduit si promo dispo
+        $promoPrice = $promotion ? $promoFinder->calculateDiscountedPrice($trottinette, $promotion) : null;
+
+
         // -------------------------------
         // 🛒 Panier via le service
         // -------------------------------
@@ -96,10 +110,12 @@ class TrottinetteController extends BaseController
             'sections' => $sections,
             'formregister' => $formregister->createView(),
             'cart' => $cartService, // 💡 ici, on passe le service entier à Twig
+            // 🔥 On envoie les infos au template
+            'promotion' => $promotion,
+            'originalPrice' => $originalPrice,
+            'promoPrice' => $promoPrice,
         ]);
     }
-
-
 
     #[Route('/trottinette/{slug}/accessoires', name: 'trottinette_accessoires')]
     public function showAccessoires(

@@ -7,7 +7,66 @@
 {% endblock %} #}
 
 {% block content %}
-</br></br></br></br></br></br></br>
+<section class="top-space">
+
+    {% if homepagePromo %}
+        <div class="promo-home-banner" data-aos="fade-down" data-aos-duration="1200">
+            <div class="promo-title">
+                🔥 {{ homepagePromo.titre }}
+            </div>
+
+            <div class="promo-details">
+                {# Affichage du montant ou pourcentage #}
+                {% if homepagePromo.discountAmount is not null %}
+                    -{{ homepagePromo.discountAmount|number_format(0, '.', ' ') }} €
+                {% elseif homepagePromo.discountPercent is not null %}
+                    -{{ homepagePromo.discountPercent }}%
+                {% endif %}
+
+                {# Affiche le code uniquement si ce n'est pas autoApply et qu'il existe #}
+                {% if homepagePromo.code is not null and not homepagePromo.autoApply %}
+                    / Code : {{ homepagePromo.code }}
+                {% endif %}
+            </div>
+        </div>
+
+        <style>
+            .top-space {
+                /* Espace sous le menu si pas de promo */
+                margin-top: 30px;
+            }
+
+            .promo-home-banner {
+                background: #ffefc1;
+                border-left: 6px solid #ff9800;
+                padding: 15px 20px;
+                margin: 0 auto 25px auto;
+                width: 90%;
+                max-width: 900px;
+                text-align: center;
+                border-radius: 10px;
+                box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            }
+
+            .promo-home-banner .promo-title {
+                font-size: 1.6rem;
+                font-weight: bold;
+                color: #c77f00;
+                margin-bottom: 5px;
+            }
+
+            .promo-home-banner .promo-details {
+                font-size: 1.4rem;
+                font-weight: bold;
+                color: #b36000;
+            }
+        </style>
+    {% endif %}
+
+
+</section>
+
+
 
 <section class="section" id="about">
     <div class="container-home about">
