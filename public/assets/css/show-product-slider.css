@@ -14,7 +14,8 @@
 
 /* ======== Base ========== */
 
-*,
+
+/* *,
 *::after,
 *::before {
     padding: 0;
@@ -25,11 +26,11 @@
 html {
     scroll-behavior: smooth;
     font-size: 62.5%;
-}
+} */
 
 body {
-    position: relative;
-    font-family: "Dosis", sans-serif;
+    /* position: relative;
+    font-family: "Dosis", sans-serif; */
     font-size: 1.6rem;
     font-weight: 400;
     line-height: 1.6;

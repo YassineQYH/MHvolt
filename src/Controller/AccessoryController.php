@@ -67,6 +67,8 @@ class AccessoryController extends BaseController
         // 💸 Prix réduit si promo dispo
         $promoPrice = $promotion ? $promoFinder->calculateDiscountedPrice($accessory, $promotion) : null;
 
+        // Trouver la promo à afficher sur la home (auto ou non)
+        $homepagePromo = $promoFinder->findHomepagePromo();
 
         return $this->render('accessoires/show.html.twig', [
             'accessory' => $accessory,
@@ -77,6 +79,7 @@ class AccessoryController extends BaseController
             'promotion' => $promotion,
             'originalPrice' => $originalPrice,
             'promoPrice' => $promoPrice,
+            'homepagePromo' => $homepagePromo,
         ]);
     }
 

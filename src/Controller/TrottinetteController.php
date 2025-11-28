@@ -99,6 +99,9 @@ class TrottinetteController extends BaseController
         // -------------------------------
         $cart = $cartService->get(); // ou $cartService->getFull() si tu veux les objets complets
 
+        // Trouver la promo à afficher sur la home (auto ou non)
+        $homepagePromo = $promoFinder->findHomepagePromo();
+
         // -------------------------------
         // ⚙️ Rendu du template
         // -------------------------------
@@ -114,6 +117,7 @@ class TrottinetteController extends BaseController
             'promotion' => $promotion,
             'originalPrice' => $originalPrice,
             'promoPrice' => $promoPrice,
+            'homepagePromo' => $homepagePromo,
         ]);
     }
 
@@ -121,7 +125,8 @@ class TrottinetteController extends BaseController
     public function showAccessoires(
         string $slug,
         Request $request,
-        UserPasswordHasherInterface $encoder
+        UserPasswordHasherInterface $encoder,
+        PromotionFinderService $promoFinder,
     ): Response {
         // -------------------------------
         // 🛠️ Récupération de la trottinette
@@ -146,6 +151,9 @@ class TrottinetteController extends BaseController
         // -------------------------------
         $formregister = $this->createRegisterForm($request, $encoder);
 
+        // Trouver la promo à afficher sur la home (auto ou non)
+        $homepagePromo = $promoFinder->findHomepagePromo();
+
         // -------------------------------
         // ⚙️ Rendu du template
         // -------------------------------
@@ -153,6 +161,7 @@ class TrottinetteController extends BaseController
             'trottinette' => $trottinette,
             'accessoires' => $accessoires,
             'formregister' => $formregister->createView(),
+            'homepagePromo' => $homepagePromo,
         ]);
     }
 }

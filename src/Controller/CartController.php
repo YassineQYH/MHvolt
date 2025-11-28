@@ -81,6 +81,16 @@ class CartController extends BaseController
             return new JsonResponse(['error' => 'Veuillez saisir un code promo.']);
         }
 
+        // 🛑 Vérification : une promotion automatique est-elle déjà applicable ?
+        $allPromos = $promotionRepository->findAll();
+        $autoPromo = $promotionService->getAutomaticPromotion($cart->getFull(), $allPromos);
+
+        if ($autoPromo) {
+            return new JsonResponse([
+                'error' => "Une promotion automatique est déjà appliquée. Vous ne pouvez pas utiliser un code promo."
+            ]);
+        }
+
         $promo = $promotionRepository->findOneBy(['code' => $code]);
 
         if (!$promo || !$promo->canBeUsed()) {
@@ -101,7 +111,7 @@ class CartController extends BaseController
                 'error' => "Ce code promo ne s'applique pas à votre panier."
             ]);
         }
-        
+
         // Total final = produits + livraison - réduction
         $totalTTC = array_reduce($cart->getFull(), fn($carry, $item) =>
             $carry + $item['product']->getPrice() * (1 + ($item['product']->getTva()?->getValue()/100 ?? 0)) * $item['quantity'],

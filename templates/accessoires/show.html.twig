@@ -9,104 +9,126 @@
 {% endblock %}
 
 {% block content %}
-<br><br><br><br><br><br><br><br>
+{# {% include 'partials/promos.html.twig' %} #}
 
-<!-- Cart Slide -->
-<section class="cart__slide" id="slider-show">
-  <div class="arrival__slide container">
-    <div class="glide" id="glide1">
-      <div class="glide__track" data-glide-el="track">
-        <ul class="glide__slides">
+    <!-- Cart Slide -->
+    <section class="cart__slide" id="slider-show">
+    <div class="arrival__slide container">
+        <div class="glide" id="glide1">
+        <div class="glide__track" data-glide-el="track">
+            <ul class="glide__slides">
 
-          {# Slide principale #}
-          <li class="glide__slide">
-            <div class="arrival">
-              <div class="cart__like">
-                <div class="image__holder">
-                  {% set image = illustrations|first %}
-                  <img src="/uploads/accessoires/{{ image ? image.image : 'default.jpg' }}" alt="{{ accessory.name }}">
-                </div>
-                <div class="cart__details">
-                  <h1>{{ accessory.name }}</h1>
-                  <p>{{ accessory.descriptionShort ?? 'Aucune description courte disponible.' }}</p>
-                </div>
-              </div>
-            </div>
-          </li>
-
-          {# Slides illustrations #}
-          {% for item in illustrations %}
+            {# Slide principale #}
             <li class="glide__slide">
-              <div class="arrival">
+                <div class="arrival">
                 <div class="cart__like">
-                  <div class="image__holder">
-                    <img src="/uploads/accessoires/{{ item.image }}" alt="{{ accessory.name }}">
-                  </div>
-                  <div class="cart__details">
+                    <div class="image__holder">
+                    {% set image = illustrations|first %}
+                    <img src="/uploads/accessoires/{{ image ? image.image : 'default.jpg' }}" alt="{{ accessory.name }}">
+                    </div>
+                    <div class="cart__details">
                     <h1>{{ accessory.name }}</h1>
                     <p>{{ accessory.descriptionShort ?? 'Aucune description courte disponible.' }}</p>
-                  </div>
+                    </div>
                 </div>
-              </div>
+                </div>
             </li>
-          {% endfor %}
-        </ul>
-      </div>
 
-      <!-- Arrows -->
-      <div class="glide__arrows" data-glide-el="controls">
-        <button class="glide__arrow glide__arrow--left" data-glide-dir="<">Précédent</button>
-        <button class="glide__arrow glide__arrow--right" data-glide-dir=">">Suivant</button>
-      </div>
+            {# Slides illustrations #}
+            {% for item in illustrations %}
+                <li class="glide__slide">
+                <div class="arrival">
+                    <div class="cart__like">
+                    <div class="image__holder">
+                        <img src="/uploads/accessoires/{{ item.image }}" alt="{{ accessory.name }}">
+                    </div>
+                    <div class="cart__details">
+                        <h1>{{ accessory.name }}</h1>
+                        <p>{{ accessory.descriptionShort ?? 'Aucune description courte disponible.' }}</p>
+                    </div>
+                    </div>
+                </div>
+                </li>
+            {% endfor %}
+            </ul>
+        </div>
 
-      <!-- Bullets -->
-      <div class="glide__bullets" data-glide-el="controls[nav]">
-        {% for key, item in illustrations %}
-          <button class="glide__bullet" data-glide-dir="={{ key }}">
-            <img src="/uploads/accessoires/{{ item.image }}" alt="{{ accessory.name }}">
-          </button>
-        {% endfor %}
-      </div>
-    </div>
+        <!-- Arrows -->
+        <div class="glide__arrows" data-glide-el="controls">
+            <button class="glide__arrow glide__arrow--left" data-glide-dir="<">Précédent</button>
+            <button class="glide__arrow glide__arrow--right" data-glide-dir=">">Suivant</button>
+        </div>
 
-    <!-- Cart buttons -->
-    <div class="cart__buttons">
-        {% set product_id = accessory.id %}
-        {% set cart_data = cart.get() ?? {} %}
-        {% set quantity_in_cart = cart_data['accessory'][product_id]|default(0) %}
+        <!-- Bullets -->
+        <div class="glide__bullets" data-glide-el="controls[nav]">
+            {% for key, item in illustrations %}
+            <button class="glide__bullet" data-glide-dir="={{ key }}">
+                <img src="/uploads/accessoires/{{ item.image }}" alt="{{ accessory.name }}">
+            </button>
+            {% endfor %}
+        </div>
+        </div>
 
-        {% if accessory.stock < 1 %}
-            <a class="buy-btn">Bientôt de retour</a>
-        {% else %}
-            <a class="buy-btn">Stock disponible : {{ accessory.stock }}</a><br>
+        <!-- BOUTONS FIXES À DROITE -->
+        <div class="cart__buttons">
+            {% set product_id = accessory.id %}
+            {% set cart_data = cart.get() ?? {} %}
+            {% set quantity_in_cart = cart_data['accessory'][product_id]|default(0) %}
 
-            {% if quantity_in_cart == 0 %}
-                <a href="{{ path('add_to_cart', {'id': product_id, 'type': 'accessory'}) }}" class="buy-btn">Ajouter</a>
-            {% elseif quantity_in_cart < accessory.stock %}
-                <a class="buy-btn">Quantité : {{ quantity_in_cart }}</a><br>
-                <a href="{{ path('add_to_cart', {'id': product_id, 'type': 'accessory'}) }}" class="buy-btn">Ajouter</a>
-                <a href="{{ path('decrease_to_cart', {'id': product_id, 'type': 'accessory'}) }}" class="buy-btn">Diminuer</a><br>
+            {% if accessory.stock < 1 %}
+                <a class="buy-btn">Bientôt de retour</a>
             {% else %}
-                <a class="buy-btn">Quantité : {{ quantity_in_cart }}</a><br>
-                <a href="{{ path('decrease_to_cart', {'id': product_id, 'type': 'accessory'}) }}" class="buy-btn">Diminuer</a><br>
-                <a class="buy-btn" style="color:red;">Max (rupture)</a>
+                <a class="buy-btn">Stock disponible : {{ accessory.stock }}</a><br>
+
+                {% if quantity_in_cart == 0 %}
+                    <a href="{{ path('add_to_cart', {'id': product_id, 'type': 'accessory'}) }}" class="buy-btn">Ajouter</a>
+                {% elseif quantity_in_cart < accessory.stock %}
+                    <a class="buy-btn">Quantité : {{ quantity_in_cart }}</a><br>
+                    <a href="{{ path('add_to_cart', {'id': product_id, 'type': 'accessory'}) }}" class="buy-btn">Ajouter</a>
+                    <a href="{{ path('decrease_to_cart', {'id': product_id, 'type': 'accessory'}) }}" class="buy-btn">Diminuer</a><br>
+                {% else %}
+                    <a class="buy-btn">Quantité : {{ quantity_in_cart }}</a><br>
+                    <a href="{{ path('decrease_to_cart', {'id': product_id, 'type': 'accessory'}) }}" class="buy-btn">Diminuer</a><br>
+                    <a class="buy-btn" style="color:red;">Max (rupture)</a>
+                {% endif %}
+
+                {# TVA dynamique depuis la BDD #}
+                {% set tvaRate = accessory.tva ? accessory.tva.value / 100 : 0 %}
+
+                {# Prix TTC normal #}
+                {% set priceTTC = accessory.price * (1 + tvaRate) %}
+
+                {# Vérifier si une promo auto est active et applicable #}
+                {% set promoPrice = priceTTC %}
+                {% if promotion and promotion.autoApply %}
+                    {% if promotion.targetType == 'all'
+                        or (promotion.targetType == 'product' and promotion.product.id == accessory.id)
+                        or (promotion.targetType == 'product_list' and accessory in promotion.products) %}
+
+                        {% if promotion.discountAmount is not null %}
+                            {% set promoPrice = (accessory.price - promotion.discountAmount) * (1 + tvaRate) %}
+                        {% elseif promotion.discountPercent is not null %}
+                            {% set promoPrice = accessory.price * (1 - promotion.discountPercent / 100) * (1 + tvaRate) %}
+                        {% endif %}
+                    {% endif %}
+                {% endif %}
+
+                {# Affichage prix avec promo si applicable #}
+                {% if promoPrice < priceTTC %}
+                    <a class="buy-btn" style="margin-top:5px;">
+                        <span style="text-decoration:line-through;color:#888;">{{ priceTTC|number_format(2, ',', '.') }} €</span>
+                        &nbsp; {{ promoPrice|number_format(2, ',', '.') }} €
+                    </a>
+                {% else %}
+                    <a class="buy-btn" style="margin-top:5px;">
+                        Prix TTC : {{ priceTTC|number_format(2, ',', '.') }} €
+                    </a>
+                {% endif %}
             {% endif %}
+        </div>
 
-            {# TVA dynamique depuis la BDD #}
-            {% if accessory.tva %}
-                {% set tvaRate = accessory.tva.value / 100 %}
-            {% else %}
-                {% set tvaRate = 0 %}
-            {% endif %}
-
-            {# Calcul TTC #}
-            {% set priceTTC = accessory.price * (1 + tvaRate) %}
-
-            <a class="buy-btn" style="margin-top:5px;">Prix TTC : {{ priceTTC|number_format(2, ',', '.') }} €</a>
-        {% endif %}
     </div>
-  </div>
-</section>
+    </section>
 
-<script src="{{ asset('assets/js/slide-img.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/js/slide-img.js') }}" type="text/javascript"></script>
 {% endblock %}

@@ -16,12 +16,14 @@
     <link rel="stylesheet" href="{{ asset('assets/css/nav.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/login-register.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/footer.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/promos-site.css') }}">
 
     {# CSS spécifiques à cette page #}
     <link rel="stylesheet" href="{{ asset('assets/css/products.css') }}">
 {% endblock %}
 
 {% block content %}
+{% include 'partials/promos.html.twig' %}
     <section class="section-pergo-list" id="pergo-list">
         <div class="title">
             <h1>Accessoires pour {{ trottinette.name }}</h1>

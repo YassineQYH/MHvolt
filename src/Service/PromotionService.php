@@ -91,4 +91,34 @@ class PromotionService
     {
         return max(0, $price - $this->calculateReduction([['product' => $product, 'quantity' => 1]], $promo));
     }
+
+    /**
+     * Retourne une promotion automatique applicable au panier (ou null)
+     */
+    public function getAutomaticPromotion(array $cartFull, iterable $allPromos = []): ?Promotion
+    {
+        // On filtre uniquement les promotions autoApply
+        foreach ($allPromos as $promo) {
+
+            // On ignore les promos non automatiques
+            if (!$promo->isAutoApply()) {
+                continue;
+            }
+
+            // On ignore celles qui ne peuvent pas être utilisées
+            if (!$promo->canBeUsed() || !$promo->isDiscountValid()) {
+                continue;
+            }
+
+            // Test : est-ce que cette promo donne réellement une réduction ?
+            $reduction = $this->calculateReduction($cartFull, $promo);
+
+            if ($reduction > 0) {
+                return $promo; // ✅ Promo auto applicable trouvée
+            }
+        }
+
+        return null; // ❌ Aucune promo auto applicable
+    }
+
 }

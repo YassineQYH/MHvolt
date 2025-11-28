@@ -7,122 +7,63 @@
 {% endblock %} #}
 
 {% block content %}
-<section class="top-space">
+    {% include 'partials/promos.html.twig' %}
 
-    {% if homepagePromo %}
-        <div class="promo-home-banner" data-aos="fade-down" data-aos-duration="1200">
-            <div class="promo-title">
-                🔥 {{ homepagePromo.titre }}
+    <section class="section" id="about">
+        <div class="container-home about">
+            <div class="right" data-aos="fade-left" data-aos-duration="2000">
+                <img src="{{ asset('/img/logo-trott.png') }}" alt="Logo trott" />
             </div>
-
-            <div class="promo-details">
-                {# Affichage du montant ou pourcentage #}
-                {% if homepagePromo.discountAmount is not null %}
-                    -{{ homepagePromo.discountAmount|number_format(0, '.', ' ') }} €
-                {% elseif homepagePromo.discountPercent is not null %}
-                    -{{ homepagePromo.discountPercent }}%
-                {% endif %}
-
-                {# Affiche le code uniquement si ce n'est pas autoApply et qu'il existe #}
-                {% if homepagePromo.code is not null and not homepagePromo.autoApply %}
-                    / Code : {{ homepagePromo.code }}
-                {% endif %}
+            <div class="left" data-aos="fade-down" data-aos-delay="70" data-aos-duration="2000">
+                <div class="title-home">
+                    <h1>Trott Hich</h1>
+                </div>
+                <p>Bienvenue sur Trott Hich, votre expert en trottinettes électriques et accessoires. Nous combinons design, performance et sécurité pour vous offrir une expérience de mobilité urbaine inégalée.</p>
             </div>
         </div>
-
-        <style>
-            .top-space {
-                /* Espace sous le menu si pas de promo */
-                margin-top: 30px;
-            }
-
-            .promo-home-banner {
-                background: #ffefc1;
-                border-left: 6px solid #ff9800;
-                padding: 15px 20px;
-                margin: 0 auto 25px auto;
-                width: 90%;
-                max-width: 900px;
-                text-align: center;
-                border-radius: 10px;
-                box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-            }
-
-            .promo-home-banner .promo-title {
-                font-size: 1.6rem;
-                font-weight: bold;
-                color: #c77f00;
-                margin-bottom: 5px;
-            }
-
-            .promo-home-banner .promo-details {
-                font-size: 1.4rem;
-                font-weight: bold;
-                color: #b36000;
-            }
-        </style>
-    {% endif %}
-
-
-</section>
-
-
-
-<section class="section" id="about">
-    <div class="container-home about">
-        <div class="right" data-aos="fade-left" data-aos-duration="2000">
-            <img src="{{ asset('/img/logo-trott.png') }}" alt="Logo trott" />
-        </div>
-        <div class="left" data-aos="fade-down" data-aos-delay="70" data-aos-duration="2000">
-            <div class="title-home">
-                <h1>Trott Hich</h1>
+    </section></br></br>
+    <section class="section" id="about">
+        <div class="container-home about">
+            <div class="left" data-aos="fade-down" data-aos-delay="70" data-aos-duration="2000">
+                <div class="title-home">
+                    <h1>Homologations !</h1>
+                </div>
+                <p>Toutes nos trottinettes respectent les normes en vigueur pour garantir votre sécurité et celle de votre entourage. Nos produits sont testés et certifiés pour rouler sereinement en ville ou sur vos trajets quotidiens.</p>
             </div>
-            <p>Bienvenue sur Trott Hich, votre expert en trottinettes électriques et accessoires. Nous combinons design, performance et sécurité pour vous offrir une expérience de mobilité urbaine inégalée.</p>
-        </div>
-    </div>
-</section></br></br>
-<section class="section" id="about">
-    <div class="container-home about">
-        <div class="left" data-aos="fade-down" data-aos-delay="70" data-aos-duration="2000">
-            <div class="title-home">
-                <h1>Homologations !</h1>
+            <div class="right" data-aos="fade-left" data-aos-duration="2000">
+                <img src="{{ asset('/img/logo-trott.png') }}" alt="Logo trott" />
             </div>
-            <p>Toutes nos trottinettes respectent les normes en vigueur pour garantir votre sécurité et celle de votre entourage. Nos produits sont testés et certifiés pour rouler sereinement en ville ou sur vos trajets quotidiens.</p>
         </div>
-        <div class="right" data-aos="fade-left" data-aos-duration="2000">
-            <img src="{{ asset('/img/logo-trott.png') }}" alt="Logo trott" />
-        </div>
-    </div>
-</section>
-<section class="section" id="about">
-    <div class="container-home about">
-        <div class="right" data-aos="fade-left" data-aos-duration="2000">
-            <img src="{{ asset('/img/logo-trott.png') }}" alt="Logo trott" />
-        </div>
-        <div class="left" data-aos="fade-down" data-aos-delay="70" data-aos-duration="2000">
-            <div class="title-home">
-                <h1>Nos garanties !</h1>
+    </section>
+    <section class="section" id="about">
+        <div class="container-home about">
+            <div class="right" data-aos="fade-left" data-aos-duration="2000">
+                <img src="{{ asset('/img/logo-trott.png') }}" alt="Logo trott" />
             </div>
-            <p>Nous offrons des garanties complètes sur toutes nos trottinettes et accessoires. Profitez d’un service client réactif et d’une assistance fiable pour prolonger la durée de vie de vos équipements et rouler en toute tranquillité.</p>
+            <div class="left" data-aos="fade-down" data-aos-delay="70" data-aos-duration="2000">
+                <div class="title-home">
+                    <h1>Nos garanties !</h1>
+                </div>
+                <p>Nous offrons des garanties complètes sur toutes nos trottinettes et accessoires. Profitez d’un service client réactif et d’une assistance fiable pour prolonger la durée de vie de vos équipements et rouler en toute tranquillité.</p>
+            </div>
         </div>
-    </div>
-</section></br></br>
+    </section></br></br>
 
-{# Slider pour les meilleurs accessoires #}
-{{ include('partials/slider_isbest_all.html.twig') }}
+    {# Slider pour les meilleurs accessoires #}
+    {{ include('partials/slider_isbest_all.html.twig') }}
 
-{# Formulaire de contact #}
-<article>
-    {{ include('partials/contact-form.html.twig') }}
-</article>
+    {# Formulaire de contact #}
+    <article>
+        {{ include('partials/contact-form.html.twig') }}
+    </article>
 
-{# AOS animations #}
-<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-<script>
-    AOS.init();
-</script>
+    {# AOS animations #}
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init();
+    </script>
 
-{# Scripts personnalisés #}
-<script src="{{ asset('assets/js/slide-product.js') }}"></script>
+    {# Scripts personnalisés #}
+    <script src="{{ asset('assets/js/slide-product.js') }}"></script>
 
 {% endblock %}

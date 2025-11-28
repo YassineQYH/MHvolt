@@ -9,156 +9,179 @@
 {% endblock %}
 
 {% block content %}
+    {# {% include 'partials/promos.html.twig' %} #}
 
-<!-- SECTION 1 : SLIDER PRINCIPAL -->
-<section class="cart__slide" id="slider-show">
-  <div class="arrival__slide container">
-    <div class="glide" id="glide1">
-      <div class="glide__track" data-glide-el="track">
-        <ul class="glide__slides">
+    <!-- SECTION 1 : SLIDER PRINCIPAL -->
+    <section class="cart__slide" id="slider-show">
+    <div class="arrival__slide container">
+        <div class="glide" id="glide1">
+        <div class="glide__track" data-glide-el="track">
+            <ul class="glide__slides">
 
-          {% set images = illustrations %}
-          {% set firstImage = images|first %}
+            {% set images = illustrations %}
+            {% set firstImage = images|first %}
 
-          {# Image principale #}
-          {% if firstImage %}
-          <li class="glide__slide">
-            <div class="arrival">
-              <div class="cart__like">
-                <div class="image__holder">
-                  <img src="/uploads/trottinettes/{{ firstImage.image }}" alt="{{ trottinette.name }}">
+            {# Image principale #}
+            {% if firstImage %}
+            <li class="glide__slide">
+                <div class="arrival">
+                <div class="cart__like">
+                    <div class="image__holder">
+                    <img src="/uploads/trottinettes/{{ firstImage.image }}" alt="{{ trottinette.name }}">
+                    </div>
+                    <div class="cart__details">
+                    <h1>{{ trottinette.name }}</h1>
+                    <p>{{ trottinette.descriptionShort ?? 'Aucune description courte disponible.' }}</p>
+                    </div>
                 </div>
-                <div class="cart__details">
-                  <h1>{{ trottinette.name }}</h1>
-                  <p>{{ trottinette.descriptionShort ?? 'Aucune description courte disponible.' }}</p>
                 </div>
-              </div>
-            </div>
-          </li>
-          {% endif %}
+            </li>
+            {% endif %}
 
-          {# Autres images #}
-          {% for item in images|slice(1) %}
-          <li class="glide__slide">
-            <div class="arrival">
-              <div class="cart__like">
-                <div class="image__holder">
-                  <img src="/uploads/trottinettes/{{ item.image }}" alt="{{ trottinette.name }}">
+            {# Autres images #}
+            {% for item in images|slice(1) %}
+            <li class="glide__slide">
+                <div class="arrival">
+                <div class="cart__like">
+                    <div class="image__holder">
+                    <img src="/uploads/trottinettes/{{ item.image }}" alt="{{ trottinette.name }}">
+                    </div>
+                    <div class="cart__details">
+                    <h1>{{ trottinette.name }}</h1>
+                    <p>{{ trottinette.descriptionShort ?? 'Aucune description courte disponible.' }}</p>
+                    </div>
                 </div>
-                <div class="cart__details">
-                  <h1>{{ trottinette.name }}</h1>
-                  <p>{{ trottinette.descriptionShort ?? 'Aucune description courte disponible.' }}</p>
                 </div>
-              </div>
-            </div>
-          </li>
-          {% endfor %}
-        </ul>
-      </div>
+            </li>
+            {% endfor %}
+            </ul>
+        </div>
 
-      {# Flèches #}
-      <div class="glide__arrows" data-glide-el="controls">
-        <button class="glide__arrow glide__arrow--left" data-glide-dir="<">Précédent</button>
-        <button class="glide__arrow glide__arrow--right" data-glide-dir=">">Suivant</button>
-      </div>
+        {# Flèches #}
+        <div class="glide__arrows" data-glide-el="controls">
+            <button class="glide__arrow glide__arrow--left" data-glide-dir="<">Précédent</button>
+            <button class="glide__arrow glide__arrow--right" data-glide-dir=">">Suivant</button>
+        </div>
 
-      {# Miniatures #}
-      <div class="glide__bullets" data-glide-el="controls[nav]">
-        {% for key, item in images %}
-          <button class="glide__bullet" data-glide-dir="={{ key }}">
-            <img src="/uploads/trottinettes/{{ item.image }}" alt="{{ trottinette.name }}">
-          </button>
+        {# Miniatures #}
+        <div class="glide__bullets" data-glide-el="controls[nav]">
+            {% for key, item in images %}
+            <button class="glide__bullet" data-glide-dir="={{ key }}">
+                <img src="/uploads/trottinettes/{{ item.image }}" alt="{{ trottinette.name }}">
+            </button>
+            {% endfor %}
+        </div>
+        </div>
+
+        <!-- BOUTONS FIXES À DROITE -->
+        <div class="cart__buttons">
+            {% set product_id = trottinette.id %}
+            {% set cart_data = cart.get() ?? {} %}
+            {% set quantity_in_cart = cart_data['trottinette'][product_id]|default(0) %}
+
+            {% if trottinette.stock < 1 %}
+                <a class="buy-btn">Bientôt de retour</a>
+            {% else %}
+                <a class="buy-btn">Stock disponible : {{ trottinette.stock }}</a><br>
+
+                {% if quantity_in_cart == 0 %}
+                    <a href="{{ path('add_to_cart', {'id': product_id, 'type': 'trottinette'}) }}" class="buy-btn">Ajouter</a>
+                {% elseif quantity_in_cart < trottinette.stock %}
+                    <a class="buy-btn">Quantité : {{ quantity_in_cart }}</a><br>
+                    <a href="{{ path('add_to_cart', {'id': product_id, 'type': 'trottinette'}) }}" class="buy-btn">Ajouter</a>
+                    <a href="{{ path('decrease_to_cart', {'id': product_id, 'type': 'trottinette'}) }}" class="buy-btn">Diminuer</a><br>
+                {% else %}
+                    <a class="buy-btn">Quantité : {{ quantity_in_cart }}</a><br>
+                    <a href="{{ path('decrease_to_cart', {'id': product_id, 'type': 'trottinette'}) }}" class="buy-btn">Diminuer</a><br>
+                    <a class="buy-btn" style="color:red;">Max (rupture)</a>
+                {% endif %}
+
+                {# TVA dynamique depuis la BDD #}
+                {% set tvaRate = trottinette.tva ? trottinette.tva.value / 100 : 0 %}
+
+                {# Prix TTC normal #}
+                {% set priceTTC = trottinette.price * (1 + tvaRate) %}
+
+                {# Vérifier si une promo auto est active et applicable #}
+                {% set promoPrice = priceTTC %}
+                {% if promotion and promotion.autoApply %}
+                    {% if promotion.targetType == 'all'
+                        or (promotion.targetType == 'product' and promotion.product.id == trottinette.id)
+                        or (promotion.targetType == 'product_list' and trottinette in promotion.products) %}
+
+                        {% if promotion.discountAmount is not null %}
+                            {% set promoPrice = (trottinette.price - promotion.discountAmount) * (1 + tvaRate) %}
+                        {% elseif promotion.discountPercent is not null %}
+                            {% set promoPrice = trottinette.price * (1 - promotion.discountPercent / 100) * (1 + tvaRate) %}
+                        {% endif %}
+                    {% endif %}
+                {% endif %}
+
+                {# Affichage prix avec promo si applicable #}
+                {% if promoPrice < priceTTC %}
+                    <a class="buy-btn" style="margin-top:5px;">
+                        <span style="text-decoration:line-through;color:#888;">{{ priceTTC|number_format(2, ',', '.') }} €</span>
+                        &nbsp; {{ promoPrice|number_format(2, ',', '.') }} €
+                    </a>
+                {% else %}
+                    <a class="buy-btn" style="margin-top:5px;">
+                        Prix TTC : {{ priceTTC|number_format(2, ',', '.') }} €
+                    </a>
+                {% endif %}
+            {% endif %}
+        </div>
+
+    </div>
+    </section>
+
+    <!-- SECTION 2 : CARACTÉRISTIQUES -->
+    <section class="trottinette-caracteristiques container">
+    <h2>Caractéristiques techniques</h2>
+
+    {% if caracteristiques is not empty %}
+        {% set categories = {} %}
+        {% for c in caracteristiques %}
+            {% set cat = c.categorie ? c.categorie.name : 'Autres' %}
+            {% set categories = categories|merge({ (cat): (categories[cat]|default([]))|merge([c]) }) %}
         {% endfor %}
-      </div>
-    </div>
 
-    <!-- BOUTONS FIXES À DROITE -->
-    <div class="cart__buttons">
-        {% set product_id = trottinette.id %}
-        {% set cart_data = cart.get() ?? {} %}
-        {% set quantity_in_cart = cart_data['trottinette'][product_id]|default(0) %}
+        {% for cat, items in categories %}
+            <div class="caracteristique-categorie">
+                <h3>{{ cat }}</h3>
+                <table class="caracteristiques-table">
+                    {% for item in items %}
+                        <tr>
+                            <td class="carac-name">
+                                {{ item.title ?? item.caracteristique.name }}
+                            </td>
+                            <td class="carac-value">
+                                {{ item.value }}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>Aucune caractéristique enregistrée pour cette trottinette.</p>
+    {% endif %}
+    </section>
 
-        {% if trottinette.stock < 1 %}
-            <a class="buy-btn">Bientôt de retour</a>
-        {% else %}
-            <a class="buy-btn">Stock disponible : {{ trottinette.stock }}</a><br>
-            {% if quantity_in_cart == 0 %}
-                <a href="{{ path('add_to_cart', {'id': product_id, 'type': 'trottinette'}) }}" class="buy-btn">Ajouter</a>
-            {% elseif quantity_in_cart < trottinette.stock %}
-                <a class="buy-btn">Quantité : {{ quantity_in_cart }}</a><br>
-                <a href="{{ path('add_to_cart', {'id': product_id, 'type': 'trottinette'}) }}" class="buy-btn">Ajouter</a>
-                <a href="{{ path('decrease_to_cart', {'id': product_id, 'type': 'trottinette'}) }}" class="buy-btn">Diminuer</a><br>
-            {% else %}
-                <a class="buy-btn">Quantité : {{ quantity_in_cart }}</a><br>
-                <a href="{{ path('decrease_to_cart', {'id': product_id, 'type': 'trottinette'}) }}" class="buy-btn">Diminuer</a><br>
-                <a class="buy-btn" style="color:red;">Max (rupture)</a>
-            {% endif %}
+    <!-- SECTION 3 : DESCRIPTIONS DÉTAILLÉES -->
+    <section class="trottinette-descriptions container">
+    <h2>Description complète</h2>
 
-            {# TVA dynamique depuis la BDD #}
-            {% if trottinette.tva %}
-                {% set tvaRate = trottinette.tva.value / 100 %}
-            {% else %}
-                {% set tvaRate = 0 %}
-            {% endif %}
+    {% if sections is not empty %}
+        {% for section in sections|sort((a,b) => a.sectionOrder <=> b.sectionOrder) %}
+            <div class="description-section">
+                <h3>{{ section.title }}</h3>
+                <p>{{ section.content|raw }}</p>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>Aucune section de description disponible.</p>
+    {% endif %}
+    </section>
 
-            {# Calcul TTC #}
-            {% set priceTTC = trottinette.price * (1 + tvaRate) %}
-
-            <a class="buy-btn" style="margin-top:5px;">Prix TTC : {{ priceTTC|number_format(2, ',', '.') }} €</a>
-        {% endif %}
-    </div>
-
-  </div>
-</section>
-
-<!-- SECTION 2 : CARACTÉRISTIQUES -->
-<section class="trottinette-caracteristiques container">
-  <h2>Caractéristiques techniques</h2>
-
-  {% if caracteristiques is not empty %}
-      {% set categories = {} %}
-      {% for c in caracteristiques %}
-          {% set cat = c.categorie ? c.categorie.name : 'Autres' %}
-          {% set categories = categories|merge({ (cat): (categories[cat]|default([]))|merge([c]) }) %}
-      {% endfor %}
-
-      {% for cat, items in categories %}
-          <div class="caracteristique-categorie">
-              <h3>{{ cat }}</h3>
-              <table class="caracteristiques-table">
-                  {% for item in items %}
-                      <tr>
-                          <td class="carac-name">
-                              {{ item.title ?? item.caracteristique.name }}
-                          </td>
-                          <td class="carac-value">
-                              {{ item.value }}
-                          </td>
-                      </tr>
-                  {% endfor %}
-              </table>
-          </div>
-      {% endfor %}
-  {% else %}
-      <p>Aucune caractéristique enregistrée pour cette trottinette.</p>
-  {% endif %}
-</section>
-
-<!-- SECTION 3 : DESCRIPTIONS DÉTAILLÉES -->
-<section class="trottinette-descriptions container">
-  <h2>Description complète</h2>
-
-  {% if sections is not empty %}
-      {% for section in sections|sort((a,b) => a.sectionOrder <=> b.sectionOrder) %}
-          <div class="description-section">
-              <h3>{{ section.title }}</h3>
-              <p>{{ section.content|raw }}</p>
-          </div>
-      {% endfor %}
-  {% else %}
-      <p>Aucune section de description disponible.</p>
-  {% endif %}
-</section>
-
-<script src="{{ asset('assets/js/slide-img.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/js/slide-img.js') }}" type="text/javascript"></script>
 {% endblock %}
