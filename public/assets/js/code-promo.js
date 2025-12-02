@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
+
     const promoForm = document.getElementById('promoForm');
     if (!promoForm) return;
 
@@ -10,6 +11,46 @@ document.addEventListener('DOMContentLoaded', function() {
     const reductionPromo = document.getElementById('reductionPromo');
     const appliedPromoCode = document.getElementById('appliedPromoCode');
 
+    //---------------------------------------------------
+    // UI Utils
+    //---------------------------------------------------
+    function resetPromoUI() {
+        promoMessage.textContent = '';
+        if (reductionPromo) reductionPromo.textContent = '';
+        if (totalRemiseContainer) totalRemiseContainer.style.display = 'none';
+        if (totalOriginal) totalOriginal.style.textDecoration = '';
+        if (appliedPromoCode) appliedPromoCode.textContent = '';
+    }
+
+    function applyPromoUI(code, discount, totalAfterPromo) {
+        promoMessage.textContent = '';
+
+        if (reductionPromo) {
+            reductionPromo.textContent =
+                '-' + discount.toFixed(2).replace('.', ',') + ' €';
+        }
+
+        if (totalOriginal) {
+            totalOriginal.style.textDecoration = 'line-through';
+        }
+
+        if (totalRemise) {
+            totalRemise.textContent =
+                totalAfterPromo.toFixed(2).replace('.', ',') + ' €';
+        }
+
+        if (totalRemiseContainer) {
+            totalRemiseContainer.style.display = 'block';
+        }
+
+        if (appliedPromoCode) {
+            appliedPromoCode.textContent = code;
+        }
+    }
+
+    //---------------------------------------------------
+    // AJAX CALL
+    //---------------------------------------------------
     async function applyPromo(code) {
         if (!code) return;
 
@@ -22,75 +63,95 @@ document.addEventListener('DOMContentLoaded', function() {
                 },
                 body: JSON.stringify({ promo_code: code })
             });
+
             const data = await response.json();
 
+            //------------------------------------------------
+            // ERROR
+            //------------------------------------------------
             if (data.error) {
                 promoMessage.textContent = data.error;
-                reductionPromo.textContent = '';
-                totalRemiseContainer.style.display = 'none';
-                totalOriginal.style.textDecoration = '';
-                appliedPromoCode.textContent = '';
-            } else {
-                promoMessage.textContent = '';
-                reductionPromo.textContent = '-' + data.discount.toFixed(2).replace('.', ',') + ' €';
-                totalOriginal.style.textDecoration = 'line-through';
-                totalRemise.textContent = data.totalAfterPromo.toFixed(2).replace('.', ',') + ' €';
-                totalRemiseContainer.style.display = 'block';
-                appliedPromoCode.textContent = code;
+                resetPromoUI();
+                return;
             }
+
+            //------------------------------------------------
+            // SUCCESS
+            //------------------------------------------------
+            // 🔥 Si le backend demande un reload, on recharge la page
+            if (data.reload === true) {
+                window.location.reload();
+                return;
+            }
+
+            // Sinon mise à jour dynamique des totaux
+            applyPromoUI(code, data.discount, data.totalAfterPromo);
+
         } catch (err) {
             console.error(err);
-            promoMessage.textContent = 'Une erreur est survenue.';
+            promoMessage.textContent = "Une erreur est survenue.";
+            resetPromoUI();
         }
     }
 
+    //---------------------------------------------------
+    // SUBMIT DU FORMULAIRE
+    //---------------------------------------------------
     promoForm.addEventListener('submit', function(e) {
         e.preventDefault();
+
         const code = promoCodeInput.value.trim();
+
         if (!code) {
-            promoMessage.textContent = 'Veuillez saisir un code promo.';
+            promoMessage.textContent = "Veuillez saisir un code promo.";
+            resetPromoUI();
             return;
         }
+
         applyPromo(code);
     });
 
-    // Réappliquer le code promo si présent au chargement
-    const currentCode = promoCodeInput.value.trim();
-    if (currentCode) {
-        applyPromo(currentCode);
-    }
-
-    // Fonction globale pour réappliquer la promo après modification du panier
+    //---------------------------------------------------
+    // RÉAPPLIQUER APRÈS MODIFICATION PANIER
+    //---------------------------------------------------
     window.reapplyPromo = function() {
         const code = promoCodeInput.value.trim();
-        if (code) {
-            applyPromo(code);
-        } else {
-            reductionPromo.textContent = '';
-            totalRemiseContainer.style.display = 'none';
-            totalOriginal.style.textDecoration = '';
-            appliedPromoCode.textContent = '';
+        if (!code) {
+            resetPromoUI();
+            return;
         }
+        applyPromo(code);
     };
 
-    // ---- Modification du panier ----
-    // Pour chaque bouton d'action (add, decrease, delete)
+    //---------------------------------------------------
+    // BOUTONS + / - / SUPPRIMER DU PANIER
+    //---------------------------------------------------
     document.querySelectorAll('.cart-action').forEach(button => {
         button.addEventListener('click', function() {
             const id = button.dataset.id;
             const type = button.dataset.type;
-            const action = button.dataset.action; // ex: add, decrease, delete
+            const action = button.dataset.action;
 
-            fetch(`/cart/${action}/${type}/${id}`) // adapte cette URL selon ton backend
+            fetch(`/cart/${action}/${id}/${type}`)
                 .then(res => res.json())
                 .then(data => {
-                    // Mise à jour du mini-panier si tu as un callback
-                    if (typeof updateMiniCart === 'function') updateMiniCart(data);
+                    if (typeof updateMiniCart === 'function') {
+                        updateMiniCart(data);
+                    }
 
-                    // Recalcule automatiquement la promo
+                    // ✅ recalcul promo après MAJ panier
                     window.reapplyPromo();
                 })
                 .catch(err => console.error(err));
         });
     });
+
+    //---------------------------------------------------
+    // ✅ RÉAPPLICATION AU CHARGEMENT
+    //---------------------------------------------------
+    const currentCode = promoCodeInput.value.trim();
+    if (currentCode) {
+        applyPromo(currentCode);
+    }
+
 });

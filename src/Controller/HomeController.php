@@ -10,6 +10,8 @@ use App\Entity\Accessory;
 use App\Form\ContactType;
 use App\Form\RegisterType;
 use App\Entity\Trottinette;
+use App\Service\PromotionService;
+use App\Repository\PromotionRepository;
 use App\Service\PromotionFinderService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -34,7 +36,8 @@ class HomeController extends AbstractController
         UserPasswordHasherInterface $encoder,
         Cart $cart,
         AuthenticationUtils $authenticationUtils,
-        PromotionFinderService $promoFinder
+        PromotionFinderService $promoFinder,
+        PromotionService $promotionService,
     ): Response
     {
         $cart = $cart->getFull();
@@ -159,7 +162,8 @@ class HomeController extends AbstractController
             'error' => $error,
             'notification' => $notification,
             'trottinettes_menu' => $trottinettesMenu,
-            'homepagePromo' => $homepagePromo
+            'homepagePromo' => $homepagePromo,
+            'promoService' => $promotionService,
         ]);
     }
 }

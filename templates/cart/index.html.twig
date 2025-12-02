@@ -6,7 +6,6 @@
 {% endblock %}
 
 {% block javascripts %}
-    {# Scripts code-promo.js #}
     {{ parent() }}
     <script src="{{ asset('assets/js/code-promo.js') }}"></script>
 {% endblock %}
@@ -17,103 +16,149 @@
     <p>Retrouvez l'ensemble des produits que vous avez ajoutés à votre panier.</p>
 
     {% if cart|length > 0 %}
-        <table class="table table-striped mt-3">
-            <thead class="thead-dark">
+        {% set totalTTC = 0 %}
+        {% set totalWeight = 0 %}
+        {% set promoDiscount = cartObject.getDiscountTTC(promoService, allPromotions) %}
+
+        {% set totalTTC = 0 %}
+{% set totalWeight = 0 %}
+
+{# Première boucle pour calculer totalTTC et totalWeight #}
+{% for item in cart %}
+    {% set priceHT = item.product.price %}
+    {% set tvaRate = item.product.tva ? (item.product.tva.value / 100) : 0 %}
+    {% set priceTTC = priceHT * (1 + tvaRate) %}
+    {% set totalItemTTC = priceTTC * item.quantity %}
+    {% set totalWeight = totalWeight + (item.product.weight.kg * item.quantity) %}
+    {% set totalTTC = totalTTC + totalItemTTC %}
+{% endfor %}
+
+    {% set promoDiscount = cartObject.getDiscountTTC(promoService, allPromotions) %}
+
+    <table class="table table-striped mt-3">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">Produit</th>
+                <th scope="col">Quantité</th>
+                <th scope="col">Total TTC</th>
+                <th scope="col">Poids</th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in cart %}
+                {% set priceHT = item.product.price %}
+                {% set tvaRate = item.product.tva ? (item.product.tva.value / 100) : 0 %}
+                {% set priceTTC = priceHT * (1 + tvaRate) %}
+                {% set totalItemTTC = priceTTC * item.quantity %}
+
+                {# Calcul de la remise proportionnelle par produit #}
+                {% set totalItemRemise = totalItemTTC %}
+                {% if promoDiscount > 0 %}
+                    {% set proportion = totalItemTTC / totalTTC %}
+                    {% set totalItemRemise = totalItemTTC - (promoDiscount * proportion) %}
+                {% endif %}
+
+                {% set illustration = item.product.illustrations|first %}
+
                 <tr>
-                    <th scope="col">Produit</th>
-                    <th scope="col">Quantité</th>
-                    <th scope="col">Total TTC</th>
-                    <th scope="col">Poids</th>
-                    <th scope="col"></th>
-                </tr>
-            </thead>
-            <tbody>
-                {% set totalTTC = 0 %}
-                {% set totalWeight = 0 %}
-
-                {% for item in cart %}
-                    {% set priceHT = item.product.price %}
-                    {% set tvaRate = item.product.tva ? (item.product.tva.value / 100) : 0 %}
-                    {% set priceTTC = priceHT * (1 + tvaRate) %}
-                    {% set totalItemTTC = priceTTC * item.quantity %}
-                    {% set totalWeight = totalWeight + (item.product.weight.kg * item.quantity) %}
-
-                    {% set illustration = item.product.illustrations|first %}
-
-                    <tr>
-                        <td>
-                            <div style="display:flex; align-items:center; gap:10px;">
-                                <div style="width:60px; flex-shrink:0; text-align:center;">
-                                    <a href="{{ path(item.type == 'accessory' ? 'accessory_show' : 'trottinette_show', {
-                                        slug: item.product.slug
-                                    }) }}">
-                                        {% if illustration %}
-                                            <img src="/uploads/{{ item.product.uploadDirectory }}/{{ illustration.image }}"
-                                                 alt="{{ item.product.name }}"
-                                                 style="height:50px; width:auto;">
-                                        {% else %}
-                                            <img src="/uploads/{{ item.product.uploadDirectory }}/default.jpg"
-                                                 alt="image par défaut"
-                                                 style="height:50px; width:auto;">
-                                        {% endif %}
-                                    </a>
-                                </div>
-                                <span style="max-width:300px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
-                                    {{ item.product.name }}
-                                </span>
+                    <td>
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <div style="width:60px; flex-shrink:0; text-align:center;">
+                                <a href="{{ path(item.type == 'accessory' ? 'accessory_show' : 'trottinette_show', { slug: item.product.slug }) }}">
+                                    {% if illustration %}
+                                        <img src="/uploads/{{ item.product.uploadDirectory }}/{{ illustration.image }}"
+                                            alt="{{ item.product.name }}"
+                                            style="height:50px; width:auto;">
+                                    {% else %}
+                                        <img src="/uploads/{{ item.product.uploadDirectory }}/default.jpg"
+                                            alt="image par défaut"
+                                            style="height:50px; width:auto;">
+                                    {% endif %}
+                                </a>
                             </div>
-                        </td>
+                            <span style="max-width:300px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                                {{ item.product.name }}
+                            </span>
+                        </div>
+                    </td>
 
-                        <td>x{{ item.quantity }}</td>
-                        <td>{{ totalItemTTC|number_format(2, ',', '.') }} €</td>
-                        <td>{{ (item.product.weight.kg * item.quantity) }} Kg</td>
-                        <td>
-                            <a href="{{ path('delete_to_cart', {
-                                'id' : item.product.id,
-                                'type': item.type|default('trottinette')
-                            }) }}">
-                                <img src="{{ asset('img/delete.png') }}" height="18px" alt="Supprimer">
-                            </a>
-                        </td>
+                    <td>x{{ item.quantity }}</td>
+
+                    <td>
+                        {% if promoDiscount > 0 %}
+                            <span style="text-decoration: line-through; color:#888;">
+                                {{ totalItemTTC|number_format(2, ',', '.') }} €
+                            </span>
+                            <br>
+                            <span style="color:green; font-weight:bold;">
+                                {{ totalItemRemise|number_format(2, ',', '.') }} €
+                            </span>
+                        {% else %}
+                            {{ totalItemTTC|number_format(2, ',', '.') }} €
+                        {% endif %}
+                    </td>
+
+                    <td>{{ (item.product.weight.kg * item.quantity) }} Kg</td>
+
+                    <td>
+                        <a href="{{ path('delete_to_cart', { 'id' : item.product.id, 'type': item.type|default('trottinette') }) }}">
+                            <img src="{{ asset('img/delete.png') }}" height="18px" alt="Supprimer">
+                        </a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+
+        {% set promoDiscount = cartObject.getDiscountTTC(promoService, allPromotions) %}
+        {% set promoCode = cartObject.getPromoCode() %}
+        {% set totalLivraison = price %}
+        {% set grandTotal = totalTTC - promoDiscount + totalLivraison %}
+
+        <table class="table mt-4" style="max-width:400px; margin-left:auto;">
+            <tbody>
+                <tr>
+                    <td colspan="2">Sous-total</td>
+                    <td>
+                        {% if promoDiscount > 0 %}
+                            <span style="text-decoration: line-through;">{{ totalTTC|number_format(2, ',', '.') }} €</span>
+                        {% else %}
+                            {{ totalTTC|number_format(2, ',', '.') }} €
+                        {% endif %}
+                    </td>
+                </tr>
+                {% if promoDiscount > 0 %}
+                    <tr>
+                        <td colspan="2">Remise</td>
+                        <td>- {{ promoDiscount|number_format(2, ',', '.') }} €</td>
                     </tr>
-
-                    {% set totalTTC = totalTTC + totalItemTTC %}
-                {% endfor %}
+                    <tr>
+                        <td colspan="2">Total après remise</td>
+                        <td><strong>{{ (totalTTC - promoDiscount)|number_format(2, ',', '.') }} €</strong></td>
+                    </tr>
+                {% endif %}
+                <tr>
+                    <td colspan="2">Livraison</td>
+                    <td>{{ totalLivraison|number_format(2, ',', '.') }} €</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><strong>Total</strong></td>
+                    <td><strong>{{ grandTotal|number_format(2, ',', '.') }} €</strong></td>
+                </tr>
             </tbody>
         </table>
 
-{% set totalAfterPromo = totalTTC + price %}
-{% set promoDiscount = cartObject.getReduction(promoService) %}
-{% set promoCode = cartObject.getPromoCode() %}
 
-<div class="text-right mb-5">
-    <b>Nombre de produits :</b> {{ quantity_product }}<br>
-    <b>Total TTC :</b> {{ totalTTC|number_format(2, ',', '.') }} €<br>
-    <b>Poids total :</b> {{ totalWeight }} kg<br>
-    <b>Prix livraison :</b> {{ price|number_format(2, ',', '.') }} €<br>
+        {# Formulaire pour entrer un nouveau code promo #}
+        <form id="promoForm" action="{{ path('cart_apply_promo') }}" method="POST" class="d-flex mt-2" style="max-width:300px; margin-left:auto;">
+            <input type="text" name="promo_code" id="promoCode" class="form-control me-2" placeholder="Code promo" value="{{ promoCode ?? '' }}">
+            <button class="btn btn-primary" type="submit">Appliquer</button>
+        </form>
+        <small id="promoMessage" class="text-danger"></small>
 
-    <b>Prix Total :</b>
-    <span id="totalOriginal" {% if promoDiscount > 0 %}style="text-decoration: line-through;"{% endif %}>
-        {{ totalAfterPromo|number_format(2, ',', '.') }} €
-    </span><br>
-
-    {# Bloc promo (toujours présent dans le DOM) #}
-    <div id="totalRemiseContainer" style="display: {% if promoDiscount > 0 %}block{% else %}none{% endif %}; margin-top: 15px; padding: 10px; border: 1px solid #28a745; border-radius: 5px; background: #ebffef; max-width:300px; margin-left:auto;">
-        <b>Code promo appliqué :</b> <span id="appliedPromoCode" style="color:green;">{{ promoCode }}</span><br>
-        <b>Réduction :</b> <span id="reductionPromo" style="color:red;">{% if promoDiscount > 0 %}-{{ promoDiscount|number_format(2, ',', '.') }} €{% endif %}</span><br>
-        <b>Total après réduction :</b>
-        <span id="totalRemise" style="font-weight:bold; color:black;">{% if promoDiscount > 0 %}{{ (totalAfterPromo - promoDiscount)|number_format(2, ',', '.') }} €{% endif %}</span>
-    </div>
-
-    {# Formulaire pour entrer un nouveau code promo #}
-    <form id="promoForm" action="{{ path('cart_apply_promo') }}" method="POST" class="d-flex mt-2" style="max-width:300px; margin-left:auto;">
-        <input type="text" name="promo_code" id="promoCode" class="form-control me-2" placeholder="Code promo" value="{{ promoCode ?? '' }}">
-        <button class="btn btn-primary" type="submit">Appliquer</button>
-    </form>
-    <small id="promoMessage" class="text-danger"></small>
-
-    <a href="{{ path('order') }}" class="btn btn-success btn-block mt-3">Valider mon panier</a>
-</div>
+        <a href="{{ path('order') }}" class="btn btn-success btn-block mt-3">Valider mon panier</a></br></br>
 
     {% else %}
         <hr>

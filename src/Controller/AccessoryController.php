@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Classe\Cart;
 use App\Entity\Accessory;
 use App\Entity\Illustration;
+use App\Service\PromotionService;
 use App\Service\PromotionFinderService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -40,7 +41,8 @@ class AccessoryController extends BaseController
         Request $request,
         UserPasswordHasherInterface $encoder,
         Cart $cartService,
-        PromotionFinderService $promoFinder
+        PromotionFinderService $promoFinder,
+        PromotionService $promotionService
     ): Response
     {
         $accessory = $this->entityManager->getRepository(Accessory::class)
@@ -80,6 +82,7 @@ class AccessoryController extends BaseController
             'originalPrice' => $originalPrice,
             'promoPrice' => $promoPrice,
             'homepagePromo' => $homepagePromo,
+            'promoService' => $promotionService,
         ]);
     }
 

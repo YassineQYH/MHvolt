@@ -49,7 +49,11 @@
 
         <!-- 🛒 Panier -->
         <li class="menu-panier">
-            {{ include('partials/cart.html.twig', { cart: cart }) }}
+            {{ include('partials/cart.html.twig', {
+                cart: cart,
+                cartObject: cart,
+                promoService: promoService
+            }) }}
         </li>
 
         {% if app.user %}

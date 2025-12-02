@@ -204,4 +204,61 @@ class Cart
         return $weightEntity ? $weightEntity->getPrice() : 0;
     }
 
+    // ------------------- Réduction TTC (pour affichage) -------------------
+    public function getDiscountTTC(PromotionService $promoService, array $allPromotions): float
+    {
+        $cartFull = $this->getFull();
+        if (empty($cartFull)) return 0;
+
+        $promo = $this->getBestPromotion($promoService, $allPromotions);
+        if (!$promo) return 0;
+
+        $discountTTC = 0;
+        foreach ($cartFull as $item) {
+            $product  = $item['product'];
+            $quantity = $item['quantity'];
+
+            if ($promo->getDiscountAmount() !== null) {
+                $unitDiscountHT = $promo->getDiscountAmount();
+            } elseif ($promo->getDiscountPercent() !== null) {
+                $unitDiscountHT = $product->getPrice() * ($promo->getDiscountPercent() / 100);
+            } else {
+                $unitDiscountHT = 0;
+            }
+
+            $tvaRate = $product->getTva()?->getValue() / 100 ?? 0;
+            $unitDiscountTTC = $unitDiscountHT * (1 + $tvaRate);
+            $discountTTC += $unitDiscountTTC * $quantity;
+        }
+
+        return $discountTTC;
+    }
+
+
+    // ------------------- Récupère la meilleure promotion applicable -------------------
+    public function getBestPromotion(PromotionService $promoService, array $allPromotions): ?Promotion
+    {
+        $cartFull = $this->getFull();
+        if (empty($cartFull)) return null;
+
+        // 1️⃣ Promo manuelle via code promo
+        $promoCode = $this->getPromoCode();
+        if ($promoCode) {
+            $manualPromo = $this->entityManager->getRepository(Promotion::class)
+                ->findOneBy(['code' => $promoCode]);
+
+            if ($manualPromo && $promoService->calculateReduction($cartFull, $manualPromo) > 0) {
+                // Si code promo valide, on l'applique directement
+                return $manualPromo;
+            }
+
+            // Si le code promo est invalide, on peut le nettoyer
+            $this->clearPromos();
+            return null;
+        }
+
+        // 2️⃣ Sinon, promo automatique
+        return $promoService->getAutomaticPromotion($cartFull, $allPromotions);
+    }
+
 }

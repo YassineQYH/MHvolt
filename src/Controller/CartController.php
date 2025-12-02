@@ -22,36 +22,41 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 class CartController extends BaseController
 {
     #[Route('/mon-panier', name: 'cart')]
-    public function index(
-        Request $requete,
-        UserPasswordHasherInterface $encodeur,
-        Cart $panier,
-        WeightRepository $weightRepository,
-        PromotionService $promotionService
-    ): Response {
+    public function index(Request $requete,
+            Cart $panier,
+            WeightRepository $weightRepository,
+            PromotionService $promotionService,
+            PromotionRepository $promoRepo
+        ): Response
+    {
+        $allPromotions = $promoRepo->findAll();
 
         $articlesPanier = $panier->getFull();
 
+        // Calcul poids et quantité
         $poids = 0.0;
         $quantite_produits = 0;
-
         foreach ($articlesPanier as $article) {
-            $objetPoids = $article['product']->getWeight();
-            $kg = $objetPoids ? $objetPoids->getKg() : 0;
-            $poidsEtQuantite = $kg * $article['quantity'];
+            $kg = $article['product']->getWeight()?->getKg() ?? 0;
+            $poids += $kg * $article['quantity'];
             $quantite_produits += $article['quantity'];
-            $poids += $poidsEtQuantite;
         }
 
         $poidsEntity = $weightRepository->findByKgPrice($poids);
         $prixLivraison = $poidsEntity ? $poidsEntity->getPrice() : 0;
 
-        // 🧍 Formulaire d’inscription
         $user = new User();
-        $formregister = $this->createForm(\App\Form\RegisterType::class, $user, [
-            'by_reference' => false
-        ]);
+        $formregister = $this->createForm(\App\Form\RegisterType::class, $user);
         $formregister->handleRequest($requete);
+
+        $allPromotions = $promoRepo->findAll();
+        $discount = $panier->getDiscountTTC($promotionService, $allPromotions);
+        $totalTTC = array_reduce($articlesPanier, fn($carry, $item) =>
+            $carry + $item['product']->getPrice() * (1 + ($item['product']->getTva()?->getValue()/100 ?? 0)) * $item['quantity'],
+            0
+        );
+
+        $grandTotal = $totalTTC + $prixLivraison - $discount;
 
         return $this->render('cart/index.html.twig', [
             'cart' => $articlesPanier,
@@ -60,10 +65,14 @@ class CartController extends BaseController
             'price' => $prixLivraison,
             'quantity_product' => $quantite_produits,
             'totalLivraison' => $prixLivraison,
+            'discount' => $discount,
+            'grandTotal' => $grandTotal,
             'formregister' => $formregister->createView(),
             'promoService' => $promotionService,
+            'allPromotions' => $allPromotions,
         ]);
     }
+
 
     #[Route('/cart/apply-promo', name: 'cart_apply_promo', methods: ['POST'])]
     public function appliquerCodePromoAjax(
@@ -81,16 +90,6 @@ class CartController extends BaseController
             return new JsonResponse(['error' => 'Veuillez saisir un code promo.']);
         }
 
-        // 🛑 Vérification : une promotion automatique est-elle déjà applicable ?
-        $allPromos = $promotionRepository->findAll();
-        $autoPromo = $promotionService->getAutomaticPromotion($cart->getFull(), $allPromos);
-
-        if ($autoPromo) {
-            return new JsonResponse([
-                'error' => "Une promotion automatique est déjà appliquée. Vous ne pouvez pas utiliser un code promo."
-            ]);
-        }
-
         $promo = $promotionRepository->findOneBy(['code' => $code]);
 
         if (!$promo || !$promo->canBeUsed()) {
@@ -99,8 +98,26 @@ class CartController extends BaseController
             return new JsonResponse(['error' => 'Code promo invalide ou expiré.']);
         }
 
-        // Calcul de la réduction avec le service dédié
-        $discount = $cart->getReduction($promotionService, $promo);
+        // ✅ Comparaison entre promo automatique et code promo : la plus avantageuse gagne
+
+        $allPromos = $promotionRepository->findAll();
+
+        // Réduction provenant d'une éventuelle promo automatique
+        $autoDiscount = $cart->getDiscountTTC($promotionService, $allPromos);
+
+        // Réduction provenant du code promo saisi
+        $codeDiscount = $cart->getReduction($promotionService, $promo);
+
+        // ❌ Si le code est moins ou égal à l’auto → on refuse
+        if ($autoDiscount >= $codeDiscount) {
+            return new JsonResponse([
+                'error' => "Une promotion automatique plus avantageuse est déjà appliquée."
+            ]);
+        }
+
+        // ✅ Sinon, le code est meilleur → on continue normalement
+        $discount = $codeDiscount;
+
         // 🔍 Vérification : si la promo ne s'applique à AUCUN article
         if ($discount <= 0) {
             // 👉 Je supprime toute promo stockée en session
@@ -114,7 +131,9 @@ class CartController extends BaseController
 
         // Total final = produits + livraison - réduction
         $totalTTC = array_reduce($cart->getFull(), fn($carry, $item) =>
-            $carry + $item['product']->getPrice() * (1 + ($item['product']->getTva()?->getValue()/100 ?? 0)) * $item['quantity'],
+            $carry + $item['product']->getPrice()
+                * (1 + ($item['product']->getTva()?->getValue()/100 ?? 0))
+                * $item['quantity'],
             0
         );
 
@@ -125,11 +144,10 @@ class CartController extends BaseController
 
         return new JsonResponse([
             'discount' => $discount,
-            'totalAfterPromo' => $totalAfterPromo
+            'totalAfterPromo' => $totalAfterPromo,
+            'reload' => true // 🔥 déclenche le reload automatique côté JS
         ]);
     }
-
-
 
 
     #[Route('/cart/add/{id}/{type}', name: 'add_to_cart', defaults: ['type' => 'trottinette'], methods: ['GET', 'POST'])]

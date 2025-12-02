@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Classe\Cart;
 use App\Entity\Trottinette;
 use App\Entity\Illustration;
+use App\Service\PromotionService;
 use App\Service\PromotionFinderService;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -55,7 +56,8 @@ class TrottinetteController extends BaseController
         Request $request,
         UserPasswordHasherInterface $encoder,
         Cart $cartService, // 🛒 On injecte ton service Cart ici
-        PromotionFinderService $promoFinder
+        PromotionFinderService $promoFinder,
+        PromotionService $promotionService
     ): Response {
         // -------------------------------
         // 🛴 Récupération de la trottinette
@@ -118,6 +120,7 @@ class TrottinetteController extends BaseController
             'originalPrice' => $originalPrice,
             'promoPrice' => $promoPrice,
             'homepagePromo' => $homepagePromo,
+            'promoService' => $promotionService,
         ]);
     }
 
@@ -127,6 +130,7 @@ class TrottinetteController extends BaseController
         Request $request,
         UserPasswordHasherInterface $encoder,
         PromotionFinderService $promoFinder,
+        PromotionService $promotionService
     ): Response {
         // -------------------------------
         // 🛠️ Récupération de la trottinette
@@ -162,6 +166,7 @@ class TrottinetteController extends BaseController
             'accessoires' => $accessoires,
             'formregister' => $formregister->createView(),
             'homepagePromo' => $homepagePromo,
+            'promoService' => $promotionService,
         ]);
     }
 }
