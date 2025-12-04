@@ -7,16 +7,18 @@ use DateTime;
 use App\Classe\Cart;
 use App\Entity\User;
 use App\Entity\Order;
-use App\Entity\OrderDetails;
 use App\Form\OrderType;
+use App\Service\PdfService;
+use App\Entity\OrderDetails;
+use App\Service\PromotionService;
 use App\Repository\WeightRepository;
-use App\Repository\CategoryAccessoryRepository;
+use App\Repository\PromotionRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use App\Repository\CategoryAccessoryRepository;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use App\Service\PdfService;
 
 class OrderController extends AbstractController
 {
@@ -30,9 +32,12 @@ class OrderController extends AbstractController
         Cart $cart,
         Request $request,
         CategoryAccessoryRepository $categoryAccessoryRepository,
-        WeightRepository $weightRepository
+        WeightRepository $weightRepository,
+        PromotionService $promotionService,
+        PromotionRepository $promotionRepository
     ): Response {
         $categories = $categoryAccessoryRepository->findAll();
+        $allPromotions = $promotionRepository->findAll();
 
         /** @var User|null $user */
         $user = $this->getUser();
@@ -68,7 +73,7 @@ class OrderController extends AbstractController
         $promoCode = null;
 
         if (method_exists($cart, 'getReduction')) {
-            $promoDiscount = (float) $cart->getReduction();
+            $promoDiscount = (float) $cart->getReduction($promotionService); // <-- correction
         }
 
         if (method_exists($cart, 'getPromoCode')) {
@@ -83,6 +88,8 @@ class OrderController extends AbstractController
             'cartObject' => $cart,
             'promoDiscount' => $promoDiscount,
             'promoCode' => $promoCode,
+            'promoService' => $promotionService,
+            'allPromotions' => $allPromotions,
         ]);
     }
 
@@ -91,7 +98,8 @@ class OrderController extends AbstractController
         Cart $cart,
         Request $request,
         WeightRepository $weightRepository,
-        CategoryAccessoryRepository $categoryAccessoryRepository
+        CategoryAccessoryRepository $categoryAccessoryRepository,
+        PromotionService $promotionService
     ): Response {
         $categories = $categoryAccessoryRepository->findAll();
         $user = $this->getUser();
@@ -153,7 +161,7 @@ class OrderController extends AbstractController
                 $order->setPromoCode($cart->getPromoCode());
             }
             if (method_exists($cart, 'getReduction')) {
-                $order->setPromoReduction($cart->getReduction());
+                $order->setPromoReduction($cart->getReduction($promotionService)); // <-- correction
             }
 
             // On sauvegarde la commande
@@ -165,18 +173,16 @@ class OrderController extends AbstractController
 
                 $orderDetails = new OrderDetails();
                 $orderDetails->setMyOrder($order);
-                $orderDetails->setProduct($produit->getName()); // nom produit en string
-                $orderDetails->setProductEntity($produit); // <-- Lien vers l'entité Product
+                $orderDetails->setProduct($produit->getName());
+                $orderDetails->setProductEntity($produit);
                 $orderDetails->setWeight($produit->getWeight() ? (string) $produit->getWeight()->getKg() : '0');
                 $orderDetails->setQuantity($quantite);
                 $orderDetails->setPrice($produit->getPrice());
                 $orderDetails->setTotal($produit->getPrice() * $quantite);
 
-                // ----- AJOUT DE LA TVA -----
                 $tvaValue = $produit->getTva() ? $produit->getTva()->getValue() : 0;
                 $orderDetails->setTva($tvaValue);
 
-                // ----- CALCUL DU TTC -----
                 $priceTTC = $produit->getPrice() * (1 + ($tvaValue / 100));
                 $orderDetails->setPriceTTC($priceTTC);
 
@@ -193,8 +199,9 @@ class OrderController extends AbstractController
                 'price' => $prixLivraison,
                 'totalLivraison' => null,
                 'categories' => $categories,
-                'promoDiscount' => $cart->getReduction(),
+                'promoDiscount' => $cart->getReduction($promotionService), // <-- correction
                 'promoCode' => $cart->getPromoCode(),
+                'promoService' => $promotionService,
             ]);
         }
 
@@ -215,7 +222,7 @@ class OrderController extends AbstractController
             'account/invoice.html.twig',
             ['order' => $order],
             'facture_' . $order->getReference() . '.pdf',
-            $download ? 'attachment' : 'inline'  // inline = affichage navigateur, attachment = téléchargement
+            $download ? 'attachment' : 'inline'
         );
     }
 
@@ -231,5 +238,4 @@ class OrderController extends AbstractController
             'order' => $order
         ]);
     }
-
 }
