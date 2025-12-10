@@ -41,50 +41,47 @@
             </div>
 
             <div class="order-summary">
-                {# 1️⃣ Calcul total HT #}
-                {% set totalHT = 0 %}
-                {% for item in cart %}
-                    {% set totalHT = totalHT + (item.product.price * item.quantity) %}
-                {% endfor %}
-
-                {# 2️⃣ Affichage produits avec remise sur HT puis calcul TTC #}
+                {# === On calcule d'abord le total TTC (produits) comme dans la page panier === #}
                 {% set totalTTC = 0 %}
                 {% for item in cart %}
                     {% set tvaRate = item.product.tva ? (item.product.tva.value / 100) : 0 %}
-                    {% set priceHT = item.product.price %}
-
-                    {# remise proportionnelle sur HT #}
-                    {% set priceHTRemise = promoDiscount > 0
-                        ? priceHT - (priceHT / totalHT * promoDiscount)
-                        : priceHT
-                    %}
-
-                    {# TTC après remise #}
-                    {% set priceTTC = priceHTRemise * (1 + tvaRate) %}
+                    {% set priceTTC = item.product.price * (1 + tvaRate) %}
                     {% set totalItemTTC = priceTTC * item.quantity %}
                     {% set totalTTC = totalTTC + totalItemTTC %}
+                {% endfor %}
 
-                    <div class="row {% if loop.index0 > 0 %}mt-2{% endif %}">
+                {# === Puis on affiche chaque ligne en répartissant la remise TTC proportionnellement === #}
+                {% for key, item in cart %}
+                    {% set tvaRate = item.product.tva ? (item.product.tva.value / 100) : 0 %}
+                    {% set priceTTC = item.product.price * (1 + tvaRate) %}
+                    {% set totalItemTTC = priceTTC * item.quantity %}
+
+                    {# Remise proportionnelle sur la ligne (TTC) - identique à cart/index.twig #}
+                    {% set totalItemRemise = promoDiscount > 0 ? totalItemTTC - (totalItemTTC / (totalTTC ?: 1) * promoDiscount) : totalItemTTC %}
+                    {% set illustration = item.product.illustrations|first %}
+
+                    <div class="row {% if key > 0 %}mt-2{% endif %}">
                         <div class="col-4">
-                            {% set illustration = item.product.illustrations|first %}
                             {% if illustration %}
-                                <img src="/uploads/{{ item.product.uploadDirectory }}/{{ illustration.image }}" height="75px">
+                                <img src="/uploads/{{ item.product.uploadDirectory }}/{{ illustration.image }}" alt="{{ item.product.name }}" height="75px">
                             {% else %}
-                                <img src="/uploads/{{ item.product.uploadDirectory }}/default.jpg" height="75px">
+                                <img src="/uploads/{{ item.product.uploadDirectory }}/default.jpg" alt="image par défaut" height="75px">
                             {% endif %}
                         </div>
+
                         <div class="col-6 my-auto">
                             {{ item.product.name }}<br>
                             <small>{{ item.product.description }}</small><br>
                             <small>x {{ item.quantity }}</small>
                         </div>
+
                         <div class="col-2 my-auto text-end">
                             {% if promoDiscount > 0 %}
                                 <span style="text-decoration:line-through;color:#888;">
-                                    {{ (priceHT * (1 + tvaRate) * item.quantity)|number_format(2, ',', '.') }} €
+                                    {{ totalItemTTC|number_format(2, ',', '.') }} €
                                 </span><br>
                                 <span style="color:green;font-weight:bold;">
-                                    {{ totalItemTTC|number_format(2, ',', '.') }} €
+                                    {{ totalItemRemise|number_format(2, ',', '.') }} €
                                 </span>
                             {% else %}
                                 {{ totalItemTTC|number_format(2, ',', '.') }} €
@@ -96,19 +93,25 @@
 
             <hr>
 
+            {# === Totaux === #}
+            <strong>Total produits :</strong> {{ totalTTC|number_format(2, ',', '.') }} €<br>
+
             {% if promoDiscount > 0 %}
                 <strong style="color:green;">Réduction ({{ promoCode }}):</strong>
                 <span style="color:red;">-{{ promoDiscount|number_format(2, ',', '.') }} €</span><br>
-                <strong>Sous-total remisé :</strong> {{ totalTTC|number_format(2, ',', '.') }} €<br>
+
+                {# Calcul du sous-total remisé: total produits TTC - promo (TTC) #}
+                {% set subtotalRemise = totalTTC - promoDiscount %}
+                <strong>Sous-total remisé :</strong> {{ subtotalRemise|number_format(2, ',', '.') }} €<br>
             {% else %}
-                <strong>Sous-total :</strong> {{ totalTTC|number_format(2, ',', '.') }} €<br>
+                {% set subtotalRemise = totalTTC %}
             {% endif %}
 
             <strong>Livraison :</strong> {{ price|number_format(2, ',', '.') }} €<br>
 
             <strong>Total à payer :</strong>
             <span style="font-weight:bold; color:black;">
-                {{ (totalTTC + price)|number_format(2, ',', '.') }} €
+                {{ (subtotalRemise + price)|number_format(2, ',', '.') }} €
             </span><br>
 
             <small class="text-muted">TVA incluse</small>
@@ -117,7 +120,7 @@
                 {# 🔗 Lien direct vers Stripe : le controller gère la session et la redirection #}
                 <a href="{{ path('stripe_create_session', {'reference': reference}) }}"
                    class="btn btn-success btn-block mt-3">
-                    Payer | {{ (totalTTC + price)|number_format(2, ',', '.') }} €
+                    Payer | {{ (subtotalRemise + price)|number_format(2, ',', '.') }} €
                 </a>
             {% endif %}
         </div>

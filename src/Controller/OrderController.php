@@ -152,7 +152,7 @@ class OrderController extends AbstractController
             'price' => $prixLivraison,
             'totalLivraison' => null,
             'categories' => $categoryAccessoryRepository->findAll(),
-            'promoDiscount' => $cart->getReduction($promotionService),
+            'promoDiscount' => $cart->getDiscountTTC($promotionService, $allPromotions),
             'promoCode' => $cart->getPromoCode(),
             'promoService' => $promotionService,
             'allPromotions' => $allPromotions,
