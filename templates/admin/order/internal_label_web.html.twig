@@ -93,19 +93,28 @@
         <table>
             {% set totalHT = 0 %}
             {% set totalTVA = 0 %}
+            {% set tvaPercentages = [] %}
             {% for item in order.orderDetails %}
                 {% set totalItemHT = item.price * item.quantity %}
                 {% set tvaItem = totalItemHT * (item.tva / 100) %}
                 {% set totalHT = totalHT + totalItemHT %}
                 {% set totalTVA = totalTVA + tvaItem %}
+
+                {% if item.tva not in tvaPercentages %}
+                    {% set tvaPercentages = tvaPercentages|merge([item.tva]) %}
+                {% endif %}
             {% endfor %}
+
 
             {% set totalProduitsTTC = totalHT + totalTVA %}
             {% set promo = order.promoReduction ?? 0 %}
             {% set totalCommande = totalProduitsTTC - promo + order.carrierPrice %}
 
             <tr><td>Total produits HT :</td><td>{{ totalHT|number_format(2, ',', ' ') }} €</td></tr>
-            <tr><td>TVA :</td><td>{{ totalTVA|number_format(2, ',', ' ') }} €</td></tr>
+            <tr>
+                <td>TVA {% if tvaPercentages|length == 1 %}({{ tvaPercentages[0] }}%) {% endif %}:</td>
+                <td>{{ totalTVA|number_format(2, ',', ' ') }} €</td>
+            </tr>
             <tr><td>Total produits TTC :</td><td>{{ totalProduitsTTC|number_format(2, ',', ' ') }} €</td></tr>
 
             {% if promo > 0 %}
@@ -120,6 +129,7 @@
             <tr><td>Transporteur :</td><td>{{ order.carrier ?? order.carrier }}</td></tr>
         </table>
     </div>
+
 
 
     <div class="footer">
