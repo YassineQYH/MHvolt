@@ -61,7 +61,8 @@ class OrderDetailsCrudController extends AbstractCrudController
                 ->hideOnDetail(),
 
             // ⚖️ Poids
-            TextField::new('weight', 'Poids'),
+            TextField::new('weight', 'Poids')
+                ->formatValue(fn($value) => $value . ' kg'),
 
             // 🔢 Quantité
             IntegerField::new('quantity', 'Quantité'),
