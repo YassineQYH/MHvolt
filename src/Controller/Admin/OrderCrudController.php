@@ -12,7 +12,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Field\{
-    IdField, TextField, ArrayField, MoneyField, ChoiceField, DateTimeField, TextEditorField, FormField
+    IdField, TextField, ArrayField, MoneyField, ChoiceField, DateTimeField, TextEditorField, FormField, NumberField
 };
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Symfony\Component\HttpFoundation\Response;
@@ -230,18 +230,16 @@ class OrderCrudController extends AbstractCrudController
         $promo = [
             FormField::addPanel('Promotion')->collapsible(),
 
-            // Champ promo affiché dans la liste et détail
             TextField::new('promoInfo', 'Promo')
-                ->onlyOnIndex() // affiché sur la liste
-                ->formatValue(function ($value, $entity) {
-                    // Affiche le code promo s'il existe, sinon le titre promo s'il existe, sinon '-'
-                    return $entity->getPromoCode() ?: ($entity->getPromoTitre() ?: '-');
-                }),
+                ->onlyOnIndex()
+                ->formatValue(fn($value, $entity) => $entity->getPromoCode() ?: ($entity->getPromoTitre() ?: '-')),
 
             TextField::new('promoCode', 'Code promo')->onlyOnDetail(),
+
             MoneyField::new('promoReduction', 'Réduction promo')
                 ->setCurrency('EUR')
                 ->setStoredAsCents(false)
+                ->formatValue(fn($value) => $value > 0 ? $value . ' €' : '-')
                 ->onlyOnDetail(),
         ];
 
@@ -249,36 +247,54 @@ class OrderCrudController extends AbstractCrudController
         $paymentDelivery = [
             FormField::addPanel('Paiement & Livraison')->collapsible(),
 
-            // Affiche le promo avant les frais de livraison
             TextField::new('promoInfo', 'Promo')
                 ->onlyOnDetail()
-                ->formatValue(function ($value, $entity) {
-                    return $entity->getPromoCode() ?: ($entity->getPromoTitre() ?: '-');
-                }),
+                ->formatValue(fn($value, $entity) => $entity->getPromoCode() ?: ($entity->getPromoTitre() ?: '-')),
+
+            // Pour le détail
+            NumberField::new('weightTotal', 'Poids total')
+                ->onlyOnDetail()
+                ->formatValue(fn($value) => number_format($value, 2, ',', ' ') . ' kg'),
+
+            // Pour la liste
+            NumberField::new('weightTotal', 'Poids total')
+                ->onlyOnIndex()
+                ->formatValue(fn($value) => number_format($value, 2, ',', ' ') . ' kg'),
+
 
             MoneyField::new('carrierPrice', 'Frais de livraison')
                 ->setCurrency('EUR')
-                ->setStoredAsCents(false),
+                ->setStoredAsCents(false)
+                ->formatValue(fn($value) => $value . ' €'),
 
             MoneyField::new('total', 'Total produit HT')
                 ->setCurrency('EUR')
-                ->setStoredAsCents(false),
+                ->setStoredAsCents(false)
+                ->formatValue(fn($value) => $value . ' €'),
 
             MoneyField::new('totalAfterReduction', 'Total produit HT (après réduction)')
                 ->setCurrency('EUR')
-                ->setStoredAsCents(false),
+                ->setStoredAsCents(false)
+                ->formatValue(fn($value, $entity) =>
+                    ($entity->getPromoCode() || $entity->getPromoTitre()) ? $value . ' €' : '-'
+                ),
 
             MoneyField::new('totalTtc', 'Total produit TTC')
                 ->setCurrency('EUR')
-                ->setStoredAsCents(false),
+                ->setStoredAsCents(false)
+                ->formatValue(fn($value) => $value . ' €'),
 
             MoneyField::new('totalTtcAfterReduction', 'Total produit TTC (après réduction)')
                 ->setCurrency('EUR')
-                ->setStoredAsCents(false),
+                ->setStoredAsCents(false)
+                ->formatValue(fn($value, $entity) =>
+                    ($entity->getPromoCode() || $entity->getPromoTitre()) ? $value . ' €' : '-'
+                ),
 
             MoneyField::new('cartTotalTtc', 'Total panier TTC (avec livraison)')
                 ->setCurrency('EUR')
-                ->setStoredAsCents(false),
+                ->setStoredAsCents(false)
+                ->formatValue(fn($value) => $value . ' €'),
 
             ChoiceField::new('paymentState', 'Paiement')->setChoices([
                 'Non payée' => 0,
@@ -314,5 +330,6 @@ class OrderCrudController extends AbstractCrudController
         // ---------------------- Fusion ----------------------
         return array_merge($general, $promo, $paymentDelivery, $secondaryTransport);
     }
+
 
 }

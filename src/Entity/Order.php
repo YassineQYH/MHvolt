@@ -218,4 +218,13 @@ class Order
     public function getPromoInfo(): ?string{return $this->promoCode ?: $this->promoTitre ?: '-';}
 
 
+    public function getWeightTotal(): float
+    {
+        return array_reduce(
+            $this->orderDetails->toArray(),
+            fn($carry, $item) => $carry + ($item->getWeight() * $item->getQuantity()),
+            0
+        );
+    }
+
 }
