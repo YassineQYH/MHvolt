@@ -63,6 +63,7 @@ class OrderCrudController extends AbstractCrudController
             ->setHtmlAttributes(['target' => '_blank']);
 
         return $actions
+            ->disable(Action::NEW, Action::EDIT, Action::DELETE)
             ->add(Crud::PAGE_DETAIL, $updatePreparation)
             ->add(Crud::PAGE_DETAIL, $updateDelivery)
             ->add(Crud::PAGE_DETAIL, $internalLabelWeb)
@@ -209,7 +210,17 @@ class OrderCrudController extends AbstractCrudController
 
     public function configureCrud(Crud $crud): Crud
     {
-        return $crud->setDefaultSort(['id' => 'DESC']);
+        return $crud
+            ->setDefaultSort(['id' => 'DESC'])
+            ->setEntityPermission('ROLE_ADMIN') // facultatif
+            ->setPageTitle(Crud::PAGE_INDEX, 'Commandes')
+            ->setPageTitle(
+                Crud::PAGE_DETAIL,
+                fn (Order $order) => 'Commande #' . $order->getId() . ' — ' . $order->getReference()
+            )
+            ->showEntityActionsInlined(true)
+            ->setEntityPermission('ROLE_ADMIN')
+            ->setFormOptions(['disabled' => true]); // bloque l’édition dans le form
     }
 
     public function configureFields(string $pageName): iterable
@@ -272,7 +283,7 @@ class OrderCrudController extends AbstractCrudController
                 ->setStoredAsCents(false)
                 ->formatValue(fn($value) => $value . ' €'),
 
-            MoneyField::new('totalAfterReduction', 'Total produit HT (après réduction)')
+            MoneyField::new('totalAfterReduction', 'Total produit HT (promo)')
                 ->setCurrency('EUR')
                 ->setStoredAsCents(false)
                 ->formatValue(fn($value, $entity) =>
@@ -284,7 +295,7 @@ class OrderCrudController extends AbstractCrudController
                 ->setStoredAsCents(false)
                 ->formatValue(fn($value) => $value . ' €'),
 
-            MoneyField::new('totalTtcAfterReduction', 'Total produit TTC (après réduction)')
+            MoneyField::new('totalTtcAfterReduction', 'Total produit TTC (promo)')
                 ->setCurrency('EUR')
                 ->setStoredAsCents(false)
                 ->formatValue(fn($value, $entity) =>
