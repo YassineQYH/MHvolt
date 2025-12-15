@@ -6,6 +6,26 @@
     {{ parent() }}
     <link rel="stylesheet" href="{{ asset('assets/css/show-product-slider.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/products.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/promos-site.css') }}">
+    <style>
+        /* ===== PROMO - SHOW PAGE ONLY ===== */
+        .promo-banner {
+            background: #ffefc1;
+            border-left: 6px solid #ff9800;
+            padding: 15px 20px;
+            margin: 0 auto 25px auto;
+            width: 90%;
+            max-width: 900px;
+            text-align: center;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+
+            /* 🎯 TEXTE */
+            font-size: 1.6rem;
+            font-weight: bold;
+            color: #c77f00;
+        }
+    </style>
 {% endblock %}
 
 {% block content %}
