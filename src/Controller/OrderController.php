@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use DateTime;
+use Dompdf\Dompdf;
+use chillerlan\QRCode\{QRCode, QROptions};
 use App\Classe\Cart;
 use App\Entity\User;
 use App\Entity\Order;
@@ -19,6 +21,8 @@ use Symfony\Component\HttpFoundation\Response;
 use App\Repository\CategoryAccessoryRepository;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+
+
 
 class OrderController extends AbstractController
 {
@@ -215,5 +219,40 @@ class OrderController extends AbstractController
         return $this->render('account/invoice_web.html.twig', [
             'order' => $order
         ]);
+    }
+
+    #[Route('/order/{id}/bordereau/pdf', name: 'order_bordereau_pdf')]
+    public function bordereauPdf(Order $order): Response
+    {
+        $trackingNumber = $order->getTrackingNumber() ?: 'N/A';
+
+        // Configuration du QR code
+        $options = new QROptions([
+            'outputType' => QRCode::OUTPUT_IMAGE_PNG,
+            'eccLevel' => QRCode::ECC_L,
+            'imageBase64' => true, // Générer directement base64
+            'scale' => 5
+        ]);
+
+        // Générer le QR code
+        $qrcode = new QRCode($options);
+        $qrCodeDataUri = $qrcode->render($trackingNumber); // base64 PNG
+
+        // Rendre le template twig en HTML
+        $html = $this->renderView('pdf/bordereau.html.twig', [
+            'order' => $order,
+            'qrCodePath' => $qrCodeDataUri
+        ]);
+
+        // Générer le PDF
+        $dompdf = new Dompdf();
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A6', 'portrait');
+        $dompdf->render();
+
+        // Envoyer le PDF en téléchargement
+        return new Response($dompdf->stream("bordereau_{$order->getReference()}.pdf", [
+            "Attachment" => true
+        ]));
     }
 }

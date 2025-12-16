@@ -17,11 +17,8 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\{
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Symfony\Component\HttpFoundation\Response;
 
-// Endroid QR Code
-use Endroid\QrCode\QrCode;
-use Endroid\QrCode\Writer\PngWriter;
-use Endroid\QrCode\Encoding\Encoding;
-use Endroid\QrCode\ErrorCorrectionLevel\ErrorCorrectionLevel;
+use chillerlan\QRCode\QRCode;
+use chillerlan\QRCode\QROptions;
 
 class OrderCrudController extends AbstractCrudController
 {
@@ -78,84 +75,126 @@ class OrderCrudController extends AbstractCrudController
             ->add(Crud::PAGE_INDEX, Action::DETAIL);
     }
 
-    // 🔹 Rendu web
+    // 🔹 Rendu web - QR code interne
     public function internalLabelWeb(AdminContext $context): Response
     {
         $order = $this->getOrderFromContext($context);
         if (!$order) return $this->redirectToOrderIndex();
 
+        // Génération du QR code basé sur la référence commande
+        $options = new \chillerlan\QRCode\QROptions([
+            'outputType' => \chillerlan\QRCode\QRCode::OUTPUT_IMAGE_PNG,
+            'eccLevel'   => \chillerlan\QRCode\QRCode::ECC_L,
+            'imageBase64'=> true, // Génère directement le base64
+            'scale'      => 5,
+        ]);
+        $qrcode = new \chillerlan\QRCode\QRCode($options);
+        $qrCodePath = $qrcode->render($order->getReference());
+
         return $this->render('admin/order/internal_label_web.html.twig', [
-            'order' => $order
+            'order' => $order,
+            'qrCodePath' => $qrCodePath,
         ]);
     }
 
+    // 🔹 Rendu web - QR code BPOST
     public function bpostLabelWeb(AdminContext $context): Response
     {
         $order = $this->getOrderFromContext($context);
         if (!$order) return $this->redirectToOrderIndex();
 
+        // Si aucun numéro de suivi, générer un temporaire
+        if (!$order->getTrackingNumber()) {
+            $order->setTrackingNumber('TEST-' . random_int(100000000, 999999999));
+            $this->entityManager->flush();
+        }
+
+        // Génération du QR code basé sur le numéro de suivi
+        $options = new \chillerlan\QRCode\QROptions([
+            'outputType' => \chillerlan\QRCode\QRCode::OUTPUT_IMAGE_PNG,
+            'eccLevel'   => \chillerlan\QRCode\QRCode::ECC_L,
+            'imageBase64'=> true,
+            'scale'      => 5,
+        ]);
+        $qrcode = new \chillerlan\QRCode\QRCode($options);
+        $qrCodePath = $qrcode->render($order->getTrackingNumber());
+
         return $this->render('admin/order/bpost_label_web.html.twig', [
-            'order' => $order
+            'order' => $order,
+            'qrCodePath' => $qrCodePath,
         ]);
     }
+
 
     // 🔹 Génération des PDF
     public function generateInternalLabel(AdminContext $context): Response
     {
         $order = $this->getOrderFromContext($context);
-        if (!$order) return $this->redirectToOrderIndex();
+        if (!$order) {
+            return $this->redirectToOrderIndex();
+        }
 
-        // Génération d’un QR code interne basé sur la référence commande
-        $qrCode = new QrCode($order->getReference());
-        $writer = new PngWriter();
-        $result = $writer->write($qrCode);
+        // 🔹 Configuration du QR Code (chillerlan)
+        $options = new QROptions([
+            'outputType'  => QRCode::OUTPUT_IMAGE_PNG,
+            'eccLevel'    => QRCode::ECC_L,
+            'scale'       => 5,
+            'imageBase64' => true, // 🔑 important pour Twig + PDF
+        ]);
 
-        // Sauvegarde temporaire du QR
-        $tempPath = sys_get_temp_dir() . '/qr_internal_' . $order->getId() . '.png';
-        $result->saveToFile($tempPath);
+        // 🔹 Génération du QR code basé sur la référence commande
+        $qrcode = new QRCode($options);
+        $qrCodeDataUri = $qrcode->render($order->getReference());
 
         return $this->pdfService->generate(
             'admin/order/internal_label.html.twig',
             [
                 'order' => $order,
-                'qrCodePath' => $tempPath
+                'qrCodePath' => $qrCodeDataUri // ⚠️ maintenant c’est une data-uri
             ],
             'etiquette_interne_' . $order->getReference() . '.pdf',
             'attachment'
         );
     }
 
+
     public function generateBpostLabel(AdminContext $context): Response
     {
         $order = $this->getOrderFromContext($context);
-        if (!$order) return $this->redirectToOrderIndex();
+        if (!$order) {
+            return $this->redirectToOrderIndex();
+        }
 
-        // Si aucun numéro de suivi, en générer un temporaire
+        // 🔹 Si aucun numéro de suivi, en générer un temporaire
         if (!$order->getTrackingNumber()) {
             $order->setTrackingNumber('TEST-' . random_int(100000000, 999999999));
             $this->entityManager->flush();
         }
 
-        // Génération du QR code
-        $qrCode = new QrCode($order->getTrackingNumber());
-        $writer = new PngWriter();
-        $result = $writer->write($qrCode);
+        // 🔹 Configuration du QR Code (chillerlan)
+        $options = new QROptions([
+            'outputType'  => QRCode::OUTPUT_IMAGE_PNG,
+            'eccLevel'    => QRCode::ECC_L,
+            'scale'       => 5,
+            'imageBase64' => true, // 🔑 essentiel pour le PDF
+        ]);
 
-        // Écriture du QR temporaire
-        $tempPath = sys_get_temp_dir() . '/qr_' . $order->getId() . '.png';
-        $result->saveToFile($tempPath);
+        // 🔹 Génération du QR code basé sur le numéro de suivi
+        $qrcode = new QRCode($options);
+        $qrCodeDataUri = $qrcode->render($order->getTrackingNumber());
 
-        // Dans le PDF Twig
+        // 🔹 Génération du PDF
         return $this->pdfService->generate(
             'admin/order/bpost_label.html.twig',
             [
                 'order' => $order,
-                'qrCodePath' => $tempPath
+                'qrCodePath' => $qrCodeDataUri
             ],
             'bordereau_bpost_' . $order->getReference() . '.pdf',
             'attachment'
         );
     }
+
 
     // 🔹 Gestion d'état
     public function updatePreparation(AdminContext $context): Response

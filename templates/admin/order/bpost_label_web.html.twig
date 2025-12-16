@@ -47,10 +47,10 @@
             margin-top: 5px;
         }
         .client-info {
-            width: 65%; /* prend 65% de la largeur */
+            width: 65%;
         }
         .qr {
-            width: 30%; /* prend 30% de la largeur */
+            width: 30%;
             text-align: center;
         }
         .footer {
@@ -66,18 +66,17 @@
 
         <div class="client-qr">
             <div class="client-info">
-            <p>Date de la commande : {{ order.createdAt|date('d/m/Y H:i') }}</p>
+                <p>Date de la commande : {{ order.createdAt|date('d/m/Y H:i') }}</p>
                 <h2>Client</h2>
                 <p>
-                    {# {{ order.user.firstName }} {{ order.user.lastName }}<br> #}
                     {% if order.user.phoneNumber is defined %}{{ order.user.phoneNumber }}<br>{% endif %}
                     {{ order.delivery|raw }}
                 </p>
                 <p>Poids total : {{ order.getWeightTotal()|number_format(2, ',', '.') }} Kg</p>
             </div>
             <div class="qr">
-                {% if order.trackingNumber %}
-                    <img src="https://api.qrserver.com/v1/create-qr-code/?data={{ order.trackingNumber }}&size=100x100" alt="QR Code">
+                {% if qrCodePath is defined %}
+                    <img src="{{ qrCodePath }}" alt="QR Code" style="width:120px;height:120px;">
                 {% endif %}
             </div>
         </div>
@@ -92,7 +91,6 @@
         <div class="footer">
             Ce bordereau doit être scanné par le transporteur lors de la prise en charge et à la livraison.
         </div>
-
     </div>
 </body>
 </html>
