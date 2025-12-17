@@ -118,7 +118,11 @@
     width: 55rem;
     height: 45rem;
 }
-
+.cart__details {
+    text-align: center; /* centre tout le contenu du bloc (h1 et p) */
+    margin-top: -6rem; /* réduit l'espace depuis la promo */
+    margin-bottom: 3rem; /* espace sous le bloc avant le slider */
+}
 .cart__details h1 {
     font-size: 5rem;
     line-height: 1.2;
@@ -129,7 +133,8 @@
 .cart__details p {
     font-size: 1.8rem;
     color: var(--grey-color-alt);
-    margin-bottom: 1.6rem;
+    margin: 1rem 0 2rem 0; /* haut 1rem, bas 2rem */
+    line-height: 1.4;
 }
 
 .cart__details .colors {
@@ -382,4 +387,17 @@
 .container-show-product {
     max-width: 1280px;
     margin: 0 auto;
+}
+/* Flèche gauche */
+.glide__arrow--left {
+    left: 20% !important; /* décaler vers le centre */
+    transform: translateY(-50%);
+    position: absolute;
+}
+
+/* Flèche droite (si tu veux garder sa position actuelle) */
+.glide__arrow--right {
+    right: 0%; /* reste collée à droite */
+    transform: translateY(-50%);
+    position: absolute;
 }
