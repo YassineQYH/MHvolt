@@ -313,3 +313,23 @@ nav .menu li a {
         padding: 28px 45px;
     }
 }
+
+
+/* ===================== SOUS-MENU "Nos trottinettes" ===================== */
+
+.menu-nav .sous-menu-trottinettes {
+    font-size: 0.75rem;
+    line-height: 1.2;
+}
+
+.menu-nav .sous-menu-trottinettes li {
+    font-size: 0.75rem;
+    padding: 4px 8px;
+    gap: 6px;
+}
+
+.menu-nav .sous-menu-trottinettes li a {
+    font-size: 0.75rem;
+    padding: 3px 6px;
+}
+

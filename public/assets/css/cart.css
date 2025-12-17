@@ -124,3 +124,18 @@
 .lien-panier a i {
     margin-left: 4px;
 }
+
+/* ===================== MINI-PANIER (TAILLE NORMALE) ===================== */
+
+.menu-nav li.menu-panier {
+    font-size: 0.85rem;
+}
+
+.menu-nav li.menu-panier small {
+    font-size: 0.75rem;
+}
+
+.menu-nav li.menu-panier strong {
+    font-size: 0.85rem;
+}
+

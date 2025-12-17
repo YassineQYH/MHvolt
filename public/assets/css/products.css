@@ -1,6 +1,6 @@
 /* Reset & global */
 
-*,
+/* *,
 *::before,
 *::after {
     margin: 0;
@@ -20,17 +20,37 @@ body {
     font-weight: 400;
     background-color: #fff;
     color: #222;
-}
+} */
 
-nav ul li a {
+/* nav ul li a {
     font-size: 1.4rem;
+} */
+
+.page-show-product {
+    font-family: "Poppins", sans-serif;
+    font-size: 1.6rem;
 }
 
-h1 {
+/* reset LOCAL uniquement */
+.page-show-product *,
+.page-show-product *::before,
+.page-show-product *::after {
+    box-sizing: border-box;
+}
+
+/* h1 {
     font-weight: 500;
 }
 
 img {
+    max-width: 100%;
+} */
+
+.page-show-product h1 {
+    font-weight: 500;
+}
+
+.page-show-product img {
     max-width: 100%;
 }
 
@@ -533,45 +553,9 @@ img {
 /* ===== OVERRIDE LOCAL SHOW-PAGE : boutons VOIR PANIER et COMMANDER ===== */
 
 
-/* ===================== SOUS-MENU "Nos trottinettes" ===================== */
-
-.menu-nav .sous-menu-trottinettes,
-.menu-nav ul li ul.sous-menu-trottinettes {
-    font-size: 1.1rem !important;
-    line-height: 1.2 !important;
-}
-
-.menu-nav ul li ul li a,
-.menu-nav .sous-menu-trottinettes li a {
-    font-size: 1.1rem !important;
-    padding: 5px 10px !important;
-    display: inline-block;
-}
-
-.menu-nav .sous-menu-trottinettes li {
-    font-size: 1.1rem !important;
-    padding: 4px 10px !important;
-    gap: 8px;
-    white-space: nowrap;
-}
 
 
-/* ===================== MINI-PANIER ===================== */
 
-.menu-nav li.menu-panier ul,
-.menu-nav li.menu-panier .cart-dropdown,
-.menu-nav li.menu-panier>* ul,
-.menu-nav li.menu-panier ul li,
-.menu-nav li.menu-panier ul li a,
-.menu-nav li.menu-panier .cart-dropdown p,
-.menu-nav li.menu-panier .cart-dropdown span,
-.menu-nav li.menu-panier .navbar-cart-product,
-.menu-nav li.menu-panier .navbar-cart-total,
-.menu-nav li.menu-panier .cart-dropdown .cart-total p {
-    font-size: 1.4rem !important;
-    /* taille normale du panier */
-    line-height: 1.4 !important;
-}
 
 
 /* ===================== BOUTONS VOIR PANIER ET COMMANDER ===================== */
@@ -605,4 +589,31 @@ img {
 
 .menu-nav .separator {
     font-size: 1.1rem !important;
+}
+
+/* ===================== PAGES SHOW PRODUITS ===================== */
+
+.page-show-product {
+    font-size: 0.9rem;
+}
+
+.page-show-product h1 {
+    font-size: 1.6rem;
+}
+
+.page-show-product h2 {
+    font-size: 1.3rem;
+}
+
+.page-show-product h3 {
+    font-size: 1.1rem;
+}
+
+.trottinette-caracteristiques {
+    max-width: 80%;
+    margin: 0 auto;
+}
+
+.section-pergo-list .title h1 {
+    font-size: 1.6rem;
 }
