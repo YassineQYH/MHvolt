@@ -1,5 +1,4 @@
 /* ======== Colors ========== */
-
 :root {
     --default-color: #e71247;
     --default-color2: #d64569;
@@ -9,6 +8,12 @@
     --grey-color-alt: #8492a6;
     --yellow: #ffcc00;
     --white: #fff;
+}
+
+/* ======== Global Page Show Product ========== */
+.page-show-product {
+    line-height: 1.6;
+    color: var(--dark-color);
 }
 
 .page-show-product ul,
@@ -31,12 +36,7 @@
     font-weight: 600;
 }
 
-.page-show-product {
-    line-height: 1.6;
-    color: var(--dark-color);
-}
-
-/* remplace .container */
+/* Container */
 .page-show-product .container {
     max-width: 114rem;
     padding: 0 1rem;
@@ -49,10 +49,7 @@
     }
 }
 
-
-
-/* ========== Product ========== */
-
+/* ======== Product Section ========== */
 .rating svg {
     width: 1.8rem;
     height: 1.8rem;
@@ -77,28 +74,7 @@
     font-weight: 500;
 }
 
-@media only screen and (max-width: 567px) {
-    .product .img__container {
-        height: 15rem;
-    }
-    .rating svg {
-        width: 1.5rem;
-        height: 1.5rem;
-    }
-    .product__bottom a:link,
-    .product__bottom a:visited {
-        display: inline-block;
-        padding: 0.6rem 3rem;
-        font-size: 1.4rem;
-    }
-    .product__bottom h3 {
-        font-size: 1.6rem;
-    }
-}
-
-
-/* =========== Cart Slide =========== */
-
+/* ======== Cart Slide / Slider Section ========== */
 .cart__slide {
     padding-bottom: 30rem;
 }
@@ -112,9 +88,9 @@
 .image__holder {
     display: flex;
     justify-content: center; /* centre horizontalement */
-    align-items: flex-start; /* aligne en haut */
-    height: 25rem; /* même que l'image */
-    margin-left: 25rem; /* décale l'image vers la droite */
+    align-items: center; /* centre verticalement */
+    height: 25rem; /* tu peux ajuster selon la taille de l'image */
+    margin-left: 0; /* supprime le décalage inutile */
 }
 
 .image__holder img {
@@ -122,11 +98,13 @@
     height: 25rem;
     object-fit: contain; /* garde toute l'image */
 }
+
 .cart__details {
     text-align: center; /* centre tout le contenu du bloc (h1 et p) */
     margin-top: -6rem; /* réduit l'espace depuis la promo */
     margin-bottom: 3rem; /* espace sous le bloc avant le slider */
 }
+
 .cart__details h1 {
     font-size: 5rem;
     line-height: 1.2;
@@ -204,21 +182,17 @@
     color: var(--grey-color);
 }
 
+/* Slider bullets */
 .glide__bullets {
     bottom: -25%;
     left: 50%;
-    /* remet bien à gauche */
     transform: translateX(-50%);
-    /* occupe toute la largeur */
     display: flex;
     justify-content: center;
-    /* centre les miniatures */
     gap: 10px;
-    /* espace entre elles */
     max-width: 100%;
     overflow: visible;
     margin-left: 10rem;
-
 }
 
 .glide__bullet {
@@ -246,7 +220,6 @@
     width: 100%;
     height: 100%;
     object-fit: contain;
-    /* ou cover si tu veux remplir totalement */
     display: block;
 }
 
@@ -269,11 +242,10 @@
     object-fit: contain;
 }
 
+/* Slider arrows */
 .glide__arrow {
     background-color: transparent;
     color: var(--grey-color-alt);
-    text-shadow: 0 0 0 rgba(0, 0, 0, 0);
-    box-shadow: 0 0 0 rgba(0, 0, 0, 0);
     box-shadow: 0;
     padding: 1.3rem 3rem;
     border: 1px solid var(--grey-color-alt);
@@ -292,95 +264,20 @@
     border: 1px solid var(--grey-color-alt);
 }
 
-@media only screen and (max-width: 1200px) {
-    .glide__bullet {
-        width: 15rem;
-        height: 15rem;
-    }
-    .thumbnail {
-        width: 15rem;
-        height: 15rem;
-    }
-    .thumbnail img {
-        height: 12rem;
-    }
+/* Flèches position */
+.glide__arrow--left {
+    left: 20% !important; /* décaler vers le centre */
+    transform: translateY(-50%);
+    position: absolute;
 }
 
-@media only screen and (max-width: 996px) {
-    .cart__slide {
-        padding-bottom: 20rem;
-    }
-    .cart__like {
-        display: grid;
-        grid-template-columns: 2fr 1.5fr;
-        gap: 0 1rem;
-        padding: 1.6rem 1rem;
-    }
-    .image__holder img {
-        width: 40rem;
-        height: 45rem;
-    }
-    .cart__details .btn__group button {
-        font-size: 1.4rem;
-        width: 12rem;
-    }
-    .glide__bullet {
-        width: 15rem;
-        height: 15rem;
-    }
-    .thumbnail {
-        width: 15rem;
-        height: 15rem;
-    }
-    .thumbnail img {
-        height: 12rem;
-    }
+.glide__arrow--right {
+    right: 0%; /* reste collée à droite */
+    transform: translateY(-50%);
+    position: absolute;
 }
 
-@media only screen and (max-width: 768px) {
-    .cart__like {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 0 1rem;
-        padding: 1.6rem 1rem;
-    }
-    .image__holder img {
-        width: 30rem;
-        height: 35rem;
-    }
-    .cart__details h1 {
-        font-size: 4rem;
-    }
-    .cart__details .btn__group button:not(:last-child) {
-        margin-bottom: 1rem;
-    }
-    .glide__bullet {
-        width: 10rem;
-        height: 10rem;
-    }
-    .thumbnail {
-        width: 10rem;
-        height: 10rem;
-    }
-    .thumbnail img {
-        height: 8rem;
-    }
-}
-
-@media only screen and (max-width: 567px) {
-    .cart__slide {
-        padding-bottom: 3rem;
-    }
-    .glide__bullet {
-        display: none;
-    }
-    .cart__like {
-        grid-template-columns: 1fr;
-        gap: 2rem 0rem;
-        padding: 1.6rem 1rem;
-    }
-}
-
+/* Slide image wrapper */
 .slide-img {
     position: relative;
 }
@@ -390,20 +287,179 @@
     box-sizing: border-box;
 }
 
+/* Container show product */
 .container-show-product {
     max-width: 1280px;
     margin: 0 auto;
 }
-/* Flèche gauche */
-.glide__arrow--left {
-    left: 20% !important; /* décaler vers le centre */
-    transform: translateY(-50%);
-    position: absolute;
+
+/* ======== Slider / Miniatures / Boutons - Media Queries Ajustées ======== */
+
+/* Large screens - à partir de 1200px */
+@media only screen and (max-width: 1200px) {
+    .image__holder img {
+        width: 32rem;
+        height: auto;
+        max-height: 25rem;
+    }
+
+    .glide__bullet {
+        width: 12rem;
+        height: 8rem; /* ratio respecté */
+    }
+    .thumbnail {
+        width: 12rem;
+        height: 8rem;
+    }
 }
 
-/* Flèche droite (si tu veux garder sa position actuelle) */
-.glide__arrow--right {
-    right: 0%; /* reste collée à droite */
-    transform: translateY(-50%);
-    position: absolute;
+/* Entre 1070px et 1200px */
+@media only screen and (max-width: 1069px) {
+    .image__holder img {
+        width: 30rem;
+        max-height: 24rem;
+    }
+
+    .glide__bullet {
+        width: 11.5rem;
+        height: 7.5rem;
+    }
+    .thumbnail {
+        width: 11.5rem;
+        height: 7.5rem;
+    }
 }
+
+/* Entre 990px et 1070px */
+@media only screen and (max-width: 990px) {
+    .image__holder img {
+        width: 28rem;
+        max-height: 23rem;
+    }
+
+    .glide__bullet {
+        width: 11rem;
+        height: 7rem;
+    }
+    .thumbnail {
+        width: 11rem;
+        height: 7rem;
+    }
+
+    .cart__details .btn__group {
+        margin-left: 10%; /* décale un peu vers la droite */
+    }
+}
+
+/* Entre 913px et 990px */
+@media only screen and (max-width: 913px) {
+    .image__holder img {
+        width: 26rem;
+        max-height: 22rem;
+    }
+
+    .glide__bullet {
+        width: 10.5rem;
+        height: 6.5rem;
+    }
+    .thumbnail {
+        width: 10.5rem;
+        height: 6.5rem;
+    }
+
+    .cart__details .btn__group {
+        margin-left: 15%; /* un peu plus sur la droite */
+    }
+}
+
+/* Entre 830px et 913px */
+@media only screen and (max-width: 830px) {
+    .image__holder img {
+        width: 24rem;
+        max-height: 20rem;
+    }
+
+    .glide__bullet {
+        width: 10rem;
+        height: 6rem;
+    }
+    .thumbnail {
+        width: 10rem;
+        height: 6rem;
+    }
+
+    .cart__details .btn__group {
+        margin-left: 20%;
+    }
+}
+
+/* Entre 768px et 830px */
+@media only screen and (max-width: 768px) {
+    .image__holder img {
+        width: 22rem;
+        max-height: 18rem;
+    }
+
+    .glide__bullet {
+        width: 9rem;
+        height: 5.5rem;
+    }
+    .thumbnail {
+        width: 9rem;
+        height: 5.5rem;
+    }
+
+    .cart__details .btn__group {
+        margin-left: 25%;
+    }
+}
+
+/* Entre 575px et 768px */
+@media only screen and (max-width: 575px) {
+    .image__holder img {
+        width: 18rem;
+        max-height: 16rem;
+    }
+
+    .glide__bullet {
+        width: 8rem;
+        height: 5rem;
+    }
+    .thumbnail {
+        width: 8rem;
+        height: 5rem;
+    }
+
+    .cart__details .btn__group {
+        margin-left: 35%; /* plus sur la droite pour petits écrans */
+    }
+}
+
+/* Extra small screens - < 567px */
+@media only screen and (max-width: 567px) {
+    .image__holder img {
+        width: 100%;
+        max-height: 18rem;
+    }
+
+    .glide__bullet {
+        width: 6rem;
+        height: 4rem;
+        display: inline-flex;
+    }
+    .thumbnail {
+        width: 100%;
+        height: auto;
+    }
+    .thumbnail img {
+        object-fit: cover;
+        width: 100%;
+        height: auto;
+    }
+
+    .cart__details .btn__group {
+        margin-left: 40%; /* bouton bien à droite */
+    }
+}
+
+
