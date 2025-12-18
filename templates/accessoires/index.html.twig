@@ -11,16 +11,16 @@
 
 {% block content %}
 
-    <section class="section-pergo-list" id="pergo-list">
+    <section class="section-product-list" id="product-list">
         <div class="title">
             <h1>Nos Accessoirs</h1>
             <p>Lorem ipsum dolor, sit amet consectetur adipisicing.</p>
         </div>
 
 
-        <div class="container-pergo-list pergo-list-center">
+        <div class="container-product-list product-list-center">
             {%for item in accessory %}
-                <div class="pergo-list-box" data-aos="fade" data-aos-duration="2000">
+                <div class="product-list-box" data-aos="fade" data-aos-duration="2000">
                     <a href="{{ path('accessoire', { 'slug' : item.slug } ) }}"> <img src="/uploads/accessoires/{{ item.image }}" alt="" /></a>
                     <p>Titre : {{ item.name }}</p>
                 </div>

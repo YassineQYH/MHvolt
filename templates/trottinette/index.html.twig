@@ -32,16 +32,16 @@
 
 {% block content %}
 
-    <section class="section-pergo-list" id="pergo-list">
+    <section class="section-product-list" id="product-list">
         <div class="title">
             <h1>Nos Trottinettes</h1>
             <p>Lorem ipsum dolor, sit amet consectetur adipisicing.</p>
         </div>
 
 
-        <div class="container-pergo-list pergo-list-center" style="color:black;">
+        <div class="container-product-list product-list-center" style="color:black;">
             {%for item in trottinettes %}
-                <div class="pergo-list-box" data-aos="fade" data-aos-duration="2000">
+                <div class="product-list-box" data-aos="fade" data-aos-duration="2000">
                     <a href="{{ path('trottinette_show', { 'slug' : item.slug } ) }}"> <img src="/uploads/{{ item.image }}" alt="" /></a>
                     <p>Titre : {{ item.name }}</p>
                 </div>

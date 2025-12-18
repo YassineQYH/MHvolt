@@ -56,7 +56,7 @@
 
 /* About Section */
 
-.section-pergo-list {
+.section-product-list {
     padding: 8rem 0 7rem 0;
     overflow-x: hidden;
     /* padding-top: 10rem; */
@@ -272,21 +272,42 @@
 }
 
 
-/* Section Liste Pergola */
+/* Section Liste Produits */
 
-.container-pergo-list {
-    max-width: 180rem;
+.container-product-list {
+    max-width: 150rem;
     margin: 0 auto;
     padding: 0 3rem;
 }
 
-.pergo-list-center {
+.product-list-center {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 3rem;
 }
 
-.pergo-list-box {
+/* Tablette */
+@media (max-width: 1200px) {
+    .container-product-list {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .container-product-list {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Petit mobile */
+@media (max-width: 480px) {
+    .container-product-list {
+        grid-template-columns: 1fr;
+    }
+}
+
+.product-list-box {
     max-width: 45rem;
     margin: 0 auto;
     padding: 1.6rem;
@@ -294,13 +315,13 @@
     border-radius: 0.5rem;
 }
 
-.pergo-list-box img {
+.product-list-box img {
     object-fit: cover;
     max-width: 400px;
-    max-height: 300px;
+    max-height: 250px;
 }
 
-.pergo-list-box p {
+.product-list-box p {
     padding: 1.6rem 0;
     font-size: 1.8rem;
 }
@@ -327,20 +348,20 @@
 }
 
 @media only screen and (max-width: 1390px) {
-    .pergo-list-center {
+    .product-list-center {
         grid-template-columns: repeat(2, 1fr);
     }
 }
 
 @media only screen and (max-width: 915px) {
-    .pergo-list-center {
+    .product-list-center {
         grid-template-columns: repeat(2, 1fr);
     }
-    .pergo-list-box {
+    .product-list-box {
         max-width: 35rem;
         padding: 1.6rem;
     }
-    .pergo-list-box img {
+    .product-list-box img {
         max-width: 300px;
         max-height: 200px;
     }
@@ -350,18 +371,18 @@
     .container-home img {
         padding: 2rem 0;
     }
-    .pergo-list-box {
+    .product-list-box {
         max-width: 65rem;
         padding: 1.6rem;
     }
-    .pergo-list-box img {
+    .product-list-box img {
         max-width: 700px;
         max-height: 350px;
     }
 }
 
 @media only screen and (max-width: 748px) {
-    .pergo-list-center {
+    .product-list-center {
         grid-template-columns: 1fr;
         gap: 3rem;
     }
@@ -380,11 +401,11 @@
     .container-home img {
         padding: 2rem 0;
     }
-    .pergo-list-box {
+    .product-list-box {
         max-width: 45rem;
         padding: 1.6rem;
     }
-    .pergo-list-box img {
+    .product-list-box img {
         max-width: 400px;
         max-height: 300px;
     }
@@ -394,11 +415,11 @@
     .container-home img {
         padding: 2rem 0;
     }
-    .pergo-list-box {
+    .product-list-box {
         max-width: 35rem;
         padding: 1.6rem;
     }
-    .pergo-list-box img {
+    .product-list-box img {
         max-width: 300px;
         max-height: 200px;
     }
@@ -408,11 +429,11 @@
     .container-home img {
         padding: 2rem 0;
     }
-    .pergo-list-box {
+    .product-list-box {
         max-width: 35rem;
         padding: 1.6rem;
     }
-    .pergo-list-box img {
+    .product-list-box img {
         max-width: 280px;
         max-height: 200px;
     }
@@ -422,11 +443,11 @@
     .container-home img {
         padding: 2rem 0;
     }
-    .pergo-list-box {
+    .product-list-box {
         max-width: 30rem;
         padding: 1.6rem;
     }
-    .pergo-list-box img {
+    .product-list-box img {
         max-width: 240px;
         max-height: 170px;
     }
@@ -436,11 +457,11 @@
     .container-home img {
         padding: 2rem 0;
     }
-    .pergo-list-box {
+    .product-list-box {
         max-width: 25rem;
         padding: 1.6rem;
     }
-    .pergo-list-box img {
+    .product-list-box img {
         max-width: 200px;
         max-height: 150px;
     }
@@ -581,6 +602,6 @@
 .page-show-product h3 {
     font-size: 1.1rem;
 }
-.section-pergo-list .title h1 {
+.section-product-list .title h1 {
     font-size: 1.6rem;
 }

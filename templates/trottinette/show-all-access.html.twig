@@ -20,16 +20,16 @@
     {% include 'partials/promos.html.twig' %}
 
     <div class="accessoires-wrapper">
-        <section class="section-pergo-list" id="pergo-list">
+        <section class="section-product-list" id="product-list">
             <div class="title">
                 <h1>Accessoires pour {{ trottinette.name }}</h1>
                 <p>Découvrez tous les accessoires compatibles</p>
             </div>
 
-            <div class="container-pergo-list pergo-list-center">
+            <div class="container-product-list product-list-center">
                 {% if accessoires is not empty %}
                     {% for item in accessoires %}
-                        <div class="pergo-list-box" data-aos="fade" data-aos-duration="2000">
+                        <div class="product-list-box" data-aos="fade" data-aos-duration="2000">
                             <a href="{{ path('accessory_show', { 'slug' : item.slug }) }}">
                                 {% set image = item.illustrations|first %}
                                 <img src="/uploads/accessoires/{{ image ? image.image : 'default.jpg' }}" alt="{{ item.name }}">

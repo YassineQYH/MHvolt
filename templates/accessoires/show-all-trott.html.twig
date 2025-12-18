@@ -9,15 +9,15 @@
 {% endblock %}
 
 {% block content %}
-    <section class="section-pergo-list" id="pergo-list">
+    <section class="section-product-list" id="product-list">
         <div class="title">
             <h1>Trottinettes compatibles avec {{ accessory.name }}</h1>
             <p>Découvrez toutes les trottinettes pour cet accessoire</p>
         </div>
 
-        <div class="container-pergo-list pergo-list-center">
+        <div class="container-product-list product-list-center">
             {% for trott in trotinettes %}
-                <div class="pergo-list-box" data-aos="fade" data-aos-duration="2000">
+                <div class="product-list-box" data-aos="fade" data-aos-duration="2000">
                     <a href="{{ path('app_trotinette_show', { slug: trott.slug }) }}">
                         <img src="/uploads/{{ trott.image }}" alt="{{ trott.name }}">
                     </a>
