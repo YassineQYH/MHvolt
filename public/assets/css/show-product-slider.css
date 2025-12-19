@@ -229,7 +229,7 @@
         position: relative;
     }
     .cart__buttons { width: auto; max-width: 12rem; margin-left: auto; align-items: flex-end; gap: 0.5rem; }
-    .image__holder { width: 100%; max-width: none; height: 21rem; }
+    .image__holder { width: 100%; max-width: none; height: 100%; }
 
     .glide__arrow { top: 0rem; padding:0.8rem; }
     .glide__arrow--left { left: 10rem; }
