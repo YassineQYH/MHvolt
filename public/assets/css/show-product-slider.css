@@ -161,176 +161,168 @@
 /* =================== RESPONSIVE ====================== */
 /* ===================================================== */
 
+/* <= 1680px : miniatures larges, plus de 4 sur une ligne */
+@media (max-width: 1680px) {
+    .glide__bullet { flex: 0 1 50%; width: 10rem; height: auto; aspect-ratio: 16/9; margin-bottom: 0.5rem; }
+}
+/* <= 1395px : miniatures larges, plus de 4 sur une ligne */
+@media (max-width: 1395px) {
+    .glide__bullet { flex: 0 1 50%; width: 8rem; height: auto; aspect-ratio: 16/9; margin-bottom: 0.5rem; }
+    /* .glide__arrow { top: 0rem; padding:0.8rem; } */
+    .glide__arrow--left { left: 10rem; }
+    .glide__arrow--right { right: 2rem; }
+}
 /* <= 1200px : miniatures larges, plus de 4 sur une ligne */
 @media (max-width: 1200px) {
-    .image__holder { height: 23rem; }
-    .glide__bullet { width: 11rem; height: 7.5rem; }
+    .glide__bullet { flex: 0 1 50%; width: 7rem; height: auto; aspect-ratio: 16/9; margin-bottom: 0.5rem; }
+}
+/* <= 1111px : miniatures larges, plus de 4 sur une ligne */
+@media (max-width: 1111px) {
+    .glide__bullet { flex: 0 1 50%; width: 6rem; height: auto; aspect-ratio: 16/9; margin-bottom: 0.5rem; }
+}
+/* 1000px - 992px : jusqu'à 4 miniatures par ligne */
+@media (max-width: 1000px) and (min-width: 993px) {
+    .image__holder { height: 22rem; max-width: 100%; }
     .glide__bullets {
         display: flex;
-        justify-content: flex-start; /* commence à gauche */
-        gap: 1rem;
-        flex-wrap: nowrap; /* une seule ligne */
-    }
-}
-
-/* 1000px - 992px : jusqu'à 4 miniatures par ligne, décalées à droite */
-@media (max-width: 1000px) and (min-width: 993px) {
-    .glide__bullet { width: 10rem; height: 6.5rem; }
-    .glide__bullets {
-        justify-content: flex-end;
-        gap: 1rem;
-        flex-wrap: nowrap;
-    }
-}
-
-/* 991px - 769px : miniatures un peu plus petites, toujours sur une ligne */
-@media (max-width: 991px) and (min-width: 769px) {
-    .image__holder { height: 21rem; }
-    .glide__bullet { width: 9.5rem; height: 6rem; }
-    .glide__bullets {
-        justify-content: flex-end;
+        flex-wrap: wrap;
         gap: 0.8rem;
-        flex-wrap: nowrap;
+        justify-content: flex-start;
+        position: relative;
+        margin-top: 1rem;
     }
+    .glide__bullet { width: 10rem; height: 6.5rem; flex: 0 1 auto; aspect-ratio: 16/9; }
+}
+
+/* 991px - 769px : miniatures un peu plus petites */
+@media (max-width: 991px) and (min-width: 769px) {
+    .arrival__slide {
+        display: grid;
+        grid-template-columns: 1fr max-content;
+        gap: 1rem;
+        align-items: start;
+        position: relative;
+    }
+    .cart__buttons { width: auto; max-width: 12rem; margin-left: auto; align-items: flex-end; gap: 0.5rem; }
+    .image__holder { width: 100%; max-width: none; height: 21rem; }
+
+    .glide__arrow { top: 0rem; padding:0.8rem; }
+    .glide__arrow--left { left: 10rem; }
+    .glide__arrow--right { right: -1rem; }
+
+    .glide__bullets {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.8rem;
+        justify-content: flex-start;
+        position: relative;
+        margin-top: 1.5rem;
+    }
+    .glide__bullet { width: 8rem; height: 7rem; flex: 0 1 auto; aspect-ratio: 16/9; }
+
+    .cart__details h1{ font-size: 1.3rem !important; }
+    .cart__details p{ font-size: 1rem; }
 }
 
 /* 768px - 651px : slider et boutons en colonne + miniatures plus larges */
 @media (max-width: 768px) and (min-width: 651px) {
-    .arrival__slide { grid-template-columns: 1fr; }
-    .cart__buttons { align-items: flex-end; gap: 1rem; }
-    .image__holder { height: 22rem; }
+    .arrival__slide {
+        display: grid;
+        grid-template-columns: 1fr max-content;
+        gap: 1rem;
+        align-items: start;
+        position: relative;
+    }
+    .cart__buttons { width: auto; max-width: 5rem; margin-left: auto; align-items: flex-end; gap: 0.5rem; }
+    .image__holder { width: 100%; max-width: none; }
 
-    .glide__arrow { top: 0rem; padding:0.8rem}
-    .glide__arrow--left { left: 5rem; }   /* ajuste flèches si besoin */
-    .glide__arrow--right { right: -8rem; }
+    .glide__arrow { top: 0rem; padding:0.8rem; }
+    .glide__arrow--left { left: 5rem; }
+    .glide__arrow--right { right: 4rem; }
 
     .glide__bullets {
-        justify-content: flex-start;  /* miniatures commencent à gauche */
-        margin-left: 10rem;           /* décale tout le conteneur vers la droite */
-        flex-wrap: wrap;              /* permet de passer sur plusieurs lignes si nécessaire */
-        gap: 0.5rem;                  /* espace entre les miniatures */
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        justify-content: flex-start;
+        position: relative;
+        margin-top: 2rem;
     }
+    .glide__bullet { flex: 0 1 25%; width: 35rem; height: auto; aspect-ratio: 16/9; margin-bottom: 0.5rem; }
 
-    .glide__bullet {
-        flex: 0 1 25%;                /* largeur de chaque miniature */
-        aspect-ratio: 16/9;
-        width: 35rem;                 /* ajuste selon rendu souhaité */
-        height: auto;
-        margin-bottom: 0.5rem;
-    }
-    .cart__details h1{
-        font-size: 1.3rem !important;
-    }
-    .cart__details p{
-        font-size: 1rem;
-    }
+    .cart__details h1{ font-size: 1.3rem !important; }
+    .cart__details p{ font-size: 1rem; }
 }
-
 
 /* 650px - 551px : miniatures 3 par ligne */
 @media (max-width: 650px) and (min-width: 551px) {
-    .glide__bullets {
-        justify-content: flex-start;
-        margin-left:10rem;
-        flex-wrap: wrap;
-        gap: 0.5rem;
-    }
-    .glide__bullet {
-        flex: 0 1 29%; /* largeur un peu plus grande que 32% */
-        aspect-ratio: 16/9;
-        width: 25rem;
-        height: auto;
-        margin-bottom: 0.5rem;
-    }
-    .cart__buttons { align-items: flex-end; gap: 1rem; }
+    .arrival__slide { display: grid; grid-template-columns: 1fr max-content; gap: 1rem; align-items: start; }
+    .cart__buttons { width: auto; max-width: 5rem; margin-left: auto; align-items: flex-end; gap: 0.5rem; }
+    .image__holder { width: 100%; max-width: none; }
+
+    .glide__arrow { top: 0rem; padding:0.8rem; }
     .glide__arrow--left { left: 2rem; }
-    .glide__arrow--right { right: -12rem; }
+    .glide__arrow--right { right: 4rem; }
+
+    .glide__bullets {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        justify-content: flex-start;
+        position: relative;
+        margin-top: 2rem;
+    }
+    .glide__bullet { flex: 0 1 25%; width: 45rem !important; height: auto; aspect-ratio: 16/9; margin-bottom: 0.5rem; }
+    .cart__details h1{ font-size: 1.2rem !important; }
+    .cart__details p{ font-size: 1rem; }
 }
 
-/* <= 576px : réduire la taille du slider */
-@media (max-width: 576px) {
-    .glide__arrow { top: -1rem; padding:0.7rem}
-    .glide__arrow--left { left: 5rem; }
-    .glide__arrow--right { right: -10rem; }
-    .cart__details h1{
-        font-size: 1.3rem !important;
-    }
-    .cart__details p{
-        font-size: 1rem;
-    }
-}
-
-/* <= 550px : miniatures 3 par ligne */
+/* <= 550px : miniatures 3 par ligne, boutons à droite */
 @media (max-width: 550px) {
+    .arrival__slide { display: block; }
+    .cart__buttons { width: auto; max-width: 100%; margin-left: auto; align-items: flex-end; gap: 0.5rem; }
+    .image__holder { width: 100%; max-width: none; }
+
     .glide__arrow { top: -1rem; padding:0.7rem; }
     .glide__arrow--left { left: 1rem; }
     .glide__arrow--right { right: -8rem; }
 
-    .cart__details h1{
-        font-size: 1.3rem !important;
-    }
-    .cart__details p{
-        font-size: 1rem;
-    }
-
-    /* Déplace boutons à droite pour libérer de la place */
-    .cart__buttons {
-        align-items: flex-end;
-        margin-left: auto;  /* pousse à droite */
-        gap: 0.5rem;
-    }
-
-    /* Conteneur des miniatures */
     .glide__bullets {
+        display: flex;
         flex-wrap: wrap;
-        justify-content: flex-start;
         gap: 0.5rem;
-        left:10rem;
-        top:20rem;
+        justify-content: flex-start;
+        position: relative;
+        margin-top: 2rem;
+        left: 0;
     }
+    .glide__bullet { flex: 0 1 32%; width: 20rem; height: auto; aspect-ratio: 16/9; margin-bottom: 0.5rem; }
 
-    /* Miniatures 3 par ligne */
-    .glide__bullet {
-        flex: 0 1 29%;  /* 3 miniatures par ligne */
-        width: 20rem;
-    }
+    .cart__details h1{ font-size: 1.3rem !important; }
+    .cart__details p{ font-size: 1rem; }
 }
 
-/* <= 550px : miniatures 3 par ligne */
+/* <= 405px : miniatures 2 par ligne */
 @media (max-width: 405px) {
+    .arrival__slide { display: block; }
+    .cart__buttons { width: auto; max-width: 100%; margin-left: auto; align-items: flex-end; gap: 0.5rem; }
+    .image__holder { width: 100%; max-width: none; }
+
     .glide__arrow { top: -1rem; padding:0.7rem; }
     .glide__arrow--left { left: 1rem; }
     .glide__arrow--right { right: -8rem; }
 
-    .cart__details h1{
-        font-size: 1.3rem !important;
-    }
-    .cart__details p{
-        font-size: 1rem;
-    }
-
-    /* Déplace boutons à droite pour libérer de la place */
-    .cart__buttons {
-        align-items: flex-end;
-        margin-left: auto;  /* pousse à droite */
-        gap: 0.5rem;
-    }
-
-    /* Conteneur des miniatures */
     .glide__bullets {
+        display: flex;
         flex-wrap: wrap;
-        justify-content: flex-start;
         gap: 0.5rem;
-        left:10rem;
-        top:20rem;
+        justify-content: flex-start;
+        position: relative;
+        margin-top: 1.5rem;
+        left: 0;
     }
+    .glide__bullet { flex: 0 1 48%; width: 18rem; height: auto; aspect-ratio: 16/9; margin-bottom: 0.5rem; }
 
-    /* Miniatures 3 par ligne */
-    .glide__bullet {
-        flex: 0 1 29%;  /* 3 miniatures par ligne */
-        width: 20rem;
-    }
+    .cart__details h1{ font-size: 1.2rem !important; }
+    .cart__details p{ font-size: 0.95rem; }
 }
-
-
-
