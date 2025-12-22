@@ -1,0 +1,23 @@
+<IfModule mod_rewrite.c>
+    Options +FollowSymLinks
+    RewriteEngine On
+
+    # Si le fichier ou le dossier existe, ne pas réécrire
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    # Redirige tout vers index.php
+    RewriteRule ^ index.php [QSA,L]
+</IfModule>
+
+# Empêche l'accès aux fichiers sensibles
+<FilesMatch "(^\.|\.env|\.htaccess|composer\.(json|lock)|symfony.lock)">
+    Require all denied
+</FilesMatch>
+
+# Pour les anciennes versions d'Apache
+<IfModule !mod_authz_core.c>
+    Order Allow,Deny
+    Deny from all
+</IfModule>
