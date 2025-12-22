@@ -65,11 +65,18 @@ class AccessoryCrudController extends AbstractCrudController
                 ->setFormTypeOption('by_reference', false)
                 ->onlyOnForms(), // visible uniquement dans le formulaire
 
-            CollectionField::new('trottinetteAccessories', 'Trottinettes associées')
-                ->allowAdd()
-                ->allowDelete()
-                ->setEntryType(TrottinetteAccessory::class)
-                ->setFormTypeOption('by_reference', false),
+            AssociationField::new('trottinetteAccessories', 'Trottinettes associées')
+                ->onlyOnDetail()
+                ->formatValue(function ($v, $entity) {
+                    $html = '<ul>';
+                    foreach ($entity->getTrottinetteAccessories() as $ta) {
+                        $html .= '<li>' . $ta->getTrottinette()?->getName() . '</li>';
+                    }
+                    $html .= '</ul>';
+                    return $html;
+                })
+                ->renderAsHtml(),
+
 
             // ======================
             // DATE (facultatif)
