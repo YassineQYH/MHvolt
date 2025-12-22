@@ -64,6 +64,12 @@ class Product
         return 'produits';
     }
 
+    public function getFirstIllustration(): ?string
+    {
+        $illustration = $this->illustrations->first();
+        return $illustration ? $illustration->getImage() : null;
+    }
+
     public function __construct()
     {
         $this->illustrations = new ArrayCollection();

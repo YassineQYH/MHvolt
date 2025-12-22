@@ -33,8 +33,9 @@ class Weight
 
     public function __toString(): string
     {
-        return (string)$this->kg;
+        return $this->kg . ' kg';
     }
+
 
     public function getId(): ?int { return $this->id; }
 

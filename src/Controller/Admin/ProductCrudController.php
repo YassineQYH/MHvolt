@@ -4,6 +4,9 @@ namespace App\Controller\Admin;
 
 use App\Entity\Product;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Field\{
     IdField,
     TextField,
@@ -15,6 +18,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\{
     DateTimeField,
     CollectionField,
     FormField,
+    ImageField,
 };
 
 class ProductCrudController extends AbstractCrudController
@@ -24,6 +28,26 @@ class ProductCrudController extends AbstractCrudController
         return Product::class;
     }
 
+    public function configureActions(Actions $actions): Actions
+    {
+        return $actions
+            ->disable(Action::NEW, Action::EDIT, Action::DELETE) // interdit création, modification, suppression
+            ->add(Crud::PAGE_INDEX, Action::DETAIL) // ajoute l'action "Voir"
+            ->update(Crud::PAGE_INDEX, Action::DETAIL, function (Action $action) {
+                return $action
+                    ->setIcon('fa fa-eye')   // icône œil
+                    ->setCssClass('btn btn-info'); // style bouton visible
+            });
+    }
+
+    public function configureCrud(Crud $crud): Crud
+    {
+        return $crud
+            ->setEntityLabelInSingular('Produit')
+            ->setEntityLabelInPlural('Produits')
+            ->setDefaultSort(['id' => 'DESC']);
+    }
+
     public function configureFields(string $pageName): iterable
     {
         return [
@@ -31,14 +55,33 @@ class ProductCrudController extends AbstractCrudController
             // ----------- IDENTIFIANT -----------
             IdField::new('id')->hideOnForm(),
 
+            // ----------- TYPE DE PRODUIT -----------
+
+            ImageField::new('firstIllustration', 'Image principale')
+                ->onlyOnIndex()
+                ->formatValue(function ($value, $entity) {
+                    /** @var \App\Entity\Product $entity */
+                    $illustration = $entity->getIllustrations()->first();
+                    if (!$illustration) return null;
+
+                    // Retourne le chemin correct selon le type
+                    switch ($entity->getType()) {
+                        case 'trottinette':
+                            return '/uploads/trottinettes/' . $illustration->getImage();
+                        case 'accessoire':
+                            return '/uploads/accessoires/' . $illustration->getImage();
+                        default:
+                            return '/uploads/produits/' . $illustration->getImage();
+                    }
+                }),
+
             // ----------- INFO PRODUIT -----------
             FormField::addPanel('Informations générales'),
 
             TextField::new('name', 'Nom du produit'),
             TextField::new('slug')->hideOnIndex(),
 
-            TextEditorField::new('description', 'Description')
-                ->hideOnIndex(),
+            TextEditorField::new('description', 'Description'),
 
             // ----------- PRIX / STOCK -----------
             FormField::addPanel('Prix & Stock'),
@@ -60,10 +103,17 @@ class ProductCrudController extends AbstractCrudController
             // ----------- RELATIONS -----------
             FormField::addPanel('Données liées'),
 
-            AssociationField::new('weight', 'Poids'),
+            AssociationField::new('weight', 'Poids (Kg)'),
 
             AssociationField::new('tva', 'TVA'),
 
+            TextField::new('type', 'Type')
+                ->onlyOnIndex() // optionnel : visible seulement dans la liste
+                ->formatValue(function ($value, $entity) {
+                    /** @var \App\Entity\Product $entity */
+                    return ucfirst($entity->getType()); // Trottinette / Accessoire / Product
+                }),
+                
             // ----------- ILLUSTRATIONS : affichées mais non modifiées ici -----------
             FormField::addPanel('Illustrations'),
 
