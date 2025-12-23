@@ -6,6 +6,7 @@ use App\Entity\Accessory;
 use App\Entity\Promotion;
 use App\Entity\Trottinette;
 use App\Service\PromotionService;
+use App\Repository\WeightRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -13,12 +14,14 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 class Cart
 {
     private EntityManagerInterface $entityManager;
+    private WeightRepository $weightRepository;
     private ?SessionInterface $session;
     private float $reduction = 0.0;
 
-    public function __construct(EntityManagerInterface $entityManager, RequestStack $requestStack)
+    public function __construct(EntityManagerInterface $entityManager, RequestStack $requestStack, WeightRepository $weightRepository)
     {
         $this->entityManager = $entityManager;
+        $this->weightRepository = $weightRepository;
 
         // Récupère la session si elle existe
         $this->session = $requestStack->getSession();
@@ -140,13 +143,25 @@ class Cart
     {
         $totalWeight = 0.0;
         foreach ($this->getFull() as $element) {
-            $weightObj = $element['product']->getWeight();
-            if ($weightObj) {
-                $totalWeight += $weightObj->getKg() * $element['quantity'];
+            $weight = $element['product']->getWeight();
+            if (is_object($weight)) {
+                $totalWeight += $weight->getKg() * $element['quantity'];
+            } elseif (is_float($weight) || is_int($weight)) {
+                $totalWeight += $weight * $element['quantity'];
             }
         }
         return $totalWeight;
     }
+
+    public function getShippingPrice(): float
+    {
+        $totalWeight = $this->getTotalWeight();
+        $weightEntity = $this->weightRepository->findPriceByWeight($totalWeight);
+
+        return $weightEntity ? $weightEntity->getPrice() : 0.0;
+    }
+
+
 
     // ------------------- Réduction ------------------- Plus besoin de setReduction(), la valeur est toujours recalculée
     /* public function setReduction(float $montant): void
@@ -200,7 +215,7 @@ class Cart
     public function getLivraisonPrice(\App\Repository\WeightRepository $weightRepository): float
     {
         $poids = $this->getTotalWeight();
-        $weightEntity = $weightRepository->findByKgPrice($poids);
+        $weightEntity = $weightRepository->findPriceByWeight($poids);
         return $weightEntity ? $weightEntity->getPrice() : 0;
     }
 

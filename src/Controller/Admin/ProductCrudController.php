@@ -100,7 +100,7 @@ class ProductCrudController extends AbstractCrudController
 
             IntegerField::new('stock', 'Stock'),
 
-            BooleanField::new('isBest', 'Meilleure vente'),
+            BooleanField::new('isBest', 'Accueil'),
 
             // ----------- RELATIONS -----------
             FormField::addPanel('Données liées'),
