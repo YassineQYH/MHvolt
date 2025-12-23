@@ -49,6 +49,7 @@ class OrderController extends AbstractController
 
         // récupération de toutes les promos
         $allPromotions = $promoRepo->findAll();
+        $promoTitre = $cart->getDiscountName($promotionService, $allPromotions);
 
         $form = $this->createForm(OrderType::class, null, ['user' => $user]);
         $form->handleRequest($request);
@@ -182,6 +183,7 @@ class OrderController extends AbstractController
             'categories' => $categoryAccessoryRepository->findAll(),
             'promoDiscount' => $cart->getDiscountTTC($promotionService, $allPromotions),
             'promoCode' => $cart->getPromoCode(),
+            'promoTitre' => $promoTitre,
             'promoService' => $promotionService,
             'allPromotions' => $allPromotions,
         ]);
