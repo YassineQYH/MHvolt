@@ -52,7 +52,7 @@ class OrderSuccessController extends AbstractController
             ->findOneBy(['stripeSessionId' => $stripeSessionId]);
 
         if (!$order || $order->getUser() !== $this->getUser()) {
-            return $this->redirectToRoute('home');
+            return $this->redirectToRoute('app_home');
         }
 
         if ($order->getPaymentState() === 0) {

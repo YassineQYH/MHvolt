@@ -45,7 +45,21 @@
                     <tr>
                         <td><span class="badge badge-secondary">{{ order.reference }}</span></td>
                         <td>
-                            {# ton statut inchangé #}
+                            {% if order.paymentState == 0 %}
+                                <span class="badge bg-danger">Non payée</span>
+                            {% elseif order.paymentState == 1 %}
+                                {% if order.deliveryState == 0 %}
+                                    <span class="badge bg-secondary">Commande en attente</span>
+                                {% elseif order.deliveryState == 1 %}
+                                    <span class="badge bg-warning">Préparation en cours</span>
+                                {% elseif order.deliveryState == 2 %}
+                                    <span class="badge bg-info">Livraison en cours</span>
+                                {% elseif order.deliveryState == 3 %}
+                                    <span class="badge bg-success">Livrée</span>
+                                {% elseif order.deliveryState == 4 %}
+                                    <span class="badge bg-danger">Annulée</span>
+                                {% endif %}
+                             {% endif %}
                         </td>
                         <td>{{ order.createdAt|date('d/m/Y') }}</td>
                         <td>{{ order.carrierPrice|number_format(2, ',', '.') }} €</td>

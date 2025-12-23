@@ -76,11 +76,16 @@ class CartController extends BaseController
         foreach ($articlesPanier as $element) {
             $produit = $element['product'];
             $quantite = (int) $element['quantity'];
-            $poids = $produit->getWeight() ? (float) $produit->getWeight()->getKg() : 0.0;
+
+            // ⚠️ garder l'entité Weight pour Twig
+            $poids = $produit->getWeight() ?? 0.0; // directement le float
             $poidsTotal += $poids * $quantite;
         }
-        $poidsTarif = $weightRepository->findByKgPrice($poidsTotal);
+
+        // ⚠️ Ne PAS faire ->getPrice() ici si tu veux afficher kg dans Twig
+        $poidsTarif = $weightRepository->findPriceByWeight($poidsTotal); // entité Weight
         $prixLivraison = $poidsTarif ? $poidsTarif->getPrice() : 0.0;
+
 
         // Promo
         $promoDiscount = method_exists($cart, 'getReduction') ? (float) $cart->getReduction($promotionService) : 0.0;
@@ -321,12 +326,10 @@ class CartController extends BaseController
             $total += $priceTTC * $item['quantity'];
 
             // Poids pour recalcul livraison
-            $productWeight = $item['product']->getWeight();
-            $kg = $productWeight ? $productWeight->getKg() : 0;
-            $poids += $kg * $item['quantity'];
+            $poids += ($item['product']->getWeight() ?? 0) * $item['quantity'];
         }
 
-        $poidsEntity = $weightRepository->findByKgPrice($poids);
+        $poidsEntity = $weightRepository->findPriceByWeight($poids);
         $livraison = $poidsEntity ? $poidsEntity->getPrice() : 0;
 
         return [

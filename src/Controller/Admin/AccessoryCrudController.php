@@ -58,7 +58,7 @@ class AccessoryCrudController extends AbstractCrudController
                     return $value->getName() . ' - ' . $value->getValue() . ' %';
                 }),
 
-            NumberField::new('manualWeight', 'Poids (kg)')
+            NumberField::new('weight', 'Poids (kg)')
                 ->setHelp('Entrez le poids exact du produit')
                 ->formatValue(function ($value, $entity) {
                     // On vérifie si c'est un entier

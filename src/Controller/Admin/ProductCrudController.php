@@ -11,7 +11,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\{
     IdField,
     TextField,
     TextEditorField,
-    MoneyField,
+    NumberField,
     IntegerField,
     BooleanField,
     AssociationField,
@@ -87,14 +87,15 @@ class ProductCrudController extends AbstractCrudController
             // ----------- PRIX / STOCK -----------
             FormField::addPanel('Prix & Stock'),
 
-            // Prix brut avec € dans la liste
-            IntegerField::new('price', 'Prix HT')
-                ->formatValue(function ($value) {
-                    return $value . ' €'; // affiché uniquement sur l'index
-                }),
+            // Index : affichage avec €
+            NumberField::new('price', 'Prix HT')
+                ->setNumDecimals(2)
+                ->formatValue(fn ($value) => number_format($value, 2, ',', ' ') . ' €')
+                ->onlyOnIndex(),
 
-            // Le même champ dans le formulaire, mais sans formatage
-            IntegerField::new('price', 'Prix HT')
+            // Formulaire : édition propre
+            NumberField::new('price', 'Prix HT')
+                ->setNumDecimals(2)
                 ->hideOnIndex(),
 
             IntegerField::new('stock', 'Stock'),
@@ -104,7 +105,13 @@ class ProductCrudController extends AbstractCrudController
             // ----------- RELATIONS -----------
             FormField::addPanel('Données liées'),
 
-            AssociationField::new('weight', 'Poids (Kg)'),
+            NumberField::new('weight', 'Poids (kg)')
+                ->formatValue(function ($value) {
+                    if (floor($value) == $value) {
+                        return $value . 'kg';
+                    }
+                    return number_format($value, 2, ',', '') . 'kg';
+                }),
 
             AssociationField::new('tva', 'TVA'),
 

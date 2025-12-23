@@ -26,16 +26,18 @@
 
     <strong>Statut de la commande :</strong>
     <td>
-        {% if order.paymentState == 1 and order.deliveryState == 0 %}
-            Paiement accepté / Commande validée
+        {% if order.paymentState == 0 %}
+            <span class="badge bg-danger">Non payée</span>
+        {% elseif order.deliveryState == 0 %}
+            <span class="badge bg-secondary">Commande validée</span>
         {% elseif order.deliveryState == 1 %}
-            Préparation en cours
+            <span class="badge bg-warning">Préparation en cours</span>
         {% elseif order.deliveryState == 2 %}
-            Livraison en cours
+            <span class="badge bg-info">Livraison en cours</span>
         {% elseif order.deliveryState == 3 %}
-            Livraison terminée
-        {% else %}
-            Commande en attente
+            <span class="badge bg-success">Livraison terminée</span>
+        {% elseif order.deliveryState == 4 %}
+            <span class="badge bg-danger">Annulée</span>
         {% endif %}
     </td><br>
 
@@ -83,7 +85,7 @@
                     </td>
 
                     <td>x{{ item.quantity }}</td>
-                    <td>{{ item.weight * item.quantity }} kg</td>
+                    <td>{{ (item.productEntity.weight ?? item.weight) * item.quantity }} kg</td>
                     <td>{{ item.price|number_format(2, ',', '.') }} €</td>
                     <td>{{ (item.price * (1 + item.tva / 100))|number_format(2, ',', '.') }} €</td>
                     <td>{{ totalItemHT|number_format(2, ',', '.') }} €</td>

@@ -80,13 +80,12 @@ class OrderController extends AbstractController
         foreach ($cart->getFull() as $element) {
             $produit = $element['product'];
             $quantite = (int) $element['quantity'];
-            $poids = $produit->getWeight() ? (float) $produit->getWeight()->getKg() : 0.0;
-
+            $poids = (float) $produit->getWeight(); // plus besoin de ->getKg()
             $poidsTotal += $poids * $quantite;
             $quantiteTotale += $quantite;
         }
 
-        $poidsTarif = $weightRepository->findByKgPrice($poidsTotal);
+        $poidsTarif = $weightRepository->findPriceByWeight($poidsTotal);
         $prixLivraison = $poidsTarif ? $poidsTarif->getPrice() : 0;
 
         // Contenu de l'adresse de livraison
@@ -152,7 +151,7 @@ class OrderController extends AbstractController
             $orderDetails->setMyOrder($order);
             $orderDetails->setProduct($produit->getName());
             $orderDetails->setProductEntity($produit);
-            $orderDetails->setWeight($produit->getWeight() ? (string) $produit->getWeight()->getKg() : '0');
+            $orderDetails->setWeight((string) $produit->getWeight());
             $orderDetails->setQuantity($quantite);
             $orderDetails->setPrice($produit->getPrice());
             $orderDetails->setTotal($produit->getPrice() * $quantite);
