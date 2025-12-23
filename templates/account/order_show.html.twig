@@ -7,12 +7,11 @@
     <h1>Ma commande {{ order.reference }}</h1>
     <a href="{{ path('account_order') }}">← Retour</a>
 
-    {# 🧾 Boutons PDF - petits et espacés #}
+    {# 🧾 Boutons PDF #}
     <div class="d-flex mt-3 mb-3">
         <a href="{{ path('account_order_invoice_web', { reference: order.reference }) }}"
-           class="btn btn-secondary btn-sm w-auto"
-           target="_blank"
-           style="margin-right: 10px;">
+           class="btn btn-secondary btn-sm w-auto me-2"
+           target="_blank">
             Voir la facture
         </a>
 
@@ -24,9 +23,12 @@
 
     <hr>
 
+    {# Statut de la commande #}
     <strong>Statut de la commande :</strong>
-    <td>
-        {% if order.paymentState == 0 %}
+    <div>
+        {% if order.deliveryState == 4 %}
+            <span class="badge bg-danger">Annulée</span>
+        {% elseif order.paymentState == 0 %}
             <span class="badge bg-danger">Non payée</span>
         {% elseif order.deliveryState == 0 %}
             <span class="badge bg-secondary">Commande validée</span>
@@ -36,10 +38,10 @@
             <span class="badge bg-info">Livraison en cours</span>
         {% elseif order.deliveryState == 3 %}
             <span class="badge bg-success">Livraison terminée</span>
-        {% elseif order.deliveryState == 4 %}
-            <span class="badge bg-danger">Annulée</span>
+        {% else %}
+            <span class="badge bg-secondary">En attente</span>
         {% endif %}
-    </td><br>
+    </div><br>
 
     <strong>Commande passée le :</strong> {{ order.createdAt|date('d/m/Y') }}<br>
     <strong>Référence de ma commande :</strong> <small>{{ order.reference }}</small><br>
@@ -62,28 +64,20 @@
         <tbody>
             {% set totalHT = 0 %}
             {% set totalTTC = 0 %}
+
             {% for item in order.orderDetails %}
                 {% set totalItemHT = item.price * item.quantity %}
-                {% set tvaItem = totalItemHT * (item.tva / 100) %}
-                {% set totalItemTTC = totalItemHT + tvaItem %}
-
+                {% set totalItemTTC = totalItemHT * (1 + (item.tva / 100)) %}
                 <tr>
                     <td>
-                        {% if item.productEntity is defined and item.productEntity %}
-                            {% set illustration = item.productEntity.illustrations|first %}
-                            {% if illustration %}
-                                <img src="/uploads/{{ item.productEntity.uploadDirectory }}/{{ illustration.image }}"
-                                    alt="{{ item.product }}"
-                                    style="width:50px; height:auto; margin-right:10px;">
-                            {% else %}
-                                <img src="/uploads/{{ item.productEntity.uploadDirectory }}/default.jpg"
-                                    alt="image par défaut"
-                                    style="width:50px; height:auto; margin-right:10px;">
-                            {% endif %}
-                        {% endif %}
+                        {% set illustration = (item.productEntity is defined and item.productEntity and item.productEntity.illustrations|length > 0)
+                            ? item.productEntity.illustrations|first
+                            : null %}
+                        <img src="/uploads/{{ item.productEntity.uploadDirectory }}/{{ illustration ? illustration.image : 'default.jpg' }}"
+                            alt="{{ item.product }}"
+                            style="width:50px; height:auto; margin-right:10px;">
                         {{ item.product }}
                     </td>
-
                     <td>x{{ item.quantity }}</td>
                     <td>{{ (item.productEntity.weight ?? item.weight) * item.quantity }} kg</td>
                     <td>{{ item.price|number_format(2, ',', '.') }} €</td>
@@ -91,27 +85,21 @@
                     <td>{{ totalItemHT|number_format(2, ',', '.') }} €</td>
                     <td>{{ totalItemTTC|number_format(2, ',', '.') }} €</td>
                 </tr>
-
                 {% set totalHT = totalHT + totalItemHT %}
                 {% set totalTTC = totalTTC + totalItemTTC %}
             {% endfor %}
         </tbody>
-
-
-
     </table>
 
     {# Totaux de la commande #}
-    {% set totalProduitsTTC = totalTTC %}
     {% set promo = order.promoReduction ?? 0 %}
-    {% set totalCommande = totalProduitsTTC - promo + order.carrierPrice %}
-
+    {% set totalCommande = totalTTC - promo + order.carrierPrice %}
 
     <table class="table table-bordered mt-4" style="max-width: 400px; float: right;">
         <tbody>
             <tr>
                 <td><strong>Total produits HT :</strong></td>
-                <td class="text-end">{{ (totalHT)|number_format(2, ',', '.') }} €</td>
+                <td class="text-end">{{ totalHT|number_format(2, ',', '.') }} €</td>
             </tr>
             <tr>
                 <td><strong>TVA :</strong></td>
@@ -119,7 +107,7 @@
             </tr>
             <tr>
                 <td><strong>Total produits TTC :</strong></td>
-                <td class="text-end">{{ (totalProduitsTTC)|number_format(2, ',', '.') }} €</td>
+                <td class="text-end">{{ totalTTC|number_format(2, ',', '.') }} €</td>
             </tr>
             {% if promo > 0 %}
             <tr>
@@ -129,11 +117,11 @@
             {% endif %}
             <tr>
                 <td><strong>Frais de livraison :</strong></td>
-                <td class="text-end">{{ (order.carrierPrice)|number_format(2, ',', '.') }} €</td>
+                <td class="text-end">{{ order.carrierPrice|number_format(2, ',', '.') }} €</td>
             </tr>
             <tr>
                 <td><strong>Total commande :</strong></td>
-                <td class="text-end">{{ (totalCommande)|number_format(2, ',', '.') }} €</td>
+                <td class="text-end">{{ totalCommande|number_format(2, ',', '.') }} €</td>
             </tr>
             <tr>
                 <td><strong>Transporteur :</strong></td>
@@ -141,7 +129,5 @@
             </tr>
         </tbody>
     </table>
-
-
 </div>
 {% endblock %}
