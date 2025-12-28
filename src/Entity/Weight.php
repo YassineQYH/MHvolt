@@ -3,10 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\WeightRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use App\Entity\Product;
 
 #[ORM\Entity(repositoryClass: WeightRepository::class)]
 class Weight
@@ -15,51 +12,43 @@ class Weight
     #[ORM\Column(type: "integer")]
     private ?int $id = null;
 
+    // Poids max ou seuil (ex: 1, 2, 5, 10)
     #[ORM\Column(type: "float")]
     private float $kg;
 
+    // Prix de livraison correspondant
     #[ORM\Column(type: "float")]
     private float $price;
 
-    #[ORM\OneToMany(mappedBy: "weight", targetEntity: Product::class)]
-    private Collection $products;
-
-    public function __construct(float $kg, float $price)
-    {
-        $this->kg = $kg;
-        $this->price = $price;
-        $this->products = new ArrayCollection();
-    }
-
     public function __toString(): string
     {
-        return (string)$this->kg;
+        return $this->kg . ' kg';
     }
 
-    public function getId(): ?int { return $this->id; }
-
-    public function getKg(): float { return $this->kg; }
-    public function setKg(float $kg): self { $this->kg = $kg; return $this; }
-
-    public function getPrice(): float { return $this->price; }
-    public function setPrice(float $price): self { $this->price = $price; return $this; }
-
-    /** @return Collection<int, Product> */
-    public function getProducts(): Collection { return $this->products; }
-
-    public function addProduct(Product $product): self
+    public function getId(): ?int
     {
-        if (!$this->products->contains($product)) {
-            $this->products[] = $product;
-            $product->setWeight($this);
-        }
+        return $this->id;
+    }
+
+    public function getKg(): float
+    {
+        return $this->kg;
+    }
+
+    public function setKg(float $kg): self
+    {
+        $this->kg = $kg;
         return $this;
     }
 
-    public function removeProduct(Product $product): self
+    public function getPrice(): float
     {
-        // On supprime la relation côté collection, mais on ne passe jamais null
-        $this->products->removeElement($product);
+        return $this->price;
+    }
+
+    public function setPrice(float $price): self
+    {
+        $this->price = $price;
         return $this;
     }
 }

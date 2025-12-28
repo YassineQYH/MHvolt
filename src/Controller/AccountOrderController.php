@@ -29,13 +29,15 @@ class AccountOrderController extends AbstractController
         $quantityProduct = 0;
 
         foreach ($cartItems as $element) {
-            $poidAndQuantity = $element['product']->getWeight()->getKg() * $element['quantity'];
+            $poidAndQuantity = $element['product']->getWeight() ?? 0.0; // float direct
             $quantityProduct += $element['quantity'];
-            $poid += $poidAndQuantity;
+            $poid += $poidAndQuantity * $element['quantity'];
         }
 
-        $weightEntity = $weightRepository->findByKgPrice($poid);
+        // Récupération du prix livraison selon poids
+        $weightEntity = $weightRepository->findPriceByWeight($poid);
         $prix = $weightEntity ? $weightEntity->getPrice() : 0.0;
+
 
         return $this->render('account/order.html.twig', [
             'orders' => $orders,

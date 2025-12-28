@@ -97,7 +97,7 @@
             <strong>Total produits :</strong> {{ totalTTC|number_format(2, ',', '.') }} €<br>
 
             {% if promoDiscount > 0 %}
-                <strong style="color:green;">Réduction ({{ promoCode }}):</strong>
+                <strong style="color:green;">Réduction ({{ promoTitre }}):</strong>
                 <span style="color:red;">-{{ promoDiscount|number_format(2, ',', '.') }} €</span><br>
 
                 {# Calcul du sous-total remisé: total produits TTC - promo (TTC) #}

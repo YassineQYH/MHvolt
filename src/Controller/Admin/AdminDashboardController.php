@@ -19,6 +19,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\TrottinetteCaracteristique;
 use App\Entity\TrottinetteDescriptionSection;
 use Symfony\Component\HttpFoundation\Response;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
@@ -32,6 +33,13 @@ class AdminDashboardController extends AbstractDashboardController
     public function __construct(EntityManagerInterface $em)
     {
         $this->em = $em;
+    }
+
+    public function configureAssets(): Assets
+    {
+        return Assets::new()
+            ->addCssFile('assets/css/admin/illustrations.css')
+            ->addJsFile('assets/js/admin/illustrations.js');
     }
 
     public function index(): Response

@@ -49,7 +49,8 @@
             {% set tvaRate = item.product.tva ? (item.product.tva.value / 100) : 0 %}
             {% set priceTTC = item.product.price * (1 + tvaRate) %}
             {% set totalItemTTC = priceTTC * item.quantity %}
-            {% set totalWeight = totalWeight + (item.product.weight.kg * item.quantity) %}
+            {% set itemWeight = item.product.weight %}
+            {% set totalWeight = totalWeight + (itemWeight * item.quantity) %}
             {% set totalTTC = totalTTC + totalItemTTC %}
         {% endfor %}
 
@@ -72,7 +73,7 @@
                     {% set totalItemTTC = priceTTC * item.quantity %}
                     {% set totalItemRemise = promoDiscount > 0 ? totalItemTTC - (totalItemTTC / totalTTC * promoDiscount) : totalItemTTC %}
                     {% set illustration = item.product.illustrations|first %}
-
+                    {% set itemWeight = item.product.weight %} {# <-- Déclaré ici #}
                     <tr>
                         <td>
                             <div style="display:flex;align-items:center;gap:10px;">
@@ -106,7 +107,7 @@
                             {% endif %}
                         </td>
 
-                        <td>{{ (item.product.weight.kg * item.quantity) }} Kg</td>
+                        <td>{{ (itemWeight * item.quantity) }} Kg</td>
 
                         <td>
                             <a href="{{ path('delete_to_cart', {'id': item.product.id, 'type': item.type|default('trottinette')}) }}">

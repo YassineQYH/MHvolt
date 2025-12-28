@@ -33,7 +33,7 @@ class Tva
 
     public function __toString(): string
     {
-        return $this->name;
+        return $this->getName() . ' - ' . $this->getValue() . ' %';
     }
 
     public function getId(): ?int { return $this->id; }

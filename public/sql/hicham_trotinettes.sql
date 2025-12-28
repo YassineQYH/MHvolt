@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 5.2.3
 -- https://www.phpmyadmin.net/
 --
--- Hôte : 127.0.0.1
--- Généré le : ven. 19 déc. 2025 à 16:13
--- Version du serveur : 10.4.32-MariaDB
--- Version de PHP : 8.2.12
+-- Hôte : localhost:3306
+-- Généré le : mar. 23 déc. 2025 à 15:44
+-- Version du serveur : 8.4.3
+-- Version de PHP : 8.3.28
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -28,8 +28,8 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `accessory` (
-  `id` int(11) NOT NULL,
-  `category_id` int(11) DEFAULT NULL
+  `id` int NOT NULL,
+  `category_id` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -58,17 +58,17 @@ INSERT INTO `accessory` (`id`, `category_id`) VALUES
 --
 
 CREATE TABLE `address` (
-  `id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `firstname` varchar(255) NOT NULL,
-  `lastname` varchar(255) NOT NULL,
-  `company` varchar(255) DEFAULT NULL,
-  `address` varchar(255) NOT NULL,
-  `postal` varchar(20) NOT NULL,
-  `city` varchar(255) NOT NULL,
-  `country` varchar(255) NOT NULL,
-  `phone` varchar(20) NOT NULL
+  `id` int NOT NULL,
+  `user_id` int NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `firstname` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `lastname` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `company` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `address` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `postal` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `city` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `country` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `phone` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -88,8 +88,8 @@ INSERT INTO `address` (`id`, `user_id`, `name`, `firstname`, `lastname`, `compan
 --
 
 CREATE TABLE `caracteristique` (
-  `id` int(11) NOT NULL,
-  `name` varchar(255) NOT NULL
+  `id` int NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -112,8 +112,8 @@ INSERT INTO `caracteristique` (`id`, `name`) VALUES
 --
 
 CREATE TABLE `categorie_caracteristique` (
-  `id` int(11) NOT NULL,
-  `name` varchar(255) NOT NULL
+  `id` int NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -136,10 +136,10 @@ INSERT INTO `categorie_caracteristique` (`id`, `name`) VALUES
 --
 
 CREATE TABLE `category_accessory` (
-  `id` int(11) NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `illustration` varchar(255) NOT NULL,
-  `description` longtext NOT NULL
+  `id` int NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `illustration` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` longtext COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -159,10 +159,10 @@ INSERT INTO `category_accessory` (`id`, `name`, `illustration`, `description`) V
 --
 
 CREATE TABLE `doctrine_migration_versions` (
-  `version` varchar(191) NOT NULL,
+  `version` varchar(191) COLLATE utf8mb3_unicode_ci NOT NULL,
   `executed_at` datetime DEFAULT NULL,
-  `execution_time` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+  `execution_time` int DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
 
 --
 -- Déchargement des données de la table `doctrine_migration_versions`
@@ -177,7 +177,9 @@ INSERT INTO `doctrine_migration_versions` (`version`, `executed_at`, `execution_
 ('DoctrineMigrations\\Version20251128084141', '2025-11-28 10:05:24', 171),
 ('DoctrineMigrations\\Version20251211102913', '2025-12-11 11:29:36', 250),
 ('DoctrineMigrations\\Version20251211131114', '2025-12-11 14:11:29', 156),
-('DoctrineMigrations\\Version20251211132030', '2025-12-11 14:20:35', 25);
+('DoctrineMigrations\\Version20251211132030', '2025-12-11 14:20:35', 25),
+('DoctrineMigrations\\Version20251223102626', '2025-12-23 11:26:45', 270),
+('DoctrineMigrations\\Version20251223133302', '2025-12-23 14:33:09', 270);
 
 -- --------------------------------------------------------
 
@@ -186,9 +188,9 @@ INSERT INTO `doctrine_migration_versions` (`version`, `executed_at`, `execution_
 --
 
 CREATE TABLE `illustration` (
-  `id` int(11) NOT NULL,
-  `product_id` int(11) NOT NULL,
-  `image` varchar(255) NOT NULL
+  `id` int NOT NULL,
+  `product_id` int NOT NULL,
+  `image` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -267,10 +269,10 @@ INSERT INTO `illustration` (`id`, `product_id`, `image`) VALUES
 --
 
 CREATE TABLE `messenger_messages` (
-  `id` bigint(20) NOT NULL,
-  `body` longtext NOT NULL,
-  `headers` longtext NOT NULL,
-  `queue_name` varchar(190) NOT NULL,
+  `id` bigint NOT NULL,
+  `body` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `headers` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `queue_name` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` datetime NOT NULL COMMENT '(DC2Type:datetime_immutable)',
   `available_at` datetime NOT NULL COMMENT '(DC2Type:datetime_immutable)',
   `delivered_at` datetime DEFAULT NULL COMMENT '(DC2Type:datetime_immutable)'
@@ -283,22 +285,22 @@ CREATE TABLE `messenger_messages` (
 --
 
 CREATE TABLE `order` (
-  `id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
+  `id` int NOT NULL,
+  `user_id` int NOT NULL,
   `created_at` datetime NOT NULL,
   `carrier_price` double NOT NULL,
-  `delivery` longtext NOT NULL,
-  `reference` varchar(255) NOT NULL,
-  `stripe_session_id` varchar(255) DEFAULT NULL,
-  `payment_state` int(11) NOT NULL,
-  `delivery_state` int(11) NOT NULL,
-  `tracking_number` varchar(255) DEFAULT NULL,
-  `carrier` varchar(255) DEFAULT NULL,
-  `secondary_carrier_tracking_number` varchar(255) DEFAULT NULL,
-  `secondary_carrier` varchar(255) DEFAULT NULL,
-  `promo_code` varchar(50) DEFAULT NULL,
+  `delivery` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `reference` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `stripe_session_id` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `payment_state` int NOT NULL,
+  `delivery_state` int NOT NULL,
+  `tracking_number` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `carrier` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `secondary_carrier_tracking_number` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `secondary_carrier` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `promo_code` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `promo_reduction` double DEFAULT NULL,
-  `promo_titre` varchar(255) DEFAULT NULL
+  `promo_titre` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -443,7 +445,10 @@ INSERT INTO `order` (`id`, `user_id`, `created_at`, `carrier_price`, `delivery`,
 (138, 1, '2025-12-11 14:15:03', 22.35, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '11122025-693ac3d7c3d45', 'cs_test_b16Vf0KeYxbCduGE8RVv9yqneyn2m6UeqK4JOiephwzlAQ7xmye9r7uCju', 1, 0, NULL, 'bpost', NULL, NULL, NULL, 116.886, 'Black Friday 15%'),
 (139, 1, '2025-12-11 14:16:32', 22.35, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '11122025-693ac430f350c', 'cs_test_b1akeV83mtncJRUDijN2McomhVYQmrWTArMUUk8EneI8D4e30b7TIXON9g', 1, 0, 'TEST-624895410', 'bpost', NULL, NULL, 'family-25', 194.81, 'Famille 25%'),
 (140, 1, '2025-12-11 15:35:40', 22.35, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '11122025-693ad6bc16610', 'cs_test_b1nu7oXIO6RcLhbLP7yGhWOGvVKyaVfFoZP0YRZBB7d3PaDT2LoBtkLFpW', 1, 0, NULL, 'bpost', NULL, NULL, NULL, 0, NULL),
-(141, 1, '2025-12-12 16:43:32', 22.35, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '12122025-693c38246b0a1', 'cs_test_b1tbaMFjVPHxZn7ouQNoXuiSO439AeNJzug7b2s7dowWho3EuN3YRQiO3D', 1, 4, NULL, 'bpost', NULL, NULL, 'family-25', 194.81, 'Famille -25%');
+(141, 1, '2025-12-12 16:43:32', 22.35, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '12122025-693c38246b0a1', 'cs_test_b1tbaMFjVPHxZn7ouQNoXuiSO439AeNJzug7b2s7dowWho3EuN3YRQiO3D', 1, 4, NULL, 'bpost', NULL, NULL, 'family-25', 194.81, 'Famille -25%'),
+(142, 1, '2025-12-23 15:15:43', 22.35, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '23122025-694aa40fe7ee4', 'cs_test_b1U56bhB2q2ZxS5Hf61B9bgMlsQPYu35wLFxVYaNaujsk9s9HzmpIHK6QW', 0, 0, NULL, 'bpost', NULL, NULL, NULL, 111.441, 'Black Friday -15%'),
+(143, 1, '2025-12-23 15:22:04', 22.35, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '23122025-694aa58cd74ad', 'cs_test_b1S890AxEGkhN3yUVBqvHIWqzILw9YknN6VnLrqnFLKripLpMwRQTUge0c', 0, 0, NULL, 'bpost', NULL, NULL, NULL, 111.441, 'Black Friday -15%'),
+(144, 1, '2025-12-23 15:23:23', 22.35, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '23122025-694aa5db370e9', 'cs_test_b1gJ9Dj5W28MwY7MSvHeYi1cCGfk4KxfldW6ZPylmPdC6MoFFl0lSJJtZg', 1, 0, NULL, 'bpost', NULL, NULL, NULL, 111.441, 'Black Friday -15%');
 
 -- --------------------------------------------------------
 
@@ -452,14 +457,14 @@ INSERT INTO `order` (`id`, `user_id`, `created_at`, `carrier_price`, `delivery`,
 --
 
 CREATE TABLE `order_details` (
-  `id` int(11) NOT NULL,
-  `my_order_id` int(11) NOT NULL,
-  `product_entity_id` int(11) DEFAULT NULL,
-  `product` varchar(255) NOT NULL,
-  `quantity` int(11) NOT NULL,
+  `id` int NOT NULL,
+  `my_order_id` int NOT NULL,
+  `product_entity_id` int DEFAULT NULL,
+  `product` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `quantity` int NOT NULL,
   `price` double NOT NULL,
   `total` double NOT NULL,
-  `weight` varchar(64) NOT NULL,
+  `weight` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
   `tva` double DEFAULT NULL,
   `price_ttc` double NOT NULL,
   `price_after_reduc` double DEFAULT NULL,
@@ -764,7 +769,13 @@ INSERT INTO `order_details` (`id`, `my_order_id`, `product_entity_id`, `product`
 (292, 140, 1, 'Trottinette électrique honey whale m5 max avec siège', 1, 599, 599, '14', 21, 724.79, 599, 599, 724.79),
 (293, 140, 5, 'roues etoiles', 1, 45, 45, '4', 21, 54.45, 45, 45, 54.45),
 (294, 141, 1, 'Trottinette électrique honey whale m5 max avec siège', 1, 599, 599, '14', 21, 724.79, 449.25, 449.25, 543.5925),
-(295, 141, 5, 'roues etoiles', 1, 45, 45, '4', 21, 54.45, 33.75, 33.75, 40.8375);
+(295, 141, 5, 'roues etoiles', 1, 45, 45, '4', 21, 54.45, 33.75, 33.75, 40.8375),
+(296, 142, 1, 'Trottinette électrique honey whale m5 max avec siège', 1, 599, 599, '14', 21, 724.79, 509.15, 509.15, 616.0715),
+(297, 142, 4, 'Xtreme Siege', 1, 15, 15, '4', 21, 18.15, 12.75, 12.75, 15.4275),
+(298, 143, 1, 'Trottinette électrique honey whale m5 max avec siège', 1, 599, 599, '14', 21, 724.79, 509.15, 509.15, 616.0715),
+(299, 143, 4, 'Xtreme Siege', 1, 15, 15, '4', 21, 18.15, 12.75, 12.75, 15.4275),
+(300, 144, 1, 'Trottinette électrique honey whale m5 max avec siège', 1, 599, 599, '14', 21, 724.79, 509.15, 509.15, 616.0715),
+(301, 144, 4, 'Xtreme Siege', 1, 15, 15, '4', 21, 18.15, 12.75, 12.75, 15.4275);
 
 -- --------------------------------------------------------
 
@@ -773,41 +784,41 @@ INSERT INTO `order_details` (`id`, `my_order_id`, `product_entity_id`, `product`
 --
 
 CREATE TABLE `product` (
-  `id` int(11) NOT NULL,
-  `weight_id` int(11) NOT NULL,
-  `tva_id` int(11) NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `slug` varchar(255) NOT NULL,
-  `description` longtext DEFAULT NULL,
+  `id` int NOT NULL,
+  `tva_id` int NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `slug` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` longtext COLLATE utf8mb4_unicode_ci,
   `price` double NOT NULL,
-  `stock` int(11) NOT NULL,
+  `stock` int NOT NULL,
   `is_best` tinyint(1) NOT NULL,
   `created_at` datetime NOT NULL,
   `updated_at` datetime NOT NULL,
-  `type` varchar(255) NOT NULL
+  `type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `weight` double NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `product`
 --
 
-INSERT INTO `product` (`id`, `weight_id`, `tva_id`, `name`, `slug`, `description`, `price`, `stock`, `is_best`, `created_at`, `updated_at`, `type`) VALUES
-(1, 25, 1, 'Trottinette électrique honey whale m5 max avec siège', 'Trottinette-électrique-honey-whale-m5-max-avec-siège', '<div>【Performance puissante】...</div>', 599, 7, 1, '2025-11-18 16:19:20', '2025-12-12 16:46:54', 'trottinette'),
-(2, 22, 1, 'KUGOO Kukirin C1 Pro', 'KUGOO-Kukirin-C1-Pro', 'Aperçu du produit : Vitesse maximale 45 km/h Charge max. 120 kg Autonomie 100 km Puissance continue 500 W Siège', 1299, 4, 1, '2025-11-18 16:19:20', '2025-11-18 16:19:20', 'trottinette'),
-(3, 28, 1, 'Bogist M5 Pro', 'Bogist-M5-Pro', 'Moteur puissant de 500 W pour des vitesses élevées...', 754, 2, 1, '2025-11-18 16:19:20', '2025-11-19 11:30:29', 'trottinette'),
-(4, 3, 1, 'Xtreme Siege', 'Xtreme-Siege', 'Siege pour trott', 15, 2, 1, '2025-11-18 16:19:20', '2025-11-18 16:19:20', 'accessoire'),
-(5, 8, 1, 'roues etoiles', 'roues-etoiles', '<div>Roue pour trott</div>', 45, 7, 1, '2025-11-18 16:19:20', '2025-12-12 16:46:54', 'accessoire'),
-(6, 2, 1, 'guidon blunt black v3', 'guidon-blunt-black-v3', 'Guidon pour trott', 49, 1, 0, '2025-11-18 16:19:20', '2025-11-18 16:19:20', 'accessoire'),
-(7, 1, 1, 'Frein Jaune', 'freinfreins-jaune', 'Frein pour trott', 19, 0, 0, '2025-11-18 16:19:20', '2025-11-18 16:19:20', 'accessoire'),
-(8, 5, 1, 'etrier de frein', 'etrier-de-frein', 'etrier-de-frein', 56, 2, 0, '2025-11-18 16:19:20', '2025-11-18 16:19:20', 'accessoire'),
-(9, 3, 1, 'Roues freestyle', 'Roues-freestyle', 'Roues-freestyle', 1, 1, 1, '2025-11-18 16:19:20', '2025-11-18 16:19:20', 'accessoire'),
-(10, 2, 1, 'roues gold', 'roues-gold', 'roues-gold', 89, 5, 1, '2025-11-18 16:19:20', '2025-11-24 10:42:47', 'accessoire'),
-(11, 4, 1, 'roues stunt', 'roues-stunt', 'roues-stunt', 55, 4, 0, '2025-11-18 16:19:20', '2025-11-18 16:19:20', 'accessoire'),
-(12, 2, 1, 'freins rouge', 'freins-rouge', 'freins-rouge', 26, 1, 1, '2025-11-18 16:19:20', '2025-11-18 16:19:20', 'accessoire'),
-(13, 4, 1, 'siege double', 'siege-double', 'siege-double', 21, 2, 0, '2025-11-18 16:19:20', '2025-11-18 16:19:20', 'accessoire'),
-(14, 2, 1, 'siege rouge', 'siege-rouge', 'siege-rouge', 45, 5, 0, '2025-11-18 16:19:20', '2025-11-18 16:19:20', 'accessoire'),
-(15, 7, 1, 'guidon multicolor', 'guidon-multicolor', '<div>guidon-multicolor</div>', 25, 4, 1, '2025-11-18 16:19:20', '2025-11-18 16:19:20', 'accessoire'),
-(16, 4, 1, 'Guidon Titanium', 'guidon-titanium', '<div>guidon-titanium</div>', 48, 0, 0, '2025-11-18 16:19:20', '2025-11-28 10:11:29', 'accessoire');
+INSERT INTO `product` (`id`, `tva_id`, `name`, `slug`, `description`, `price`, `stock`, `is_best`, `created_at`, `updated_at`, `type`, `weight`) VALUES
+(1, 1, 'Trottinette électrique honey whale m5 max avec siège', 'Trottinette-électrique-honey-whale-m5-max-avec-siège', '<div>【Performance puissante】...</div>', 599, 6, 1, '2025-11-18 16:19:20', '2025-12-23 15:23:34', 'trottinette', 14),
+(2, 1, 'KUGOO Kukirin C1 Pro', 'KUGOO-Kukirin-C1-Pro', 'Aperçu du produit : Vitesse maximale 45 km/h Charge max. 120 kg Autonomie 100 km Puissance continue 500 W Siège', 1299, 4, 1, '2025-11-18 16:19:20', '2025-11-18 16:19:20', 'trottinette', 11),
+(3, 1, 'Bogist M5 Pro', 'Bogist-M5-Pro', 'Moteur puissant de 500 W pour des vitesses élevées...', 754, 2, 1, '2025-11-18 16:19:20', '2025-11-19 11:30:29', 'trottinette', 17),
+(4, 1, 'Xtreme Siege', 'Xtreme-Siege', 'Siege pour trott', 15, 1, 1, '2025-11-18 16:19:20', '2025-12-23 15:23:34', 'accessoire', 4),
+(5, 1, 'roues etoiles', 'roues-etoiles', '<div>Roue pour trott</div>', 45, 7, 1, '2025-11-18 16:19:20', '2025-12-12 16:46:54', 'accessoire', 7),
+(6, 1, 'guidon blunt black v3', 'guidon-blunt-black-v3', 'Guidon pour trott', 49, 1, 0, '2025-11-18 16:19:20', '2025-11-18 16:19:20', 'accessoire', 2),
+(7, 1, 'Frein Jaune', 'freinfreins-jaune', 'Frein pour trott', 19, 0, 0, '2025-11-18 16:19:20', '2025-11-18 16:19:20', 'accessoire', 4),
+(8, 1, 'etrier de frein', 'etrier-de-frein', 'etrier-de-frein', 56, 2, 0, '2025-11-18 16:19:20', '2025-11-18 16:19:20', 'accessoire', 5),
+(9, 1, 'Roues freestyle', 'Roues-freestyle', 'Roues-freestyle', 1, 1, 1, '2025-11-18 16:19:20', '2025-11-18 16:19:20', 'accessoire', 8),
+(10, 1, 'roues gold', 'roues-gold', 'roues-gold', 89, 5, 1, '2025-11-18 16:19:20', '2025-11-24 10:42:47', 'accessoire', 6),
+(11, 1, 'roues stunt', 'roues-stunt', 'roues-stunt', 55, 4, 0, '2025-11-18 16:19:20', '2025-11-18 16:19:20', 'accessoire', 3),
+(12, 1, 'freins rouge', 'freins-rouge', 'freins-rouge', 26, 1, 1, '2025-11-18 16:19:20', '2025-11-18 16:19:20', 'accessoire', 4),
+(13, 1, 'siege double', 'siege-double', 'siege-double', 21, 2, 0, '2025-11-18 16:19:20', '2025-11-18 16:19:20', 'accessoire', 6),
+(14, 1, 'siege rouge', 'siege-rouge', 'siege-rouge', 45, 5, 0, '2025-11-18 16:19:20', '2025-11-18 16:19:20', 'accessoire', 9),
+(15, 1, 'guidon multicolor', 'guidon-multicolor', '<div>guidon-multicolor</div>', 25, 4, 1, '2025-11-18 16:19:20', '2025-11-18 16:19:20', 'accessoire', 5),
+(16, 1, 'Guidon Titanium', 'guidon-titanium', '<div>guidon-titanium</div>', 48, 0, 0, '2025-11-18 16:19:20', '2025-11-28 10:11:29', 'accessoire', 6);
 
 -- --------------------------------------------------------
 
@@ -816,14 +827,14 @@ INSERT INTO `product` (`id`, `weight_id`, `tva_id`, `name`, `slug`, `description
 --
 
 CREATE TABLE `product_history` (
-  `id` int(11) NOT NULL,
-  `product_id` int(11) NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `slug` varchar(255) DEFAULT NULL,
-  `description` longtext DEFAULT NULL,
-  `stock` int(11) NOT NULL,
+  `id` int NOT NULL,
+  `product_id` int NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `slug` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `description` longtext COLLATE utf8mb4_unicode_ci,
+  `stock` int NOT NULL,
   `price` double DEFAULT NULL,
-  `main_image` varchar(255) DEFAULT NULL,
+  `main_image` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `modified_at` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -834,18 +845,18 @@ CREATE TABLE `product_history` (
 --
 
 CREATE TABLE `promotion` (
-  `id` int(11) NOT NULL,
-  `category_access_id` int(11) DEFAULT NULL,
-  `product_id` int(11) DEFAULT NULL,
-  `code` varchar(100) DEFAULT NULL,
-  `target_type` varchar(30) NOT NULL,
+  `id` int NOT NULL,
+  `category_access_id` int DEFAULT NULL,
+  `product_id` int DEFAULT NULL,
+  `code` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `target_type` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,
   `discount_amount` double DEFAULT NULL,
   `discount_percent` double DEFAULT NULL,
   `start_date` datetime NOT NULL,
   `end_date` datetime DEFAULT NULL,
-  `quantity` int(11) NOT NULL,
-  `used` int(11) NOT NULL,
-  `titre` varchar(255) DEFAULT NULL,
+  `quantity` int NOT NULL,
+  `used` int NOT NULL,
+  `titre` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `auto_apply` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -872,8 +883,8 @@ INSERT INTO `promotion` (`id`, `category_access_id`, `product_id`, `code`, `targ
 --
 
 CREATE TABLE `promotion_product` (
-  `promotion_id` int(11) NOT NULL,
-  `product_id` int(11) NOT NULL
+  `promotion_id` int NOT NULL,
+  `product_id` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -893,9 +904,9 @@ INSERT INTO `promotion_product` (`promotion_id`, `product_id`) VALUES
 --
 
 CREATE TABLE `reset_password` (
-  `id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `token` varchar(255) NOT NULL,
+  `id` int NOT NULL,
+  `user_id` int NOT NULL,
+  `token` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -906,12 +917,12 @@ CREATE TABLE `reset_password` (
 --
 
 CREATE TABLE `trottinette` (
-  `id` int(11) NOT NULL,
-  `name_short` varchar(255) DEFAULT NULL,
-  `description_short` longtext DEFAULT NULL,
+  `id` int NOT NULL,
+  `name_short` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `description_short` longtext COLLATE utf8mb4_unicode_ci,
   `is_header` tinyint(1) NOT NULL,
-  `header_image` varchar(255) DEFAULT NULL,
-  `header_btn_title` varchar(255) DEFAULT NULL
+  `header_image` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `header_btn_title` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -930,9 +941,9 @@ INSERT INTO `trottinette` (`id`, `name_short`, `description_short`, `is_header`,
 --
 
 CREATE TABLE `trottinette_accessory` (
-  `id` int(11) NOT NULL,
-  `trottinette_id` int(11) NOT NULL,
-  `accessory_id` int(11) NOT NULL
+  `id` int NOT NULL,
+  `trottinette_id` int NOT NULL,
+  `accessory_id` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -967,12 +978,12 @@ INSERT INTO `trottinette_accessory` (`id`, `trottinette_id`, `accessory_id`) VAL
 --
 
 CREATE TABLE `trottinette_caracteristique` (
-  `id` int(11) NOT NULL,
-  `trottinette_id` int(11) DEFAULT NULL,
-  `caracteristique_id` int(11) DEFAULT NULL,
-  `categorie_id` int(11) DEFAULT NULL,
-  `title` varchar(255) DEFAULT NULL,
-  `value` varchar(255) DEFAULT NULL
+  `id` int NOT NULL,
+  `trottinette_id` int DEFAULT NULL,
+  `caracteristique_id` int DEFAULT NULL,
+  `categorie_id` int DEFAULT NULL,
+  `title` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `value` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -1013,11 +1024,11 @@ INSERT INTO `trottinette_caracteristique` (`id`, `trottinette_id`, `caracteristi
 --
 
 CREATE TABLE `trottinette_description_section` (
-  `id` int(11) NOT NULL,
-  `trottinette_id` int(11) NOT NULL,
-  `title` varchar(255) NOT NULL,
-  `content` longtext NOT NULL,
-  `section_order` int(11) NOT NULL
+  `id` int NOT NULL,
+  `trottinette_id` int NOT NULL,
+  `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `content` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `section_order` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -1048,8 +1059,8 @@ INSERT INTO `trottinette_description_section` (`id`, `trottinette_id`, `title`, 
 --
 
 CREATE TABLE `tva` (
-  `id` int(11) NOT NULL,
-  `name` varchar(100) NOT NULL,
+  `id` int NOT NULL,
+  `name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   `value` double NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -1070,21 +1081,21 @@ INSERT INTO `tva` (`id`, `name`, `value`) VALUES
 --
 
 CREATE TABLE `user` (
-  `id` int(11) NOT NULL,
-  `email` varchar(180) NOT NULL,
-  `roles` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT '(DC2Type:json)' CHECK (json_valid(`roles`)),
-  `password` varchar(255) NOT NULL,
-  `first_name` varchar(64) NOT NULL,
-  `last_name` varchar(64) NOT NULL,
-  `tel` varchar(16) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `id` int NOT NULL,
+  `email` varchar(180) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `roles` json NOT NULL,
+  `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `first_name` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `last_name` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `tel` varchar(16) COLLATE utf8mb4_unicode_ci NOT NULL
+) ;
 
 --
 -- Déchargement des données de la table `user`
 --
 
 INSERT INTO `user` (`id`, `email`, `roles`, `password`, `first_name`, `last_name`, `tel`) VALUES
-(1, 'admin@admin.fr', '[\"ROLE_ADMIN\",\"ROLE_USER\"]', '$2y$13$4bwJInzuXY/eug5T/185NOh32jBDFRFDCp2HH79Xzmkb344xMCdJy', 'Admin', 'Admin', '06 04 05 02 09'),
+(1, 'admin@admin.fr', '[\"ROLE_ADMIN\", \"ROLE_USER\"]', '$2y$13$4bwJInzuXY/eug5T/185NOh32jBDFRFDCp2HH79Xzmkb344xMCdJy', 'Admin', 'Admin', '06 04 05 02 09'),
 (2, 'user@user.fr', '[\"ROLE_USER\"]', '$2y$13$LhrRJcEyiJpsDCwVooctFeP6ee/jHM7M8qigKaJSz1v5bwU5Un7qa', 'User', 'User', '06 01 01 01 02'),
 (3, 'test@test.fr', '[]', '$2y$13$A0Y74ufwtfrtYNJZ9cHUYufIrqqrpudNWJ.wWbuCURqXN1c8KCYcC', 'test', 'test', '+33641414141'),
 (4, 'yassine.qyh@gmail.com', '[]', '$2y$13$YRpq.Q95CEOdyQSWa.TnLe0oU0QykXGeOHHkcWxQnh3x/909Rd4kO', 'Yass', 'Qay', '+33641512128');
@@ -1096,7 +1107,7 @@ INSERT INTO `user` (`id`, `email`, `roles`, `password`, `first_name`, `last_name
 --
 
 CREATE TABLE `weight` (
-  `id` int(11) NOT NULL,
+  `id` int NOT NULL,
   `kg` double NOT NULL,
   `price` double NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -1221,7 +1232,6 @@ ALTER TABLE `order_details`
 ALTER TABLE `product`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `UNIQ_D34A04AD989D9B62` (`slug`),
-  ADD KEY `IDX_D34A04AD350035DC` (`weight_id`),
   ADD KEY `IDX_D34A04AD4D79775F` (`tva_id`);
 
 --
@@ -1311,109 +1321,109 @@ ALTER TABLE `weight`
 -- AUTO_INCREMENT pour la table `address`
 --
 ALTER TABLE `address`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT pour la table `caracteristique`
 --
 ALTER TABLE `caracteristique`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT pour la table `categorie_caracteristique`
 --
 ALTER TABLE `categorie_caracteristique`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT pour la table `category_accessory`
 --
 ALTER TABLE `category_accessory`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT pour la table `illustration`
 --
 ALTER TABLE `illustration`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=73;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=73;
 
 --
 -- AUTO_INCREMENT pour la table `messenger_messages`
 --
 ALTER TABLE `messenger_messages`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT pour la table `order`
 --
 ALTER TABLE `order`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=142;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=145;
 
 --
 -- AUTO_INCREMENT pour la table `order_details`
 --
 ALTER TABLE `order_details`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=296;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=302;
 
 --
 -- AUTO_INCREMENT pour la table `product`
 --
 ALTER TABLE `product`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT pour la table `product_history`
 --
 ALTER TABLE `product_history`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT pour la table `promotion`
 --
 ALTER TABLE `promotion`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT pour la table `reset_password`
 --
 ALTER TABLE `reset_password`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT pour la table `trottinette_accessory`
 --
 ALTER TABLE `trottinette_accessory`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT pour la table `trottinette_caracteristique`
 --
 ALTER TABLE `trottinette_caracteristique`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=101;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=101;
 
 --
 -- AUTO_INCREMENT pour la table `trottinette_description_section`
 --
 ALTER TABLE `trottinette_description_section`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
 -- AUTO_INCREMENT pour la table `tva`
 --
 ALTER TABLE `tva`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT pour la table `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT pour la table `weight`
 --
 ALTER TABLE `weight`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48;
 
 --
 -- Contraintes pour les tables déchargées
@@ -1455,7 +1465,6 @@ ALTER TABLE `order_details`
 -- Contraintes pour la table `product`
 --
 ALTER TABLE `product`
-  ADD CONSTRAINT `FK_D34A04AD350035DC` FOREIGN KEY (`weight_id`) REFERENCES `weight` (`id`),
   ADD CONSTRAINT `FK_D34A04AD4D79775F` FOREIGN KEY (`tva_id`) REFERENCES `tva` (`id`);
 
 --

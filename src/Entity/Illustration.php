@@ -50,4 +50,20 @@ class Illustration
         $this->product = $product;
         return $this;
     }
+    public function getImagePath(): string
+    {
+        if ($this->product) {
+            switch ($this->product->getType()) {
+                case 'trottinette':
+                    return '/uploads/trottinettes/' . $this->image;
+                case 'accessoire':
+                    return '/uploads/accessoires/' . $this->image;
+                default:
+                    return '/uploads/produits/' . $this->image;
+            }
+        }
+
+        return '/uploads/produits/' . $this->image;
+    }
+
 }

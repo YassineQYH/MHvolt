@@ -6,7 +6,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Entity\Illustration;
-use App\Entity\Weight;
 use App\Entity\Tva;
 
 #[ORM\Entity]
@@ -40,9 +39,8 @@ class Product
     #[ORM\Column(type:"boolean")]
     protected bool $isBest = false;
 
-    #[ORM\ManyToOne(targetEntity: Weight::class)]
-    #[ORM\JoinColumn(nullable: false)]
-    protected ?Weight $weight = null;
+    #[ORM\Column(type: 'float')]
+    private float $weight;
 
     #[ORM\ManyToOne(targetEntity: Tva::class)]
     #[ORM\JoinColumn(nullable: false)]
@@ -62,6 +60,12 @@ class Product
     {
         // valeur par défaut (si jamais un produit n'est ni trottinette ni accessoire)
         return 'produits';
+    }
+
+    public function getFirstIllustration(): ?string
+    {
+        $illustration = $this->illustrations->first();
+        return $illustration ? $illustration->getImage() : null;
     }
 
     public function __construct()
@@ -93,8 +97,16 @@ class Product
     public function getIsBest(): bool { return $this->isBest; }
     public function setIsBest(bool $isBest): self { $this->isBest = $isBest; return $this; }
 
-    public function getWeight(): ?Weight { return $this->weight; }
-    public function setWeight(Weight $weight): self { $this->weight = $weight; return $this; }
+    public function getWeight(): ?float{return $this->weight;}
+    public function setWeight(float $weight): self
+    {
+        if ($weight <= 0) {
+            throw new \InvalidArgumentException('Le poids doit être supérieur à 0');
+        }
+
+        $this->weight = $weight;
+        return $this;
+    }
 
     public function getTva(): ?Tva { return $this->tva; }
     public function setTva(Tva $tva): self { $this->tva = $tva; return $this; }

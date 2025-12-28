@@ -1,0 +1,56 @@
+{% set illustrations = field.value %}
+
+{% if illustrations is empty %}
+    <em>Aucune image</em>
+{% else %}
+    {% set mainImage = illustrations|first %}
+
+    <div class="ea-illustrations">
+
+        <!-- Image principale (VISUELLE) -->
+        <div class="ea-main-image">
+            <img
+                id="ea-main-image"
+                src="
+                    {% if entity.instance.type == 'trottinette' %}
+                        /uploads/trottinettes/{{ mainImage.image }}
+                    {% elseif entity.instance.type == 'accessoire' %}
+                        /uploads/accessoires/{{ mainImage.image }}
+                    {% else %}
+                        /uploads/produits/{{ mainImage.image }}
+                    {% endif %}
+                "
+            >
+        </div>
+
+        <!-- Miniatures -->
+        {% if illustrations|length > 1 %}
+            <div class="ea-thumbnails">
+                {% for illustration in illustrations %}
+                    <img
+                        src="
+                            {% if entity.instance.type == 'trottinette' %}
+                                /uploads/trottinettes/{{ illustration.image }}
+                            {% elseif entity.instance.type == 'accessoire' %}
+                                /uploads/accessoires/{{ illustration.image }}
+                            {% else %}
+                                /uploads/produits/{{ illustration.image }}
+                            {% endif %}
+                        "
+                        class="ea-thumbnail"
+                        data-full="
+                            {% if entity.instance.type == 'trottinette' %}
+                                /uploads/trottinettes/{{ illustration.image }}
+                            {% elseif entity.instance.type == 'accessoire' %}
+                                /uploads/accessoires/{{ illustration.image }}
+                            {% else %}
+                                /uploads/produits/{{ illustration.image }}
+                            {% endif %}
+                        "
+                    >
+                {% endfor %}
+            </div>
+        {% endif %}
+
+    </div>
+{% endif %}
