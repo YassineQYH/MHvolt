@@ -19,16 +19,15 @@ a .slider {
 }
 
 .box {
-    width: 450px;
-    /* largeur fixe */
-    height: 450px;
-    /* hauteur fixe pour que tous les cadres soient identiques */
+    width: 450px; /* largeur fixe */
+    height: 450px; /* hauteur fixe pour que tous les cadres soient identiques */
+    background-color: rgba(255, 255, 255, 0.85); /* léger blanc translucide */
     box-shadow: 2px 2px 30px rgba(0, 0, 0, 0.2);
-    border-radius: 10px;
+    border-radius: 16px; /* angles arrondis */
     overflow: hidden;
     margin: 25px;
-    flex-direction: column;
-    /* pour bien gérer image + détail */
+    flex-direction: column; /* pour bien gérer image + détail */
+    transition: all 0.3s ease; /* pour un effet smooth si hover */
 }
 
 .box-show {
@@ -49,12 +48,11 @@ a .slider {
     height: 80%;
     object-fit: contain;
     display: block;
-    margin: auto;
-    /* centre horizontalement et verticalement */
+    margin: auto; /* centre horizontalement et verticalement */
     box-sizing: border-box;
     position: relative;
-    top: 10%;
-    /* descend l'image de 10% du parent */
+    top: 10%; /* descend l'image de 10% du parent */
+    border-radius: 16px; /* même rayon que la box */
 }
 
 .detail-box {
@@ -126,6 +124,12 @@ a .slider {
     visibility: visible;
     animation: fade 2.5s;
 }
+
+/* Dégradé jaune → blanc pour la section "is best" */
+.slider {
+    background-image: linear-gradient(175deg, #fdeb5a 0%, #ffffff 50%, #EEE 100%);
+}
+
 
 @keyframes fade {
     0% {
