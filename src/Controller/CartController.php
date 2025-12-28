@@ -49,8 +49,11 @@ class CartController extends BaseController
         // ⚠️ Vérification utilisateur connecté
         if (!$user) {
             $this->addFlash('info-alert', 'Vous devez être connecté pour valider votre panier.');
-            return $this->redirectToRoute('cart');
+
+            // On redirige vers la page home avec un paramètre pour afficher le modal
+            return $this->redirectToRoute('app_home', ['login' => 1]);
         }
+
 
         /** @var User $user */
         $user = $this->getUser();
@@ -197,7 +200,7 @@ class CartController extends BaseController
         $autoDiscount = $cart->getDiscountTTC($promotionService, $allPromos);
 
         // ❌ Si le code est moins ou égal à l’auto → on refuse
-        if ($autoDiscount >= $codeDiscount) {
+        if ($autoDiscount > $codeDiscount) {
             return new JsonResponse([
                 'error' => "Une promotion automatique plus avantageuse est déjà appliquée."
             ]);
