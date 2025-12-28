@@ -53,7 +53,7 @@ class AccountAddressController extends AbstractController
             $this->entityManager->persist($address);
             $this->entityManager->flush();
 
-            return $cartContent ? $this->redirectToRoute('order') : $this->redirectToRoute('account_address');
+            return $cartContent ? $this->redirectToRoute('cart') : $this->redirectToRoute('account_address');
         }
 
         return $this->render('account/address_form.html.twig', [

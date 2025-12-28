@@ -42,10 +42,10 @@ class AddressType extends AbstractType
                 'label' => 'Code postal',
                 'attr' => ['placeholder' => 'Ex : 75001'],
                 'constraints' => [
-                    new Length(['min' => 5, 'max' => 5]),
+                    new Length(['min' => 4, 'max' => 5]),
                     new Regex([
-                        'pattern' => '/^\d{5}$/',
-                        'message' => 'Le code postal doit contenir 5 chiffres.'
+                        'pattern' => '/^\d{4,5}$/', // accepte 4 ou 5 chiffres
+                        'message' => 'Le code postal doit contenir 4 ou 5 chiffres.'
                     ])
                 ]
             ])

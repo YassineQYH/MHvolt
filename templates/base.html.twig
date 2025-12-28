@@ -194,6 +194,22 @@
                             registerModal.style.display = 'block';
                         }
                     {% endif %}
+
+                    // 🔔 Ouvrir automatiquement le modal login si ?login=1
+                    {% if app.request.get('login') %}
+                        const wrapper = document.querySelector('.wrapper');
+                        if(wrapper) wrapper.classList.add('active-popup');
+                    {% endif %}
+                });
+                
+                // 🔔 Ouvrir automatiquement le modal d'inscription si erreur
+                document.addEventListener('DOMContentLoaded', function() {
+                    {% if app.flashes('register_error') is not empty %}
+                        const registerModal = document.querySelector('login');
+                        if(registerModal) {
+                            registerModal.style.display = 'block';
+                        }
+                    {% endif %}
                 });
             </script>
         {% endblock %}

@@ -49,8 +49,11 @@ class CartController extends BaseController
         // ⚠️ Vérification utilisateur connecté
         if (!$user) {
             $this->addFlash('info-alert', 'Vous devez être connecté pour valider votre panier.');
-            return $this->redirectToRoute('cart');
+
+            // On redirige vers la page home avec un paramètre pour afficher le modal
+            return $this->redirectToRoute('app_home', ['login' => 1]);
         }
+
 
         /** @var User $user */
         $user = $this->getUser();
@@ -116,7 +119,7 @@ class CartController extends BaseController
         Cart $cart,
         PromotionRepository $promotionRepository,
         WeightRepository $weightRepository,
-        PromotionService $promotionService // <-- injecté
+        PromotionService $promotionService
     ): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
@@ -128,79 +131,65 @@ class CartController extends BaseController
 
         $promo = $promotionRepository->findOneBy(['code' => $code]);
 
-        // ❌ Code inexistant
         if (!$promo) {
             $cart->clearPromos();
-            return new JsonResponse([
-                'error' => 'Ce code promo est invalide.'
-            ]);
+            return new JsonResponse(['error' => 'Ce code promo est invalide.']);
         }
 
-        // ❌ Code expiré
         if ($promo->isExpired()) {
             $cart->clearPromos();
-            return new JsonResponse([
-                'error' => 'Ce code promo est expiré.'
-            ]);
+            return new JsonResponse(['error' => 'Ce code promo est expiré.']);
         }
 
-        // ❌ Code épuisé (quantity atteinte) ← TON CAS
         if (!$promo->isAvailable()) {
             $cart->clearPromos();
-            return new JsonResponse([
-                'error' => 'Ce code promo n’est plus disponible.'
-            ]);
+            return new JsonResponse(['error' => 'Ce code promo n’est plus disponible.']);
         }
 
-        // ❌ Pas encore actif
         if (!$promo->isActive()) {
             $cart->clearPromos();
-            return new JsonResponse([
-                'error' => 'Ce code promo n’est pas encore actif.'
-            ]);
+            return new JsonResponse(['error' => 'Ce code promo n’est pas encore actif.']);
         }
 
-        // ❌ Mal configuré
         if (!$promo->isDiscountValid()) {
             $cart->clearPromos();
+            return new JsonResponse(['error' => 'Ce code promo est invalide.']);
+        }
+
+        // 🔹 Calcul réduction du code promo saisi
+        $codeDiscount = $cart->getReduction($promotionService, $promo);
+
+        // 🔹 Vérification : si la promo ne s'applique à aucun article
+        if ($codeDiscount <= 0) {
+            $cart->clearPromos();
             return new JsonResponse([
-                'error' => 'Ce code promo est invalide.'
+                'error' => "Ce code promo ne s'applique à aucun article de votre panier."
             ]);
         }
 
-
-        // ✅ Comparaison entre promo automatique et code promo : la plus avantageuse gagne
-
+        // 🔹 Filtre les promotions automatiques (sans code)
         $allPromos = $promotionRepository->findAll();
+        $autoPromos = array_filter($allPromos, fn($p) => $p->getCode() === null);
 
-        // Réduction provenant d'une éventuelle promo automatique
-        $autoDiscount = $cart->getDiscountTTC($promotionService, $allPromos);
+        // ⚠️ Calcul du montant de la promo automatique
+        $autoDiscount = 0;
+        if (!empty($autoPromos)) {
+            $autoDiscount = $cart->getDiscountTTC($promotionService, $autoPromos) ?: 0;
+        }
 
-        // Réduction provenant du code promo saisi
-        $codeDiscount = $cart->getReduction($promotionService, $promo);
-
-        // ❌ Si le code est moins ou égal à l’auto → on refuse
-        if ($autoDiscount >= $codeDiscount) {
+        // 🔹 Vérification si une promo automatique plus avantageuse existe
+        if ($autoDiscount > 0 && $autoDiscount >= $codeDiscount) {
             return new JsonResponse([
                 'error' => "Une promotion automatique plus avantageuse est déjà appliquée."
             ]);
         }
 
-        // ✅ Sinon, le code est meilleur → on continue normalement
+
+        // ✅ Applique le code promo
         $discount = $codeDiscount;
+        $cart->setPromoCode($code);
 
-        // 🔍 Vérification : si la promo ne s'applique à AUCUN article
-        if ($discount <= 0) {
-            // 👉 Je supprime toute promo stockée en session
-            $cart->clearPromos();
-
-            // 👉 Je renvoie une erreur spécifique
-            return new JsonResponse([
-                'error' => "Ce code promo ne s'applique pas à votre panier."
-            ]);
-        }
-
-        // Total final = produits + livraison - réduction
+        // 🔹 Calcul total final = produits + livraison - réduction
         $totalTTC = array_reduce($cart->getFull(), fn($carry, $item) =>
             $carry + $item['product']->getPrice()
                 * (1 + ($item['product']->getTva()?->getValue()/100 ?? 0))
@@ -210,16 +199,13 @@ class CartController extends BaseController
 
         $totalAfterPromo = $totalTTC - $discount + $cart->getLivraisonPrice($weightRepository);
 
-        // Stocke uniquement le code promo
-        $cart->setPromoCode($code);
-
+        // 🔹 Renvoie la réponse JSON pour le front
         return new JsonResponse([
             'discount' => $discount,
             'totalAfterPromo' => $totalAfterPromo,
-            'reload' => true // 🔥 déclenche le reload automatique côté JS
+            'reload' => true
         ]);
     }
-
 
     #[Route('/cart/add/{id}/{type}', name: 'add_to_cart', defaults: ['type' => 'trottinette'], methods: ['GET', 'POST'])]
     public function add(Cart $panier, int $id, string $type, Request $requete): Response

@@ -151,7 +151,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // ✅ RÉAPPLICATION AU CHARGEMENT
     //---------------------------------------------------
     const currentCode = promoCodeInput.value.trim();
-    if (currentCode) {
+    if (currentCode && !promoMessage.textContent) {
         applyPromo(currentCode);
     }
 
