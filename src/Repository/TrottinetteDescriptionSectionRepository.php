@@ -6,7 +6,7 @@ use App\Entity\TrottinetteDescriptionSection;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
-class TrottinetteDescriptionSectionRepositoryRepository extends ServiceEntityRepository
+class TrottinetteDescriptionSectionRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {

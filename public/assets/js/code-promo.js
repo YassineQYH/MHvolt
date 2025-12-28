@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const totalRemise = document.getElementById('totalRemise');
     const reductionPromo = document.getElementById('reductionPromo');
     const appliedPromoCode = document.getElementById('appliedPromoCode');
+    const promoCodeValidInput = document.getElementById('promoCodeValid');
 
     //---------------------------------------------------
     // UI Utils
@@ -70,28 +71,39 @@ document.addEventListener('DOMContentLoaded', function() {
             // ERROR
             //------------------------------------------------
             if (data.error) {
-                resetPromoUI(); // on nettoie l’UI AVANT
-                promoMessage.textContent = data.error; // puis on affiche le message
+                resetPromoUI();
+                promoMessage.textContent = data.error;
+
+                // ⚠️ vider le champ et marquer promo invalide
+                promoCodeInput.value = '';
+                if (promoCodeValidInput) promoCodeValidInput.value = "0";
+
                 return;
             }
 
             //------------------------------------------------
             // SUCCESS
             //------------------------------------------------
-            // 🔥 Si le backend demande un reload, on recharge la page
-            // Reload uniquement s'il n'y a PAS d'erreur
-            if (data.reload === true && !data.error) {
+            // 🔹 Mettre le flag promo valide
+            if (promoCodeValidInput) promoCodeValidInput.value = "1";
+
+            // 🔹 Mise à jour dynamique des totaux
+            applyPromoUI(code, data.discount, data.totalAfterPromo);
+
+            // 🔹 Si backend demande un reload (ex. remise appliquée correctement)
+            if (data.reload === true) {
+                // on garde le reload mais on met le flag pour ne pas réappliquer après
+                sessionStorage.setItem('promoReloaded', '1');
                 window.location.reload();
                 return;
             }
 
-            // Sinon mise à jour dynamique des totaux
-            applyPromoUI(code, data.discount, data.totalAfterPromo);
 
         } catch (err) {
             console.error(err);
             promoMessage.textContent = "Une erreur est survenue.";
             resetPromoUI();
+            if (promoCodeValidInput) promoCodeValidInput.value = "0";
         }
     }
 
@@ -117,10 +129,13 @@ document.addEventListener('DOMContentLoaded', function() {
     //---------------------------------------------------
     window.reapplyPromo = function() {
         const code = promoCodeInput.value.trim();
-        if (!code) {
+        const promoCodeValid = promoCodeValidInput?.value === "1";
+
+        if (!code || !promoCodeValid) {
             resetPromoUI();
             return;
         }
+
         applyPromo(code);
     };
 
@@ -148,11 +163,18 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     //---------------------------------------------------
-    // ✅ RÉAPPLICATION AU CHARGEMENT
+    // ✅ RÉAPPLICATION AU CHARGEMENT (uniquement si promo valide)
     //---------------------------------------------------
     const currentCode = promoCodeInput.value.trim();
-    if (currentCode && !promoMessage.textContent) {
-        applyPromo(currentCode);
+    const promoCodeValid = promoCodeValidInput?.value === "1";
+
+    // ✅ on ne réapplique que si le code promo est valide ET qu'on n'a pas encore reloadé
+    if (currentCode && promoCodeValid && !promoMessage.textContent && !sessionStorage.getItem('promoReloaded')) {
+        applyPromo(currentCode).then(() => {
+            // on marque que le reload est déjà fait
+            sessionStorage.setItem('promoReloaded', '1');
+        });
     }
+
 
 });
