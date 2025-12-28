@@ -27,7 +27,7 @@ class StripeController extends AbstractController
             PromotionService $promotionService,
             string $reference
         ): RedirectResponse {
-            $YOUR_DOMAIN = 'http://127.0.0.1:8000';
+            $YOUR_DOMAIN = $_ENV['APP_URL'];
             $product_for_stripe = [];
 
             /** @var User|null $user */
