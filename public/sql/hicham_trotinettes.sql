@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : localhost:3306
--- Généré le : mer. 07 jan. 2026 à 18:23
+-- Généré le : ven. 09 jan. 2026 à 16:01
 -- Version du serveur : 8.4.3
 -- Version de PHP : 8.2.30
 
@@ -195,7 +195,7 @@ CREATE TABLE `home_video` (
 --
 
 INSERT INTO `home_video` (`id`, `title`, `video_file`, `video_url`, `headline`, `subtitle`, `is_active`, `position`, `created_at`, `updated_at`) VALUES
-(1, 'super trott', 'led-pergola-695e7b137a576.mp4', NULL, 'Avengers Trottinette', 'Trottinette de superHero Marvel', 1, 1, '2026-01-07 16:02:19', '2026-01-07 18:00:57');
+(1, 'super trott', 'videoplayback-696117c79ff4f.mp4', NULL, 'Avengers Trottinette', 'Trottinette de superHero Marvel', 1, 1, '2026-01-07 16:02:19', '2026-01-09 15:59:20');
 
 -- --------------------------------------------------------
 
