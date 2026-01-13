@@ -97,6 +97,13 @@ class HomeController extends AbstractController
             return $this->redirectToRoute('app_home');
         }
 
+        if ($formcontact->isSubmitted() && !$formcontact->isValid()) {
+            $this->addFlash(
+                'error',
+                "Une erreur est survenue. Veuillez vérifier les informations du formulaire de contact."
+            );
+        }
+
         // --- LOGIN ---
         $error = $authenticationUtils->getLastAuthenticationError();
         $lastUsername = $authenticationUtils->getLastUsername();
@@ -113,7 +120,6 @@ class HomeController extends AbstractController
         if ($formregister->isSubmitted() && $formregister->isValid()) {
             $user = $formregister->getData();
 
-            // Vérifier si l'email existe déjà
             $search_email = $this->entityManager->getRepository(User::class)
                 ->findOneByEmail($user->getEmail());
 
@@ -124,11 +130,24 @@ class HomeController extends AbstractController
                 $this->entityManager->persist($user);
                 $this->entityManager->flush();
 
-                $notification = "Votre inscription s'est correctement déroulée. Vous pouvez dès à présent vous connecter à votre compte.";
+                // ✅ FLASH SUCCÈS
+                $this->addFlash(
+                    'info-alert',
+                    "Votre inscription s'est correctement déroulée. Vous pouvez dès à présent vous connecter à votre compte."
+                );
+
             } else {
-                $notification = "L'email que vous avez renseigné existe déjà.";
+                // ❌ FLASH ERREUR
+                $this->addFlash(
+                    'error',
+                    "L'email que vous avez renseigné existe déjà."
+                );
             }
+
+            // 🔄 IMPORTANT : redirection pour afficher le flash
+            return $this->redirectToRoute('app_home');
         }
+
 
         // --- DONNÉES POUR LE CARROUSEL ---
         /* $headers = $this->entityManager->getRepository(Trottinette::class)
