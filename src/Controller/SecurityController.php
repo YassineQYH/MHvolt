@@ -30,21 +30,19 @@ class SecurityController extends AbstractController
     /**
      * 🧍‍♂️ Inscription utilisateur
      */
-    #[Route(path: '/inscription', name: 'app_register')]
+    /*     #[Route(path: '/inscription', name: 'app_register')]
     public function register(
         Request $request,
         UserPasswordHasherInterface $passwordHasher,
         AuthenticationUtils $authenticationUtils
     ): Response {
-        // Partie login (erreurs et dernier username)
+        // Login
         $error = $authenticationUtils->getLastAuthenticationError();
         $lastUsername = $authenticationUtils->getLastUsername();
 
-        // Partie inscription
-        $notification = null;
+        // Inscription
         $user = new User();
         $form = $this->createForm(RegisterType::class, $user);
-
         $form->handleRequest($request);
 
         if ($form->isSubmitted()) {
@@ -53,39 +51,38 @@ class SecurityController extends AbstractController
                 ->findOneByEmail($user->getEmail());
 
             if ($form->isValid() && !$existingUser) {
-                // Hachage du mot de passe
+                // ✅ Inscription réussie
                 $hashedPassword = $passwordHasher->hashPassword($user, $user->getPassword());
                 $user->setPassword($hashedPassword);
 
-                // Persistance utilisateur
                 $this->entityManager->persist($user);
                 $this->entityManager->flush();
 
-                // Message de succès
-                $this->addFlash('register_success', "✅ Votre inscription s'est bien déroulée. Vous pouvez maintenant vous connecter.");
+                $this->addFlash('info-alert', "✅ Votre inscription s'est bien déroulée. Vous pouvez maintenant vous connecter.");
+
+                // 🔄 Redirection pour afficher le flash
+                return $this->redirectToRoute('app_register');
+
+            } elseif ($existingUser) {
+                // ⚠️ Email déjà utilisé
+                $this->addFlash('info-alert', "⚠️ L'adresse e-mail est déjà utilisée.");
+
+                return $this->redirectToRoute('app_register');
+
             } else {
-                if ($existingUser) {
-                    // Email déjà utilisé
-                    $this->addFlash('info-alert', "⚠️ L'adresse e-mail est déjà utilisée.");
-                } else {
-                    // Formulaire invalide
-                    $this->addFlash('info-alert', "⚠️ L’inscription n’a pas pu aboutir. Veuillez vérifier vos informations.");
-                }
+                // ⚠️ Formulaire invalide
+                $this->addFlash('info-alert', "⚠️ L’inscription n’a pas pu aboutir. Veuillez vérifier vos informations.");
+
+                return $this->redirectToRoute('app_register');
             }
         }
 
-
-        /* if ($form->isSubmitted() && !$form->isValid()) {
-            $this->addFlash('register_error', '⚠️ L’inscription n’a pas pu aboutir. Veuillez vérifier vos informations.');
-        } */
-
         return $this->render('register/index.html.twig', [
             'formregister' => $form->createView(),
-            'notification' => $notification,
             'last_username' => $lastUsername,
             'error' => $error,
         ]);
-    }
+    }*/
 
     /**
      * 🔑 Connexion API

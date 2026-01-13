@@ -139,7 +139,7 @@ class HomeController extends AbstractController
             } else {
                 // ❌ FLASH ERREUR
                 $this->addFlash(
-                    'error',
+                    'info-alert',
                     "L'email que vous avez renseigné existe déjà."
                 );
             }
