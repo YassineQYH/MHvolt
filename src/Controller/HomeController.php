@@ -127,6 +127,9 @@ class HomeController extends AbstractController
                 $password = $encoder->hashPassword($user, $user->getPassword());
                 $user->setPassword($password);
 
+                // 🔹 AJOUT DU ROLE PAR DÉFAUT
+                $user->setRoles(['ROLE_USER']);
+
                 $this->entityManager->persist($user);
                 $this->entityManager->flush();
 

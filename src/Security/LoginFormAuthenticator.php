@@ -3,11 +3,11 @@
 namespace App\Security;
 
 use App\Entity\User;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Security\Core\Security;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
 use Symfony\Component\Security\Http\SecurityRequestAttributes;
@@ -20,7 +20,6 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\CsrfTokenBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\RememberMeBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
-use Doctrine\ORM\EntityManagerInterface;
 
 class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
 {
@@ -31,6 +30,16 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
         private EntityManagerInterface $entityManager
     ) {}
 
+    /**
+     * 🔐 IMPORTANT :
+     * L’authenticator ne s’exécute QUE pour le formulaire login
+     */
+    public function supports(Request $request): bool
+    {
+        return $request->isMethod('POST')
+            && $request->request->get('type') === 'login';
+    }
+
     public function authenticate(Request $request): Passport
     {
         $email = $request->request->get('email', '');
@@ -38,8 +47,9 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
 
         $request->getSession()->set(SecurityRequestAttributes::LAST_USERNAME, $email);
 
-        // Vérification de l'email avant de créer le Passport
-        $user = $this->entityManager->getRepository(User::class)
+        // 🔎 Vérification email
+        $user = $this->entityManager
+            ->getRepository(User::class)
             ->findOneByEmail($email);
 
         if (!$user) {
@@ -63,18 +73,12 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
         TokenInterface $token,
         string $firewallName
     ): ?Response {
-
         if ($targetPath = $this->getTargetPath($request->getSession(), $firewallName)) {
             return new RedirectResponse($targetPath);
         }
 
         /** @var SessionInterface $session */
         $session = $request->getSession();
-        if (!$session instanceof SessionInterface) {
-            throw new \LogicException('La session est requise pour les flashs');
-        }
-
-        // ✅ Message flash succès
         $session->getFlashBag()->add(
             'info-alert',
             'Heureux de vous revoir 👋'
@@ -86,26 +90,16 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
     }
 
     public function onAuthenticationFailure(
-    Request $request,
-    AuthenticationException $exception
+        Request $request,
+        AuthenticationException $exception
     ): Response {
 
         /** @var SessionInterface $session */
         $session = $request->getSession();
-        if (!$session instanceof SessionInterface) {
-            throw new \LogicException('La session est requise pour les flashs');
-        }
 
-        // ⚡ Message par défaut
-        $message = $exception->getMessage();
-
-        // Si l'exception est un CustomUserMessageAuthenticationException (email inexistant)
-        if ($exception instanceof CustomUserMessageAuthenticationException) {
-            $message = $exception->getMessage(); // affiche le message “⚠️ L’email renseigné n’existe pas.”
-        } else {
-            // Pour toutes les autres erreurs (ex: mot de passe incorrect)
-            $message = '⚠️ Mot de passe incorrect. Veuillez réessayer.';
-        }
+        $message = $exception instanceof CustomUserMessageAuthenticationException
+            ? $exception->getMessage()
+            : '⚠️ Mot de passe incorrect. Veuillez réessayer.';
 
         $session->getFlashBag()->add('info-alert', $message);
 
@@ -114,13 +108,8 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
         );
     }
 
-
     protected function getLoginUrl(Request $request): string
     {
-        if (isset($_POST["type"]) && $_POST["type"] === "login") {
-            return $this->urlGenerator->generate($request->get('_route'), $request->get('_route_params'));
-        }
-
         return $this->urlGenerator->generate('app_home');
     }
 }
