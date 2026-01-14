@@ -7,13 +7,19 @@ use Mailjet\Resources;
 
 class Mail
 {
+    private string $api_key;
+    private string $api_key_secret;
+
+    public function __construct()
+    {
+        $this->api_key = $_ENV['MAILJET_PUBLIC_KEY'] ?? '';
+        $this->api_key_secret = $_ENV['MAILJET_PRIVATE_KEY'] ?? '';
+    }
+
     public function send($to_email, $to_name, $subject, $content)
     {
-        // Récupère les clés depuis les variables d'environnement
-        $api_key = $_ENV['MAILJET_APIKEY_PUBLIC'] ?? $_ENV['MAILER_DSN_PUBLIC_KEY'] ?? null;
-        $api_secret = $_ENV['MAILJET_APIKEY_PRIVATE'] ?? $_ENV['MAILER_DSN_PRIVATE_KEY'] ?? null;
-
-        $mj = new Client($api_key, $api_secret, true, ['version' => 'v3.1']);
+        $mj = new Client($this->api_key, $this->api_key_secret, true, ['version' => 'v3.1']);
+        $mj->setTimeout(3);
 
         $body = [
             'Messages' => [
