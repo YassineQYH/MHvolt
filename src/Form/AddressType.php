@@ -63,8 +63,8 @@ class AddressType extends AbstractType
                 'attr' => ['placeholder' => 'Ex : +33612345678'],
                 'constraints' => [
                     new Regex([
-                        'pattern' => '/^\+33[67]\d{8}$/',
-                        'message' => 'Le numéro doit commencer par +336 ou +337 et contenir 8 chiffres.'
+                        'pattern' => '/^(?:\+33[67]\d{8}|\+32[4-7]\d{8})$/',
+                        'message' => 'Le numéro doit commencer par +33 (France) ou +32 (Belgique) et être correct.'
                     ])
                 ]
             ]);
