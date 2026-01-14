@@ -15,7 +15,7 @@
 
             {% if app.user %}
                 <div class="mb-3 hello-user">
-                    Vous êtes connecté en tant que {{ app.user.userIdentifier }},
+                    <p>Vous êtes connecté en tant que {{ app.user.userIdentifier }}</p>,
                     <a href="{{ path('app_logout') }}" class="register-link"> </a>
                 </div>
 
@@ -26,7 +26,7 @@
                         <li><a href="{{ path('app_logout') }}">Déconnexion</a></li>
                     </ul>
                 {% elseif is_granted('ROLE_USER') %}
-                    <ul class="sous-menu-nom">
+                    <ul class="sous-menu-nom menu-mon-compte">
                         <li><a href="/compte">Compte</a></li>
                         <li><a href="{{ path('app_logout') }}">Déconnexion</a></li>
                     </ul>

@@ -465,8 +465,19 @@ body.modal-open {
 
 
 /* Menu utilisateur connecté - texte réduit et espacement optimisé */
+.hello-user p{
+    background: #f0f0f0;
+    border-radius: 4px;
+    display: flex;
+    justify-content: center;
+}
+.sous-menu-nom.menu-mon-compte li {
+    display: flex;
+    justify-content: center;
+}
 
 .sous-menu-nom.menu-mon-compte li a {
+    background: #f0f0f0;
     color: #000;
     /* texte noir */
     text-decoration: none;
@@ -487,7 +498,7 @@ body.modal-open {
 }
 
 .sous-menu-nom.menu-mon-compte li a:hover {
-    background: #f0f0f0;
+    background: #f3efbc;
     /* léger fond au survol */
 }
 
