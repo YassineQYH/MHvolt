@@ -14,7 +14,7 @@ class TestMailController extends AbstractController
     {
         $mail = new Mail();
         $success = $mail->send(
-            'yassine.qyh@gmail.com', 
+            'qayouh.yassine@outlook.be',
             'Yass',
             'Test Mailjet',
             '<p>Bonjour, ceci est un test depuis Symfony + Mailjet !</p>'
