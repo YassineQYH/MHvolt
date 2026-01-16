@@ -48,7 +48,7 @@ class AdminDashboardController extends AbstractDashboardController
 
     public function index(): Response
     {
-        $request = $this->requestStack->getCurrentRequest();
+        $request = $this->container->get('request_stack')->getCurrentRequest();
 
         $ordersByMonthData = $this->getOrdersByMonth($request);
 
@@ -61,6 +61,7 @@ class AdminDashboardController extends AbstractDashboardController
             'revenueByMonth'   => $this->getRevenueByMonth(),
         ]);
     }
+
 
 
     public function configureDashboard(): Dashboard
