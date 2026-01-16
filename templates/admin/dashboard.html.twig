@@ -10,15 +10,34 @@
 
         <div style="flex:1 1 500px; min-width:300px; max-height:400px;">
             <h2>Commandes par mois</h2>
+
+            <!-- Navigation années -->
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+                {% if prevYear %}
+                    <a href="?year={{ prevYear }}" class="arrow-left">&larr; {{ prevYear }}</a>
+                {% else %}
+                    <span></span>
+                {% endif %}
+
+                <span class="current-year">{{ yearToDisplay }}</span>
+
+                {% if nextYear %}
+                    <a href="?year={{ nextYear }}" class="arrow-right">{{ nextYear }} &rarr;</a>
+                {% else %}
+                    <span></span>
+                {% endif %}
+            </div>
+
             <canvas id="ordersByMonth" class="dashboard-canvas"></canvas>
         </div>
+
 
         <div style="flex:1 1 400px; min-width:300px; max-height:400px;">
             <h2>Statut des commandes</h2>
             <canvas id="ordersByStatus" class="dashboard-canvas"></canvas>
         </div>
 
-    </div>
+    </div></br>
 
     <!-- Ligne 2 : Chiffre d'affaires -->
     <div style="margin-top:40px; flex:1 1 100%; min-width:300px; max-height:400px;">
@@ -49,7 +68,10 @@
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            scales: { y: { beginAtZero: true } },
+            scales: {
+                y: { beginAtZero: true },
+                x: { title: { display: true, text: 'Mois' } }
+            },
             plugins: { legend: { position: 'bottom' } }
         }
     });

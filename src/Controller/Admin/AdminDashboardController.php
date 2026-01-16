@@ -18,6 +18,8 @@ use App\Entity\TrottinetteAccessory;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\TrottinetteCaracteristique;
 use App\Entity\TrottinetteDescriptionSection;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
@@ -29,10 +31,12 @@ use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
 class AdminDashboardController extends AbstractDashboardController
 {
     private EntityManagerInterface $em;
+    private RequestStack $requestStack;
 
-    public function __construct(EntityManagerInterface $em)
+    public function __construct(EntityManagerInterface $em, RequestStack $requestStack)
     {
         $this->em = $em;
+        $this->requestStack = $requestStack;
     }
 
     public function configureAssets(): Assets
@@ -44,13 +48,20 @@ class AdminDashboardController extends AbstractDashboardController
 
     public function index(): Response
     {
-        // Affichage du template custom avec les graphiques
+        $request = $this->requestStack->getCurrentRequest();
+
+        $ordersByMonthData = $this->getOrdersByMonth($request);
+
         return $this->render('admin/dashboard.html.twig', [
             'orderStatusStats' => $this->getOrderStatusStats(),
-            'ordersByMonth' => $this->getOrdersByMonth(),
-            'revenueByMonth' => $this->getRevenueByMonth(),
+            'ordersByMonth'    => $ordersByMonthData['ordersByMonth'],
+            'yearToDisplay'    => $ordersByMonthData['yearToDisplay'],
+            'prevYear'         => $ordersByMonthData['prevYear'],
+            'nextYear'         => $ordersByMonthData['nextYear'],
+            'revenueByMonth'   => $this->getRevenueByMonth(),
         ]);
     }
+
 
     public function configureDashboard(): Dashboard
     {
@@ -139,31 +150,66 @@ class AdminDashboardController extends AbstractDashboardController
     }
 
 
-    private function getOrdersByMonth(): array
+    public function getOrdersByMonth(Request $request): array
     {
         $conn = $this->em->getConnection();
+
+        // 📌 Requête SQL avec année et mois
         $sql = "
             SELECT
+                YEAR(o.created_at) AS year,
                 MONTH(o.created_at) AS month,
                 COUNT(o.id) AS total
             FROM `order` o
-            GROUP BY month
-            ORDER BY month ASC
+            GROUP BY year, month
+            ORDER BY year ASC, month ASC
         ";
 
         $results = $conn->executeQuery($sql)->fetchAllAssociative();
 
-        $labels = [];
-        $values = [];
-
+        // 📌 Organiser les données par année
+        $data = [];
         foreach ($results as $row) {
-            // Pour rendre le mois lisible, tu peux convertir le numéro en texte
-            $labels[] = date('F', mktime(0, 0, 0, $row['month'], 1));
-            $values[] = $row['total'];
+            $year = (int)$row['year'];
+            $month = (int)$row['month'];
+            $total = (int)$row['total'];
+
+            $data[$year][$month] = $total;
         }
 
-        return ['labels' => $labels, 'values' => $values];
+        // 📌 Récupérer l'année sélectionnée dans la requête (GET)
+        $years = array_keys($data);
+        $currentYear = date('Y');
+
+        $yearToDisplay = $request->query->getInt('year', $currentYear);
+        if (!in_array($yearToDisplay, $years)) {
+            // si l'année sélectionnée n'existe pas dans les données, afficher la dernière année
+            $yearToDisplay = max($years);
+        }
+
+        // 📌 Préparer labels et valeurs pour Chart.js
+        $labels = [];
+        $values = [];
+        for ($m = 1; $m <= 12; $m++) {
+            $labels[] = strftime('%B', mktime(0, 0, 0, $m, 1)); // Janvier, Février, ...
+            $values[] = $data[$yearToDisplay][$m] ?? 0;
+        }
+
+        // 📌 Années pour navigation flèches
+        $prevYear = $yearToDisplay - 1;
+        $nextYear = $yearToDisplay + 1;
+
+        return [
+            'ordersByMonth' => [
+                'labels' => $labels,
+                'values' => $values,
+            ],
+            'yearToDisplay' => $yearToDisplay,
+            'prevYear' => in_array($prevYear, $years) ? $prevYear : null,
+            'nextYear' => in_array($nextYear, $years) ? $nextYear : null,
+        ];
     }
+
 
     private function getOrderStatusStats(): array
     {
