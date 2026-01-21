@@ -13,20 +13,13 @@
 
             <!-- Navigation années -->
             <div class="year-navigation">
-                {% if prevYear %}
-                    <a href="?year={{ prevYear }}" class="arrow-left">&larr; {{ prevYear }}</a>
-                {% else %}
-                    <span></span>
-                {% endif %}
+                <a href="#" class="arrow-left" style="visibility:hidden">&larr;</a>
 
                 <span class="current-year">{{ yearToDisplay }}</span>
 
-                {% if nextYear %}
-                    <a href="?year={{ nextYear }}" class="arrow-right">{{ nextYear }} &rarr;</a>
-                {% else %}
-                    <span></span>
-                {% endif %}
+                <a href="#" class="arrow-right" style="visibility:hidden">&rarr;</a>
             </div>
+
 
             <canvas id="ordersByMonth" class="dashboard-canvas"></canvas>
         </div>
@@ -36,7 +29,7 @@
             <canvas id="ordersByStatus" class="dashboard-canvas"></canvas>
         </div>
 
-    </div></br>
+    </div></br></br></br></br>
 
     <!-- Ligne 2 : Chiffre d'affaires -->
     <div style="margin-top:40px; flex:1 1 100%; min-width:300px; max-height:400px;">
@@ -86,7 +79,7 @@
     // -----------------------------
     // 🥧 Statut des commandes (PIE)
     // -----------------------------
-    new Chart(
+    const ordersByStatusChart = new Chart(
         document.getElementById('ordersByStatus'),
         {
             type: 'pie',
@@ -133,20 +126,53 @@
     );
 
     // -----------------------------
-    // 🔄 Navigation années (AJAX)
+    // 🔄 Navigation années
     // -----------------------------
+    function updateYearNavigation(data) {
+        const left = document.querySelector('.arrow-left');
+        const right = document.querySelector('.arrow-right');
+
+        if (data.prevYear) {
+            left.href = '?year=' + data.prevYear;
+            left.textContent = '← ' + data.prevYear;
+            left.style.visibility = 'visible';
+        } else {
+            left.style.visibility = 'hidden';
+        }
+
+        if (data.nextYear) {
+            right.href = '?year=' + data.nextYear;
+            right.textContent = data.nextYear + ' →';
+            right.style.visibility = 'visible';
+        } else {
+            right.style.visibility = 'hidden';
+        }
+    }
+
+    // Mise à jour initiale des flèches dès le chargement
+    updateYearNavigation({
+        prevYear: {{ prevYear is not null ? prevYear : 'null' }},
+        nextYear: {{ nextYear is not null ? nextYear : 'null' }}
+    });
+
+    // Gestion du clic AJAX sur les flèches
     document.querySelectorAll('.year-navigation a').forEach(link => {
-        link.addEventListener('click', function(e){
+        link.addEventListener('click', function(e) {
             e.preventDefault();
-            fetch(this.href, { headers:{ 'X-Requested-With':'XMLHttpRequest' } })
+
+            if (!this.href || this.style.visibility === 'hidden') {
+                return;
+            }
+
+            fetch(this.href, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
             .then(res => res.json())
             .then(data => {
-                // 📊 Mise à jour commandes
+                // 📊 Commandes
                 ordersByMonthChart.data.labels = data.ordersByMonth.labels;
                 ordersByMonthChart.data.datasets[0].data = data.ordersByMonth.values;
                 ordersByMonthChart.update();
 
-                // 💰 Mise à jour chiffre d'affaires
+                // 💰 Chiffre d'affaires
                 revenueChart.data.labels = data.revenueByMonth.labels;
                 revenueChart.data.datasets[0].data = data.revenueByMonth.values;
                 revenueChart.update();
@@ -154,23 +180,14 @@
                 // 🗓️ Année affichée
                 document.querySelector('.current-year').textContent = data.yearToDisplay;
 
-                // ⬅️➡️ Flèches
-                const left = document.querySelector('.arrow-left');
-                const right = document.querySelector('.arrow-right');
-
-                if(left){
-                    if(data.prevYear){ left.href='?year='+data.prevYear; left.style.visibility='visible'; }
-                    else { left.style.visibility='hidden'; }
-                }
-                if(right){
-                    if(data.nextYear){ right.href='?year='+data.nextYear; right.style.visibility='visible'; }
-                    else { right.style.visibility='hidden'; }
-                }
+                // ⬅️➡️ Navigation
+                updateYearNavigation(data);
             })
             .catch(err => console.error('Erreur chargement stats:', err));
         });
     });
 </script>
+
 
 <style>
     /* Classe pour harmoniser tous les canvas */
