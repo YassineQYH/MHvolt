@@ -62,7 +62,7 @@ class ContactType extends AbstractType
                 'attr' => [
                     'class' => 'form-element',
                     'id' => 'email',
-                    'placeholder' => 'admin@hich-trott.com',
+                    'placeholder' => 'admin@mhvolt.com',
                     'required' => true
                 ]
             ])
@@ -72,7 +72,7 @@ class ContactType extends AbstractType
                 'attr' => [
                     'class' => 'form-element',
                     'id' => 'company',
-                    'placeholder' => 'Https://hich-trott.com'
+                    'placeholder' => 'Https://mhvolt.com'
                 ]
             ])
             ->add('message', TextareaType::class, [

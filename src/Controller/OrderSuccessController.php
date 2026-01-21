@@ -81,7 +81,7 @@ class OrderSuccessController extends AbstractController
             $contentAdmin = "Bonjour, </br>La commande n°<strong>" . $order->getReference() . "</strong> "
                 . "de <strong>" . $order->getUser()->getFirstname() . " " . $order->getUser()->getLastname() . "</strong> "
                 . "vient d'être payée et validée.";
-            $mailAdmin->send('admin@hich-trott.com', '', $subject, $contentAdmin);
+            $mailAdmin->send('admin@mhvolt.com', '', $subject, $contentAdmin);
         }
 
         return $this->render('order_success/index.html.twig', [

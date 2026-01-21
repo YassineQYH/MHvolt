@@ -53,15 +53,15 @@ class ResetPasswordController extends AbstractController
                 ]);
 
                 $content = "Bonjour " . $user->getFirstname() . "</br>"
-                    . "Vous avez demandé à réinitialiser votre mot de passe sur le site Hich-Trott.</br></br>"
+                    . "Vous avez demandé à réinitialiser votre mot de passe sur le site mhvolt.</br></br>"
                     . "Merci de bien vouloir cliquer sur le lien suivant pour "
-                    . "<a href='https://hicham_trotinettes.test/" . $url . "'>mettre à jour votre mot de passe</a>.";
+                    . "<a href='https://mhvolt.test/" . $url . "'>mettre à jour votre mot de passe</a>.";
 
                 $mail = new Mail();
                 $mail->send(
                     $user->getEmail(),
                     $user->getFirstname() . ' ' . $user->getLastname(),
-                    'Réinitialiser votre mot de passe sur Hich-Trott',
+                    'Réinitialiser votre mot de passe sur mhvolt',
                     $content
                 );
 

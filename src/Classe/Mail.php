@@ -26,7 +26,7 @@ class Mail
                 [
                     'From' => [
                         'Email' => "yassine.qyh@gmail.com",
-                        'Name' => "Hich Trott"
+                        'Name' => "MHvolt"
                     ],
                     'To' => [
                         [
