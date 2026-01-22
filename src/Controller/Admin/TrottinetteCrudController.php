@@ -15,7 +15,8 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\{
     NumberField,
     AssociationField,
     IntegerField,
-    DateTimeField
+    DateTimeField,
+    MoneyField
 };
 
 class TrottinetteCrudController extends AbstractCrudController
@@ -72,10 +73,10 @@ class TrottinetteCrudController extends AbstractCrudController
             // ======================
             // PRIX / STOCK
             // ======================
-            NumberField::new('price', 'Prix HT')
-                ->onlyOnIndex()
-                ->setNumDecimals(2)
-                ->formatValue(fn ($value) => number_format($value, 2, ',', ' ') . ' €'),
+            MoneyField::new('price', 'Prix')
+                ->setCurrency('EUR')
+                ->setStoredAsCents(false)
+                ->setHelp('Entrez le prix en euros.'),
 
             AssociationField::new('tva', 'TVA')
                 ->formatValue(function ($value, $entity) {

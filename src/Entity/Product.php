@@ -27,6 +27,16 @@ class Product
     #[ORM\Column(type:"string", length:255, unique:true)]
     protected ?string $slug = null;
 
+    #[ORM\PrePersist]
+    #[ORM\PreUpdate]
+    public function setSlugValue(): void
+    {
+        if (!$this->slug && $this->name) {
+            $slugger = new \Symfony\Component\String\Slugger\AsciiSlugger();
+            $this->slug = strtolower($slugger->slug($this->name));
+        }
+    }
+
     #[ORM\Column(type:"text", nullable:true)]
     protected ?string $description = null;
 
