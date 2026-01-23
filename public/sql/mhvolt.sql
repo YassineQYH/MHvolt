@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : localhost:3306
--- Généré le : ven. 09 jan. 2026 à 16:08
+-- Généré le : ven. 23 jan. 2026 à 15:56
 -- Version du serveur : 8.4.3
 -- Version de PHP : 8.2.30
 
@@ -49,7 +49,8 @@ INSERT INTO `accessory` (`id`, `category_id`) VALUES
 (13, 3),
 (5, 4),
 (9, 4),
-(10, 4);
+(10, 4),
+(18, 5);
 
 -- --------------------------------------------------------
 
@@ -77,9 +78,9 @@ CREATE TABLE `address` (
 
 INSERT INTO `address` (`id`, `user_id`, `name`, `firstname`, `lastname`, `company`, `address`, `postal`, `city`, `country`, `phone`) VALUES
 (1, 1, 'Maison', 'Yass', 'Qay', NULL, '51 Rue de Konoha', '63200', 'angleur', 'France', '06.11.55.22.51'),
-(2, 2, 'Maison', 'Hich', 'Qay', NULL, '51 Belle jardinère', '63118', 'sart-tilman', 'France', '06.11.55.22.51'),
+(2, 2, 'Maison', 'Hich', 'Qay', NULL, '51 Belle jardinère', '63118', 'sart-tilman', 'FR', '+33601020304'),
 (3, 1, 'Travail', 'Yass', 'Qay', NULL, '51 Rue du Hueco Mundo', '63200', 'clermont ferrand', 'France', '06.11.55.22.51'),
-(4, 4, 'Maison', 'Yass', 'Qay', NULL, '17 marie marving', '63200', 'riom', 'FR', '+33641515128');
+(6, 3, 'maison', 'pre test', 'nom test', NULL, 'rue davin', '4031', 'angleur', 'BE', '+32485968745');
 
 -- --------------------------------------------------------
 
@@ -89,21 +90,26 @@ INSERT INTO `address` (`id`, `user_id`, `name`, `firstname`, `lastname`, `compan
 
 CREATE TABLE `caracteristique` (
   `id` int NOT NULL,
-  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `categorie_id` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `caracteristique`
 --
 
-INSERT INTO `caracteristique` (`id`, `name`) VALUES
-(1, 'Taille'),
-(2, 'Poids'),
-(3, 'Batterie'),
-(4, 'Vitesse maximale'),
-(5, 'Autonomie'),
-(6, 'Charge maximale'),
-(7, 'sécurité enfant');
+INSERT INTO `caracteristique` (`id`, `name`, `categorie_id`) VALUES
+(1, 'Taille', 5),
+(2, 'Poids', 5),
+(3, 'Batterie', 2),
+(4, 'Vitesse maximale', 2),
+(5, 'Autonomie', 2),
+(6, 'Charge maximale', 6),
+(7, 'Sécurité enfant', 7),
+(8, 'Caractéristique 01', 8),
+(9, 'Caractéristique 02', 9),
+(10, 'Caractéristique 02.5', 9),
+(11, 'Caractéristique 03', 10);
 
 -- --------------------------------------------------------
 
@@ -127,7 +133,10 @@ INSERT INTO `categorie_caracteristique` (`id`, `name`) VALUES
 (4, 'Roues & Pneus'),
 (5, 'Dimensions & Poids'),
 (6, 'Autres particularités'),
-(7, 'Équipement de sécurité');
+(7, 'Équipement de sécurité'),
+(8, 'Nouvelle catégorie temporaire des caractéristiques 01'),
+(9, 'Nouvelle catégorie temporaire des caractéristiques 02'),
+(10, 'Nouvelle catégorie temporaire des caractéristiques 03');
 
 -- --------------------------------------------------------
 
@@ -147,10 +156,11 @@ CREATE TABLE `category_accessory` (
 --
 
 INSERT INTO `category_accessory` (`id`, `name`, `illustration`, `description`) VALUES
-(1, 'Guidon', 'guidon-blunt-black-v2.jpg', 'guidon-blunt-black-v2'),
-(2, 'Freins', 'freins.jpg', 'freins'),
-(3, 'siege', 'siege-trott-elec.jpg', 'siege-trott-elec'),
-(4, 'Roues', 'Roues-freestyle.jpg', 'Roues-freestyle');
+(1, 'Guidon', 'guidon-blunt-black-v2.jpg', '<div>guidon-blunt-black-v2</div>'),
+(2, 'Freins', 'freins-rouge.jpg', '<div>freins</div>'),
+(3, 'siege', 'siege-rouge.jpg', '<div>siege-trott-elec</div>'),
+(4, 'Roues', 'roues-stunt.jpg', '<div>Roues-freestyle</div>'),
+(5, 'Categorie 01 d\'accessoire', '2b753fdb0013b7a44b322b19405b.jpg', '<div>Categorie 01 d\'accessoire</div>');
 
 -- --------------------------------------------------------
 
@@ -169,7 +179,11 @@ CREATE TABLE `doctrine_migration_versions` (
 --
 
 INSERT INTO `doctrine_migration_versions` (`version`, `executed_at`, `execution_time`) VALUES
-('DoctrineMigrations\\Version20260107143346', '2026-01-07 15:37:01', 168);
+('DoctrineMigrations\\Version20260107143346', '2026-01-07 15:37:01', 168),
+('DoctrineMigrations\\Version20260114131843', '2026-01-14 14:19:00', 202),
+('DoctrineMigrations\\Version20260121154605', '2026-01-21 16:46:18', 168),
+('DoctrineMigrations\\Version20260123084635', '2026-01-23 09:47:29', 723),
+('DoctrineMigrations\\Version20260123090023', '2026-01-23 10:00:31', 174);
 
 -- --------------------------------------------------------
 
@@ -179,11 +193,11 @@ INSERT INTO `doctrine_migration_versions` (`version`, `executed_at`, `execution_
 
 CREATE TABLE `home_video` (
   `id` int NOT NULL,
-  `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `video_file` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `video_url` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `headline` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `subtitle` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `title` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `video_file` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `video_url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `headline` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `subtitle` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `is_active` tinyint(1) NOT NULL,
   `position` int DEFAULT NULL,
   `created_at` datetime NOT NULL COMMENT '(DC2Type:datetime_immutable)',
@@ -276,7 +290,13 @@ INSERT INTO `illustration` (`id`, `product_id`, `image`) VALUES
 (69, 16, 'guidon-titanium.jpg'),
 (70, 1, 'trottbleue-01.png'),
 (71, 1, 'trottbleue-02.png'),
-(72, 1, 'trottbleue-03.png');
+(72, 1, 'trottbleue-03.png'),
+(73, 17, '004.png'),
+(74, 17, '005.png'),
+(75, 18, '001.png'),
+(76, 18, '002.png'),
+(77, 17, '025 - Pikatchu - LBP.png'),
+(78, 18, '074 - Racailloux - YQ.png');
 
 -- --------------------------------------------------------
 
@@ -293,6 +313,13 @@ CREATE TABLE `messenger_messages` (
   `available_at` datetime NOT NULL COMMENT '(DC2Type:datetime_immutable)',
   `delivered_at` datetime DEFAULT NULL COMMENT '(DC2Type:datetime_immutable)'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Déchargement des données de la table `messenger_messages`
+--
+
+INSERT INTO `messenger_messages` (`id`, `body`, `headers`, `queue_name`, `created_at`, `available_at`, `delivered_at`) VALUES
+(1, 'O:36:\\\"Symfony\\\\Component\\\\Messenger\\\\Envelope\\\":2:{s:44:\\\"\\0Symfony\\\\Component\\\\Messenger\\\\Envelope\\0stamps\\\";a:1:{s:46:\\\"Symfony\\\\Component\\\\Messenger\\\\Stamp\\\\BusNameStamp\\\";a:1:{i:0;O:46:\\\"Symfony\\\\Component\\\\Messenger\\\\Stamp\\\\BusNameStamp\\\":1:{s:55:\\\"\\0Symfony\\\\Component\\\\Messenger\\\\Stamp\\\\BusNameStamp\\0busName\\\";s:21:\\\"messenger.bus.default\\\";}}}s:45:\\\"\\0Symfony\\\\Component\\\\Messenger\\\\Envelope\\0message\\\";O:51:\\\"Symfony\\\\Component\\\\Mailer\\\\Messenger\\\\SendEmailMessage\\\":2:{s:60:\\\"\\0Symfony\\\\Component\\\\Mailer\\\\Messenger\\\\SendEmailMessage\\0message\\\";O:28:\\\"Symfony\\\\Component\\\\Mime\\\\Email\\\":6:{i:0;N;i:1;N;i:2;s:212:\\\"Bonjour yassine,<br><br>Cliquez sur ce lien pour créer votre mot de passe : <a href=\\\'https://mhvolt.test/set-password/876f97ce-f45e-45d1-93fb-3a789ddc64cd\\\'>Créer mon mot de passe</a><br>Ce lien expire dans 24h.\\\";i:3;s:5:\\\"utf-8\\\";i:4;a:0:{}i:5;a:2:{i:0;O:37:\\\"Symfony\\\\Component\\\\Mime\\\\Header\\\\Headers\\\":2:{s:46:\\\"\\0Symfony\\\\Component\\\\Mime\\\\Header\\\\Headers\\0headers\\\";a:3:{s:4:\\\"from\\\";a:1:{i:0;O:47:\\\"Symfony\\\\Component\\\\Mime\\\\Header\\\\MailboxListHeader\\\":5:{s:50:\\\"\\0Symfony\\\\Component\\\\Mime\\\\Header\\\\AbstractHeader\\0name\\\";s:4:\\\"From\\\";s:56:\\\"\\0Symfony\\\\Component\\\\Mime\\\\Header\\\\AbstractHeader\\0lineLength\\\";i:76;s:50:\\\"\\0Symfony\\\\Component\\\\Mime\\\\Header\\\\AbstractHeader\\0lang\\\";N;s:53:\\\"\\0Symfony\\\\Component\\\\Mime\\\\Header\\\\AbstractHeader\\0charset\\\";s:5:\\\"utf-8\\\";s:58:\\\"\\0Symfony\\\\Component\\\\Mime\\\\Header\\\\MailboxListHeader\\0addresses\\\";a:1:{i:0;O:30:\\\"Symfony\\\\Component\\\\Mime\\\\Address\\\":2:{s:39:\\\"\\0Symfony\\\\Component\\\\Mime\\\\Address\\0address\\\";s:23:\\\"no-reply@hich-trott.com\\\";s:36:\\\"\\0Symfony\\\\Component\\\\Mime\\\\Address\\0name\\\";s:0:\\\"\\\";}}}}s:2:\\\"to\\\";a:1:{i:0;O:47:\\\"Symfony\\\\Component\\\\Mime\\\\Header\\\\MailboxListHeader\\\":5:{s:50:\\\"\\0Symfony\\\\Component\\\\Mime\\\\Header\\\\AbstractHeader\\0name\\\";s:2:\\\"To\\\";s:56:\\\"\\0Symfony\\\\Component\\\\Mime\\\\Header\\\\AbstractHeader\\0lineLength\\\";i:76;s:50:\\\"\\0Symfony\\\\Component\\\\Mime\\\\Header\\\\AbstractHeader\\0lang\\\";N;s:53:\\\"\\0Symfony\\\\Component\\\\Mime\\\\Header\\\\AbstractHeader\\0charset\\\";s:5:\\\"utf-8\\\";s:58:\\\"\\0Symfony\\\\Component\\\\Mime\\\\Header\\\\MailboxListHeader\\0addresses\\\";a:1:{i:0;O:30:\\\"Symfony\\\\Component\\\\Mime\\\\Address\\\":2:{s:39:\\\"\\0Symfony\\\\Component\\\\Mime\\\\Address\\0address\\\";s:21:\\\"yassine.qyh@gmail.com\\\";s:36:\\\"\\0Symfony\\\\Component\\\\Mime\\\\Address\\0name\\\";s:0:\\\"\\\";}}}}s:7:\\\"subject\\\";a:1:{i:0;O:48:\\\"Symfony\\\\Component\\\\Mime\\\\Header\\\\UnstructuredHeader\\\":5:{s:50:\\\"\\0Symfony\\\\Component\\\\Mime\\\\Header\\\\AbstractHeader\\0name\\\";s:7:\\\"Subject\\\";s:56:\\\"\\0Symfony\\\\Component\\\\Mime\\\\Header\\\\AbstractHeader\\0lineLength\\\";i:76;s:50:\\\"\\0Symfony\\\\Component\\\\Mime\\\\Header\\\\AbstractHeader\\0lang\\\";N;s:53:\\\"\\0Symfony\\\\Component\\\\Mime\\\\Header\\\\AbstractHeader\\0charset\\\";s:5:\\\"utf-8\\\";s:55:\\\"\\0Symfony\\\\Component\\\\Mime\\\\Header\\\\UnstructuredHeader\\0value\\\";s:31:\\\"Création de votre mot de passe\\\";}}}s:49:\\\"\\0Symfony\\\\Component\\\\Mime\\\\Header\\\\Headers\\0lineLength\\\";i:76;}i:1;N;}}s:61:\\\"\\0Symfony\\\\Component\\\\Mailer\\\\Messenger\\\\SendEmailMessage\\0envelope\\\";N;}}', '[]', 'default', '2026-01-22 09:13:42', '2026-01-22 09:13:42', NULL);
 
 -- --------------------------------------------------------
 
@@ -333,7 +360,6 @@ INSERT INTO `order` (`id`, `user_id`, `created_at`, `carrier_price`, `delivery`,
 (7, 1, '2025-10-21 16:35:23', 22.35, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '21102025-68f79a2bbf571', NULL, 1, 3, '6G61397378424', 'colissimo', NULL, NULL, NULL, NULL, NULL),
 (8, 1, '2025-10-21 16:37:04', 19.8, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '21102025-68f79a902672b', 'cs_test_b11AmvahjrP8RuTIhMPNCtqZwyg6T0fJQ81CLWFBzisnEATWsvQWmN8fSD', 1, 1, '6G61397895822', 'colissimo', NULL, NULL, NULL, NULL, NULL),
 (9, 1, '2025-10-22 09:35:14', 19.8, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '22102025-68f88932a6b2e', 'cs_test_b1MfDJ2kREupjottpXlscZl1IhorILdWvOFmrGBHtokfu5bVWFuqXapsYo', 1, 2, '6G61398207501', 'colissimo', NULL, NULL, NULL, NULL, NULL),
-(10, 4, '2025-10-22 16:28:00', 20.65, 'Yass Qay<br>+33641515128<br>17 marie marving<br>63200 riom<br>FR', '22102025-68f8e9f1541e1', 'cs_test_b16TGqtnQO05GSgFvVzu0G8kdkwP4QvAaAaCwIZ289xG8H11x0UVaRWmMH', 1, 3, 'CC084147325FR', 'colissimo', NULL, NULL, NULL, NULL, NULL),
 (11, 1, '2025-10-24 16:05:28', 18.95, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '24102025-68fb87a892a1e', 'cs_test_b1WyzxbI3cyBvwK3HaidvFnWnn9KC5Jcw7aihkIPGyNNW9iLukn8DDkEii', 1, 2, '6G61398207501', 'bpost', NULL, NULL, NULL, NULL, NULL),
 (12, 1, '2025-11-07 16:17:59', 24.68, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '07112025-690e0da74f3bb', NULL, 0, 0, NULL, 'bpost', NULL, NULL, NULL, NULL, NULL),
 (13, 1, '2025-11-07 16:18:34', 24.68, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '07112025-690e0dcac0a47', NULL, 0, 0, NULL, 'bpost', NULL, NULL, NULL, NULL, NULL),
@@ -464,7 +490,8 @@ INSERT INTO `order` (`id`, `user_id`, `created_at`, `carrier_price`, `delivery`,
 (141, 1, '2025-12-12 16:43:32', 22.35, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '12122025-693c38246b0a1', 'cs_test_b1tbaMFjVPHxZn7ouQNoXuiSO439AeNJzug7b2s7dowWho3EuN3YRQiO3D', 1, 4, NULL, 'bpost', NULL, NULL, 'family-25', 194.81, 'Famille -25%'),
 (142, 1, '2025-12-23 15:15:43', 22.35, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '23122025-694aa40fe7ee4', 'cs_test_b1U56bhB2q2ZxS5Hf61B9bgMlsQPYu35wLFxVYaNaujsk9s9HzmpIHK6QW', 0, 0, NULL, 'bpost', NULL, NULL, NULL, 111.441, 'Black Friday -15%'),
 (143, 1, '2025-12-23 15:22:04', 22.35, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '23122025-694aa58cd74ad', 'cs_test_b1S890AxEGkhN3yUVBqvHIWqzILw9YknN6VnLrqnFLKripLpMwRQTUge0c', 0, 0, NULL, 'bpost', NULL, NULL, NULL, 111.441, 'Black Friday -15%'),
-(144, 1, '2025-12-23 15:23:23', 22.35, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '23122025-694aa5db370e9', 'cs_test_b1gJ9Dj5W28MwY7MSvHeYi1cCGfk4KxfldW6ZPylmPdC6MoFFl0lSJJtZg', 1, 0, NULL, 'bpost', NULL, NULL, NULL, 111.441, 'Black Friday -15%');
+(144, 1, '2025-12-23 15:23:23', 22.35, 'Yass Qay<br>06.11.55.22.51<br>51 Rue de Konoha<br>63200 angleur<br>France', '23122025-694aa5db370e9', 'cs_test_b1gJ9Dj5W28MwY7MSvHeYi1cCGfk4KxfldW6ZPylmPdC6MoFFl0lSJJtZg', 1, 0, NULL, 'bpost', NULL, NULL, NULL, 111.441, 'Black Friday -15%'),
+(145, 3, '2026-01-14 10:21:02', 24.68, 'pre test nom test<br>+32485968745<br>rue davin<br>4031 angleur<br>BE', '14012026-69675ffeb7164', 'cs_test_b1EKjeQS1dCiRPf5ushRJT7ug33sBscMWoLeoYcxvBdv8YV8YpGZon9knK', 1, 2, 'TEST-333724131', 'bpost', NULL, NULL, NULL, 0, NULL);
 
 -- --------------------------------------------------------
 
@@ -527,9 +554,6 @@ INSERT INTO `order_details` (`id`, `my_order_id`, `product_entity_id`, `product`
 (32, 9, 6, 'guidon blunt black v3', 1, 49, 49, '0.5', 21, 0, NULL, NULL, NULL),
 (33, 9, 12, 'freins rouge', 1, 26, 26, '0.5', 21, 0, NULL, NULL, NULL),
 (34, 9, 9, 'Roues freestyle', 1, 1, 1, '0.75', 21, 0, NULL, NULL, NULL),
-(35, 10, 1, 'Trottinette électrique honey whale m5 max avec siège', 1, 599, 599, '14', 21, 0, NULL, NULL, NULL),
-(36, 10, 9, 'Roues freestyle', 2, 1, 2, '0.75', 21, 0, NULL, NULL, NULL),
-(37, 10, 12, 'freins rouge', 1, 26, 26, '0.5', 21, 0, NULL, NULL, NULL),
 (38, 11, 1, 'Trottinette électrique honey whale m5 max avec siège', 1, 599, 599, '14', 21, 0, NULL, NULL, NULL),
 (39, 11, 4, 'Xtreme Siege', 1, 15, 15, '0.75', 21, 0, NULL, NULL, NULL),
 (40, 12, 3, 'Bogist M5 Pro', 1, 754, 754, '17', 21, 0, NULL, NULL, NULL),
@@ -791,7 +815,9 @@ INSERT INTO `order_details` (`id`, `my_order_id`, `product_entity_id`, `product`
 (298, 143, 1, 'Trottinette électrique honey whale m5 max avec siège', 1, 599, 599, '14', 21, 724.79, 509.15, 509.15, 616.0715),
 (299, 143, 4, 'Xtreme Siege', 1, 15, 15, '4', 21, 18.15, 12.75, 12.75, 15.4275),
 (300, 144, 1, 'Trottinette électrique honey whale m5 max avec siège', 1, 599, 599, '14', 21, 724.79, 509.15, 509.15, 616.0715),
-(301, 144, 4, 'Xtreme Siege', 1, 15, 15, '4', 21, 18.15, 12.75, 12.75, 15.4275);
+(301, 144, 4, 'Xtreme Siege', 1, 15, 15, '4', 21, 18.15, 12.75, 12.75, 15.4275),
+(302, 145, 1, 'Trottinette électrique honey whale m5 max avec siège', 1, 599, 599, '14', 21, 724.79, 599, 599, 724.79),
+(303, 145, 5, 'roues etoiles', 1, 45, 45, '7', 21, 54.45, 45, 45, 54.45);
 
 -- --------------------------------------------------------
 
@@ -819,11 +845,11 @@ CREATE TABLE `product` (
 --
 
 INSERT INTO `product` (`id`, `tva_id`, `name`, `slug`, `description`, `price`, `stock`, `is_best`, `created_at`, `updated_at`, `type`, `weight`) VALUES
-(1, 1, 'Trottinette électrique honey whale m5 max avec siège', 'Trottinette-électrique-honey-whale-m5-max-avec-siège', '<div>【Performance puissante】...</div>', 599, 6, 1, '2025-11-18 16:19:20', '2025-12-23 15:23:34', 'trottinette', 14),
+(1, 1, 'Trottinette électrique honey whale m5 max avec siège', 'Trottinette-électrique-honey-whale-m5-max-avec-siège', '<div>【Performance puissante】...</div>', 599, 5, 1, '2025-11-18 16:19:20', '2026-01-14 10:26:14', 'trottinette', 14),
 (2, 1, 'KUGOO Kukirin C1 Pro', 'KUGOO-Kukirin-C1-Pro', 'Aperçu du produit : Vitesse maximale 45 km/h Charge max. 120 kg Autonomie 100 km Puissance continue 500 W Siège', 1299, 4, 1, '2025-11-18 16:19:20', '2025-11-18 16:19:20', 'trottinette', 11),
 (3, 1, 'Bogist M5 Pro', 'Bogist-M5-Pro', 'Moteur puissant de 500 W pour des vitesses élevées...', 754, 2, 1, '2025-11-18 16:19:20', '2025-11-19 11:30:29', 'trottinette', 17),
 (4, 1, 'Xtreme Siege', 'Xtreme-Siege', 'Siege pour trott', 15, 1, 1, '2025-11-18 16:19:20', '2025-12-23 15:23:34', 'accessoire', 4),
-(5, 1, 'roues etoiles', 'roues-etoiles', '<div>Roue pour trott</div>', 45, 7, 1, '2025-11-18 16:19:20', '2025-12-12 16:46:54', 'accessoire', 7),
+(5, 1, 'roues etoiles', 'roues-etoiles', '<div>Roue pour trott</div>', 45, 6, 1, '2025-11-18 16:19:20', '2026-01-14 10:26:14', 'accessoire', 7),
 (6, 1, 'guidon blunt black v3', 'guidon-blunt-black-v3', 'Guidon pour trott', 49, 1, 0, '2025-11-18 16:19:20', '2025-11-18 16:19:20', 'accessoire', 2),
 (7, 1, 'Frein Jaune', 'freinfreins-jaune', 'Frein pour trott', 19, 0, 0, '2025-11-18 16:19:20', '2025-11-18 16:19:20', 'accessoire', 4),
 (8, 1, 'etrier de frein', 'etrier-de-frein', 'etrier-de-frein', 56, 2, 0, '2025-11-18 16:19:20', '2025-11-18 16:19:20', 'accessoire', 5),
@@ -834,7 +860,9 @@ INSERT INTO `product` (`id`, `tva_id`, `name`, `slug`, `description`, `price`, `
 (13, 1, 'siege double', 'siege-double', 'siege-double', 21, 2, 0, '2025-11-18 16:19:20', '2025-11-18 16:19:20', 'accessoire', 6),
 (14, 1, 'siege rouge', 'siege-rouge', 'siege-rouge', 45, 5, 0, '2025-11-18 16:19:20', '2025-11-18 16:19:20', 'accessoire', 9),
 (15, 1, 'guidon multicolor', 'guidon-multicolor', '<div>guidon-multicolor</div>', 25, 4, 1, '2025-11-18 16:19:20', '2025-11-18 16:19:20', 'accessoire', 5),
-(16, 1, 'Guidon Titanium', 'guidon-titanium', '<div>guidon-titanium</div>', 48, 0, 0, '2025-11-18 16:19:20', '2025-11-28 10:11:29', 'accessoire', 6);
+(16, 1, 'Guidon Titanium', 'guidon-titanium', '<div>guidon-titanium</div>', 48, 0, 0, '2025-11-18 16:19:20', '2025-11-28 10:11:29', 'accessoire', 6),
+(17, 1, 'Trottinette de test', 'trottinette-de-test', '<div>descrition de la Trottinette de test</div>', 50, 4, 0, '2026-01-22 14:21:27', '2026-01-23 15:54:18', 'trottinette', 5),
+(18, 1, 'access de test', 'access-de-test', '<div>description de access test</div>', 50, 3, 0, '2026-01-22 15:47:12', '2026-01-23 15:53:44', 'accessoire', 4);
 
 -- --------------------------------------------------------
 
@@ -945,7 +973,8 @@ CREATE TABLE `trottinette` (
 INSERT INTO `trottinette` (`id`, `name_short`, `description_short`) VALUES
 (1, 'Honey Whale M5 Max', 'Moteur 1000 W, pneus 14 pouces, autonomie 40 km'),
 (2, 'KUGOO C1 Pro', 'Vitesse 45 km/h, autonomie 100 km, charge max 120 kg'),
-(3, 'Bogist M5 Pro', 'Moteur 500 W, pneus 12 pouces, autonomie 35 km');
+(3, 'Bogist M5 Pro', 'Moteur 500 W, pneus 12 pouces, autonomie 35 km'),
+(17, 'trott test', '<div>court desc trott de test</div>');
 
 -- --------------------------------------------------------
 
@@ -982,7 +1011,10 @@ INSERT INTO `trottinette_accessory` (`id`, `trottinette_id`, `accessory_id`) VAL
 (16, 3, 6),
 (17, 3, 7),
 (18, 3, 12),
-(19, 3, 16);
+(19, 3, 16),
+(20, 17, 18),
+(21, 17, 12),
+(22, 17, 14);
 
 -- --------------------------------------------------------
 
@@ -992,10 +1024,8 @@ INSERT INTO `trottinette_accessory` (`id`, `trottinette_id`, `accessory_id`) VAL
 
 CREATE TABLE `trottinette_caracteristique` (
   `id` int NOT NULL,
-  `trottinette_id` int DEFAULT NULL,
-  `caracteristique_id` int DEFAULT NULL,
-  `categorie_id` int DEFAULT NULL,
-  `title` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `trottinette_id` int NOT NULL,
+  `caracteristique_id` int NOT NULL,
   `value` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -1003,32 +1033,38 @@ CREATE TABLE `trottinette_caracteristique` (
 -- Déchargement des données de la table `trottinette_caracteristique`
 --
 
-INSERT INTO `trottinette_caracteristique` (`id`, `trottinette_id`, `caracteristique_id`, `categorie_id`, `title`, `value`) VALUES
-(1, 1, 1, 1, 'Dimensions', '1380 x 320 x 630 mm'),
-(2, 1, 2, 2, 'Poids', '36 kg'),
-(3, 1, 3, 3, 'Batterie', '48 V 13 Ah'),
-(79, 3, 6, 6, 'Charge maximale', '120 kg'),
-(80, 1, 1, 5, 'Dimensions', '1380 x 320 x 630 mm'),
-(81, 1, 2, 5, 'Poids', '36 kg'),
-(82, 1, 3, 2, 'Batterie', '48 V 13 Ah'),
-(83, 1, 4, 2, 'Vitesse maximale', '45 km/h'),
-(84, 1, 5, 2, 'Autonomie', '40 km'),
-(85, 1, 6, 2, 'Charge maximale', '120 kg'),
-(86, 1, 7, 7, 'Sécurité enfant', 'Oui'),
-(87, 2, 1, 5, 'Dimensions', '1250 x 300 x 600 mm'),
-(88, 2, 2, 5, 'Poids', '32 kg'),
-(89, 2, 3, 2, 'Batterie', '48 V 10 Ah'),
-(90, 2, 4, 2, 'Vitesse maximale', '45 km/h'),
-(91, 2, 5, 2, 'Autonomie', '100 km'),
-(92, 2, 6, 2, 'Charge maximale', '120 kg'),
-(93, 2, 7, 7, 'Sécurité enfant', 'Non'),
-(94, 3, 1, 5, 'Dimensions', '1200 x 280 x 600 mm'),
-(95, 3, 2, 5, 'Poids', '28 kg'),
-(96, 3, 3, 2, 'Batterie', '48 V 15 Ah'),
-(97, 3, 4, 2, 'Vitesse maximale', '40 km/h'),
-(98, 3, 5, 2, 'Autonomie', '35 km'),
-(99, 3, 6, 2, 'Charge maximale', '120 kg'),
-(100, 3, 7, 7, 'Sécurité enfant', 'Oui');
+INSERT INTO `trottinette_caracteristique` (`id`, `trottinette_id`, `caracteristique_id`, `value`) VALUES
+(1, 1, 1, '1380 x 320 x 630 mm'),
+(2, 1, 2, '36 kg'),
+(3, 1, 3, '48 V 13 Ah'),
+(79, 3, 6, '120 kg'),
+(80, 1, 1, '1380 x 320 x 630 mm'),
+(81, 1, 2, '36 kg'),
+(82, 1, 3, '48 V 13 Ah'),
+(83, 1, 4, '45 km/h'),
+(84, 1, 5, '40 km'),
+(85, 1, 6, '120 kg'),
+(86, 1, 7, 'Oui'),
+(87, 2, 1, '1250 x 300 x 600 mm'),
+(88, 2, 2, '32 kg'),
+(89, 2, 3, '48 V 10 Ah'),
+(90, 2, 4, '45 km/h'),
+(91, 2, 5, '100 km'),
+(92, 2, 6, '120 kg'),
+(93, 2, 7, 'Non'),
+(94, 3, 1, '1200 x 280 x 600 mm'),
+(95, 3, 2, '28 kg'),
+(96, 3, 3, '48 V 15 Ah'),
+(97, 3, 4, '40 km/h'),
+(98, 3, 5, '35 km'),
+(99, 3, 6, '120 kg'),
+(100, 3, 7, 'Oui'),
+(101, 17, 8, 'info 01'),
+(102, 17, 9, 'info 02'),
+(103, 17, 10, 'Info 02.5'),
+(104, 17, 11, 'Info 03'),
+(105, 17, 11, 'Info 03.3'),
+(106, 17, 11, 'Valeur 03');
 
 -- --------------------------------------------------------
 
@@ -1040,7 +1076,7 @@ CREATE TABLE `trottinette_description_section` (
   `id` int NOT NULL,
   `trottinette_id` int NOT NULL,
   `title` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `content` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `content` longtext COLLATE utf8mb4_unicode_ci,
   `section_order` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -1063,7 +1099,11 @@ INSERT INTO `trottinette_description_section` (`id`, `trottinette_id`, `title`, 
 (27, 3, 'Moteur puissant de 500 W', 'Le BOGIST M5 Pro est propulsé par un moteur de 500 W, offrant une puissance impressionnante pour les trajets urbains ou les aventures hors route.', 1),
 (28, 3, 'Batterie haute capacité 48 V 15 Ah', 'Équipé d\'une batterie au lithium 48 V 15 Ah, le M5 Pro offre une autonomie allant jusqu\'à 35 km par charge.', 2),
 (29, 3, 'Confort et maniabilité', 'Pneus de 12 pouces et suspension optimisée pour un confort maximal sur tous les types de routes.', 3),
-(30, 3, 'Sécurité complète', 'Éclairage LED, freins à disque et protection enfant pour une sécurité optimale.', 4);
+(30, 3, 'Sécurité complète', 'Éclairage LED, freins à disque et protection enfant pour une sécurité optimale.', 4),
+(31, 17, 'test  DescriptionSection', '<div>test&nbsp; DescriptionSection</div>', 1),
+(32, 17, 'bla bla bla', '<div>bla bla bla</div>', 3),
+(34, 17, 'toto', '<div>toto</div>', 4),
+(40, 17, 'tutu', '<div>tutu</div>', 2);
 
 -- --------------------------------------------------------
 
@@ -1100,18 +1140,49 @@ CREATE TABLE `user` (
   `password` varchar(255) NOT NULL,
   `first_name` varchar(64) NOT NULL,
   `last_name` varchar(64) NOT NULL,
-  `tel` varchar(16) NOT NULL
+  `tel` varchar(16) NOT NULL,
+  `password_reset_token` varchar(255) DEFAULT NULL,
+  `password_reset_token_expires_at` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Déchargement des données de la table `user`
 --
 
-INSERT INTO `user` (`id`, `email`, `roles`, `password`, `first_name`, `last_name`, `tel`) VALUES
-(1, 'admin@admin.fr', '[\"ROLE_ADMIN\", \"ROLE_USER\"]', '$2y$13$4bwJInzuXY/eug5T/185NOh32jBDFRFDCp2HH79Xzmkb344xMCdJy', 'Admin', 'Admin', '06 04 05 02 09'),
-(2, 'user@user.fr', '[\"ROLE_USER\"]', '$2y$13$LhrRJcEyiJpsDCwVooctFeP6ee/jHM7M8qigKaJSz1v5bwU5Un7qa', 'User', 'User', '06 01 01 01 02'),
-(3, 'test@test.fr', '[]', '$2y$13$A0Y74ufwtfrtYNJZ9cHUYufIrqqrpudNWJ.wWbuCURqXN1c8KCYcC', 'test', 'test', '+33641414141'),
-(4, 'yassine.qyh@gmail.com', '[]', '$2y$13$YRpq.Q95CEOdyQSWa.TnLe0oU0QykXGeOHHkcWxQnh3x/909Rd4kO', 'Yass', 'Qay', '+33641512128');
+INSERT INTO `user` (`id`, `email`, `roles`, `password`, `first_name`, `last_name`, `tel`, `password_reset_token`, `password_reset_token_expires_at`) VALUES
+(1, 'admin@admin.fr', '[\"ROLE_ADMIN\", \"ROLE_USER\"]', '$2y$13$4bwJInzuXY/eug5T/185NOh32jBDFRFDCp2HH79Xzmkb344xMCdJy', 'Admin', 'Admin', '+33609080705', NULL, NULL),
+(2, 'user@user.fr', '[\"ROLE_USER\"]', '$2y$13$LhrRJcEyiJpsDCwVooctFeP6ee/jHM7M8qigKaJSz1v5bwU5Un7qa', 'User', 'User', '+33601020304', NULL, NULL),
+(3, 'test@test.fr', '[\"ROLE_USER\"]', '$2y$13$A0Y74ufwtfrtYNJZ9cHUYufIrqqrpudNWJ.wWbuCURqXN1c8KCYcC', 'test', 'test', '+33641414141', NULL, NULL),
+(6, 'zine@zine.be', '[\"ROLE_USER\"]', '$2y$13$j6u/p/.f9pWBgSH7B0RWBeCiGyvK5mHQEIWXmZlomQjVqSGRACL1q', 'zine', 'qyh', '+32441512129', NULL, NULL),
+(11, 'test@test.be', '[\"ROLE_USER\"]', '$2y$13$TBF3pDhIrvO3uXfiaZeZz.ajNDBXUS/4UAUnbwCeITqLFBSq2DheW', 'test', 'test', '+33654879584', NULL, NULL),
+(18, 'test@test1.fr', '[\"ROLE_USER\"]', '$2y$13$nFP6H4H2P.jx8E88OAr12e4WHmuUdS34h6N8nrvSqTwcT8ADCnDeS', 'test', 'test', '+33658987415', NULL, NULL),
+(19, 'test@t1est.fr', '[\"ROLE_USER\"]', '$2y$13$KGPKAhVe9Mtv.DJqMma8.uY9jl81K9rP6dS/qlc5S81MT2npFt6Z2', 'test', 'test', '+33697845785', NULL, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `user_registration_token`
+--
+
+CREATE TABLE `user_registration_token` (
+  `id` int NOT NULL,
+  `email` varchar(180) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `password_hash` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `first_name` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `last_name` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `tel` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `token` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `expires_at` datetime NOT NULL COMMENT '(DC2Type:datetime_immutable)'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Déchargement des données de la table `user_registration_token`
+--
+
+INSERT INTO `user_registration_token` (`id`, `email`, `password_hash`, `first_name`, `last_name`, `tel`, `token`, `expires_at`) VALUES
+(1, 'yassine.qyh@gmail.com', '$2y$13$cQx43nLySPh7VH2kmlxVGOLo4nrm8Ns6j7gN/49c/I0mKuexFpDyS', 'yass', 'qyh', '+33645857968', '757b30fbc92134c59346492ccfd0c8400ebc7c2c2826461f47f90adb2a588b23', '2026-01-15 14:19:39'),
+(2, 'yassine.qyh@gmail.com', '$2y$13$4hSVfZ1P0csIHeGl194rj.ODMMZYFAohIY4WeZeWp15qDTOs.A8GO', 'yass', 'qay', '+33641021585', 'd7514283f0e3b17c5ecc1086e5b8b8337bba47018ee2205e07215ce90dc01c13', '2026-01-23 10:23:52'),
+(3, 'yassine.qyh@gmail.com', '$2y$13$/FOrR78pyOS1Aol03yAa4e8axP2/NHPAZp1UrEChA7g3gZEpGpmdu', 'yass', 'qay', '+33641021585', 'ae91f631aefa8478c040240c3a704b09f17eafe82135ba026554adf9d11b3da4', '2026-01-23 10:24:03');
 
 -- --------------------------------------------------------
 
@@ -1188,7 +1259,8 @@ ALTER TABLE `address`
 -- Index pour la table `caracteristique`
 --
 ALTER TABLE `caracteristique`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `IDX_D14FBE8BBCF5E72D` (`categorie_id`);
 
 --
 -- Index pour la table `categorie_caracteristique`
@@ -1303,8 +1375,7 @@ ALTER TABLE `trottinette_accessory`
 ALTER TABLE `trottinette_caracteristique`
   ADD PRIMARY KEY (`id`),
   ADD KEY `IDX_22FC340CF6798F43` (`trottinette_id`),
-  ADD KEY `IDX_22FC340C1704EEB7` (`caracteristique_id`),
-  ADD KEY `IDX_22FC340CBCF5E72D` (`categorie_id`);
+  ADD KEY `IDX_22FC340C1704EEB7` (`caracteristique_id`);
 
 --
 -- Index pour la table `trottinette_description_section`
@@ -1327,6 +1398,13 @@ ALTER TABLE `user`
   ADD UNIQUE KEY `UNIQ_IDENTIFIER_EMAIL` (`email`);
 
 --
+-- Index pour la table `user_registration_token`
+--
+ALTER TABLE `user_registration_token`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `UNIQ_7CD9E7285F37A13B` (`token`);
+
+--
 -- Index pour la table `weight`
 --
 ALTER TABLE `weight`
@@ -1340,25 +1418,25 @@ ALTER TABLE `weight`
 -- AUTO_INCREMENT pour la table `address`
 --
 ALTER TABLE `address`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT pour la table `caracteristique`
 --
 ALTER TABLE `caracteristique`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT pour la table `categorie_caracteristique`
 --
 ALTER TABLE `categorie_caracteristique`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT pour la table `category_accessory`
 --
 ALTER TABLE `category_accessory`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT pour la table `home_video`
@@ -1370,31 +1448,31 @@ ALTER TABLE `home_video`
 -- AUTO_INCREMENT pour la table `illustration`
 --
 ALTER TABLE `illustration`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=73;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=79;
 
 --
 -- AUTO_INCREMENT pour la table `messenger_messages`
 --
 ALTER TABLE `messenger_messages`
-  MODIFY `id` bigint NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT pour la table `order`
 --
 ALTER TABLE `order`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=145;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=146;
 
 --
 -- AUTO_INCREMENT pour la table `order_details`
 --
 ALTER TABLE `order_details`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=302;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=304;
 
 --
 -- AUTO_INCREMENT pour la table `product`
 --
 ALTER TABLE `product`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT pour la table `product_history`
@@ -1406,7 +1484,7 @@ ALTER TABLE `product_history`
 -- AUTO_INCREMENT pour la table `promotion`
 --
 ALTER TABLE `promotion`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT pour la table `reset_password`
@@ -1418,37 +1496,43 @@ ALTER TABLE `reset_password`
 -- AUTO_INCREMENT pour la table `trottinette_accessory`
 --
 ALTER TABLE `trottinette_accessory`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT pour la table `trottinette_caracteristique`
 --
 ALTER TABLE `trottinette_caracteristique`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=101;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=107;
 
 --
 -- AUTO_INCREMENT pour la table `trottinette_description_section`
 --
 ALTER TABLE `trottinette_description_section`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
 -- AUTO_INCREMENT pour la table `tva`
 --
 ALTER TABLE `tva`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT pour la table `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+
+--
+-- AUTO_INCREMENT pour la table `user_registration_token`
+--
+ALTER TABLE `user_registration_token`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT pour la table `weight`
 --
 ALTER TABLE `weight`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
 
 --
 -- Contraintes pour les tables déchargées
@@ -1466,6 +1550,12 @@ ALTER TABLE `accessory`
 --
 ALTER TABLE `address`
   ADD CONSTRAINT `FK_D4E6F81A76ED395` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`);
+
+--
+-- Contraintes pour la table `caracteristique`
+--
+ALTER TABLE `caracteristique`
+  ADD CONSTRAINT `FK_D14FBE8BBCF5E72D` FOREIGN KEY (`categorie_id`) REFERENCES `categorie_caracteristique` (`id`);
 
 --
 -- Contraintes pour la table `illustration`
@@ -1536,14 +1626,13 @@ ALTER TABLE `trottinette_accessory`
 --
 ALTER TABLE `trottinette_caracteristique`
   ADD CONSTRAINT `FK_22FC340C1704EEB7` FOREIGN KEY (`caracteristique_id`) REFERENCES `caracteristique` (`id`),
-  ADD CONSTRAINT `FK_22FC340CBCF5E72D` FOREIGN KEY (`categorie_id`) REFERENCES `categorie_caracteristique` (`id`),
   ADD CONSTRAINT `FK_22FC340CF6798F43` FOREIGN KEY (`trottinette_id`) REFERENCES `trottinette` (`id`);
 
 --
 -- Contraintes pour la table `trottinette_description_section`
 --
 ALTER TABLE `trottinette_description_section`
-  ADD CONSTRAINT `FK_B92E215BF6798F43` FOREIGN KEY (`trottinette_id`) REFERENCES `trottinette` (`id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `FK_B92E215BF6798F43` FOREIGN KEY (`trottinette_id`) REFERENCES `trottinette` (`id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
