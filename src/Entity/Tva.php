@@ -24,12 +24,13 @@ class Tva
     #[ORM\OneToMany(mappedBy: "tva", targetEntity: Product::class)]
     private Collection $products;
 
-    public function __construct(string $name, float $value)
+    public function __construct(string $name = '', float $value = 0.0)
     {
         $this->name = $name;
         $this->value = $value;
         $this->products = new ArrayCollection();
     }
+
 
     public function __toString(): string
     {
