@@ -43,8 +43,8 @@ class AccessoryCrudController extends AbstractCrudController
             IdField::new('id')->hideOnForm(),
 
             ImageField::new('firstIllustration', 'Image')
-                ->setBasePath('/uploads/accessoires')
-                ->onlyOnIndex(),
+                ->onlyOnIndex()
+                ->setBasePath(''),
 
             TextField::new('name', 'Nom'),
             TextField::new('slug')->setFormTypeOption('disabled', true)->hideOnIndex(),

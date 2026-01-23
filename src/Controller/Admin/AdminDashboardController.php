@@ -122,7 +122,7 @@ class AdminDashboardController extends AbstractDashboardController
         // --- CRUD Accessoires ---
         yield MenuItem::section('Accessoires');
         yield MenuItem::linkToCrud('Accessoires', 'fas fa-box', Accessory::class);
-        yield MenuItem::linkToCrud('Catégorie ↔ Accessoires', 'fas fa-link', CategoryAccessory::class);
+        yield MenuItem::linkToCrud('Catégorie des accessoires', 'fas fa-link', CategoryAccessory::class);
         yield MenuItem::linkToCrud('Trottinette ↔ Accessoires', 'fas fa-tags', TrottinetteAccessory::class);
 
         //-- Illustrations --//

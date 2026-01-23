@@ -21,7 +21,7 @@ class Illustration
 
     public function __toString(): string
     {
-        return $this->image ?? '';
+        return $this->image ?? 'Illustration';
     }
 
     public function getId(): ?int

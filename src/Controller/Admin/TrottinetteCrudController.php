@@ -55,8 +55,8 @@ class TrottinetteCrudController extends AbstractCrudController
             IdField::new('id')->hideOnForm(),
 
             ImageField::new('firstIllustration', 'Image')
-                ->setBasePath('/uploads/trottinettes')
-                ->onlyOnIndex(),
+                ->onlyOnIndex()
+                ->setBasePath(''),
 
             TextField::new('name', 'Nom'),
             TextField::new('nameShort', 'Nom court')->hideOnIndex(),
@@ -140,12 +140,13 @@ class TrottinetteCrudController extends AbstractCrudController
                 ->formatValue(function ($v, $entity) {
                     $html = '<ul>';
                     foreach ($entity->getTrottinetteCaracteristiques() as $tc) {
-                        $label = $tc->getTitle() ?: $tc->getCaracteristique()?->getName();
+                        $label = $tc->getCaracteristique()?->getName() ?? '—';
                         $html .= '<li>' . $label . ' : ' . $tc->getValue() . '</li>';
                     }
                     return $html . '</ul>';
                 })
                 ->renderAsHtml(),
+
 
             AssociationField::new('trottinetteAccessories')
                 ->onlyOnDetail()

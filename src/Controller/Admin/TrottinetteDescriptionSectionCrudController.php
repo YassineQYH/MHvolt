@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\TrottinetteDescriptionSection;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\{IdField, TextField, TextEditorField, AssociationField, IntegerField};
 use Doctrine\ORM\EntityManagerInterface;
@@ -12,6 +13,13 @@ class TrottinetteDescriptionSectionCrudController extends AbstractCrudController
     public static function getEntityFqcn(): string
     {
         return TrottinetteDescriptionSection::class;
+    }
+
+    public function configureCrud(Crud $crud): Crud
+    {
+        return $crud
+            ->setEntityLabelInSingular("Description et section de trottinette")
+            ->setEntityLabelInPlural('Descriptions et sections des trottinettes');
     }
 
     public function configureFields(string $pageName): iterable

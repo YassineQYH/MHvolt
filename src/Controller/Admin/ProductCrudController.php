@@ -58,23 +58,9 @@ class ProductCrudController extends AbstractCrudController
 
             // ----------- TYPE DE PRODUIT -----------
 
-            ImageField::new('firstIllustration', 'Image principale')
+            ImageField::new('firstIllustrationPath', 'Image')
                 ->onlyOnIndex()
-                ->formatValue(function ($value, $entity) {
-                    /** @var \App\Entity\Product $entity */
-                    $illustration = $entity->getIllustrations()->first();
-                    if (!$illustration) return null;
-
-                    // Retourne le chemin correct selon le type
-                    switch ($entity->getType()) {
-                        case 'trottinette':
-                            return '/uploads/trottinettes/' . $illustration->getImage();
-                        case 'accessoire':
-                            return '/uploads/accessoires/' . $illustration->getImage();
-                        default:
-                            return '/uploads/produits/' . $illustration->getImage();
-                    }
-                }),
+                ->setBasePath(''), // EasyAdmin va utiliser le getter
 
             // ----------- INFO PRODUIT -----------
             FormField::addPanel('Informations générales'),

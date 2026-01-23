@@ -161,5 +161,11 @@ class Trottinette extends Product
 
         return $this;
     }
-    
+
+    public function getFirstIllustration(): ?string
+    {
+        $illustration = $this->getIllustrations()->first();
+        return $illustration ? $illustration->getImagePath() : null;
+    }
+
 }

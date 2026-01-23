@@ -74,9 +74,14 @@ class Product
 
     public function getFirstIllustration(): ?string
     {
-        $illustration = $this->illustrations->first();
-        return $illustration ? $illustration->getImage() : null;
+        $illustration = $this->getIllustrations()->first();
+        if (!$illustration) {
+            return null;
+        }
+
+        return $illustration->getImagePath();
     }
+
 
     public function __construct()
     {
@@ -173,5 +178,13 @@ class Product
         if ($this->createdAt === null) {
             $this->createdAt = new \DateTimeImmutable();
         }
+    }
+
+    public function getFirstIllustrationPath(): ?string
+    {
+        $first = $this->illustrations->first();
+        if (!$first) return null;
+
+        return $first->getImagePath(); // ou getImageFullPath() selon ton getter
     }
 }
