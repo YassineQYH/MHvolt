@@ -111,6 +111,10 @@ class AdminDashboardController extends AbstractDashboardController
         yield MenuItem::linkToCrud('Promotions', 'fas fa-tags', Promotion::class);
         yield MenuItem::linkToCrud('TVA', 'fas fa-percentage', Tva::class);
 
+        //-- Illustrations --//
+        yield MenuItem::section('Illustrations');
+        yield MenuItem::linkToCrud('Illustrations Produits', 'fas fa-image', Illustration::class);
+
         // --- CRUD Trottinettes ---
         yield MenuItem::section('Trottinettes');
         yield MenuItem::linkToCrud('Trottinettes', 'fas fa-folder', Trottinette::class);
@@ -124,10 +128,6 @@ class AdminDashboardController extends AbstractDashboardController
         yield MenuItem::linkToCrud('Accessoires', 'fas fa-box', Accessory::class);
         yield MenuItem::linkToCrud('Catégorie des accessoires', 'fas fa-link', CategoryAccessory::class);
         yield MenuItem::linkToCrud('Trottinette ↔ Accessoires', 'fas fa-tags', TrottinetteAccessory::class);
-
-        //-- Illustrations --//
-        yield MenuItem::section('Illustrations');
-        yield MenuItem::linkToCrud('Illustrations Produits', 'fas fa-image', Illustration::class);
 
         // --- CRUD Home Video ---
         yield MenuItem::section('Page d’accueil');
