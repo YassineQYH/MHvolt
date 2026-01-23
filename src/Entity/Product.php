@@ -31,8 +31,10 @@ class Product
     #[ORM\PreUpdate]
     public function setSlugValue(): void
     {
-        if (!$this->slug && $this->name) {
-            $slugger = new \Symfony\Component\String\Slugger\AsciiSlugger();
+        $slugger = new \Symfony\Component\String\Slugger\AsciiSlugger();
+
+        // Si le slug est vide ou si le slug ne correspond pas au nom actuel
+        if (!$this->slug || strtolower($slugger->slug($this->name)) !== $this->slug) {
             $this->slug = strtolower($slugger->slug($this->name));
         }
     }
