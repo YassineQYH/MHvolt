@@ -8,6 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 use App\Entity\Product;
 use App\Entity\CategoryAccessory;
 use App\Validator\UniqueAutoPromo;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity]
@@ -70,7 +71,6 @@ class Promotion
 
     // ----------------- GETTERS / SETTERS ------------------
     public function getId(): ?int { return $this->id; }
-
     public function getTitre(): ?string { return $this->titre; }
     public function setTitre(?string $titre): self { $this->titre = $titre; return $this; }
 
@@ -177,5 +177,28 @@ class Promotion
     {
         $now = new \DateTimeImmutable();
         return $this->endDate !== null && $this->endDate < $now;
+    }
+
+    // -------------------------
+    // VALIDATION CUSTOM
+    // -------------------------
+    #[Assert\Callback]
+    public function validateDiscount(ExecutionContextInterface $context): void
+    {
+        if ($this->discountAmount !== null && $this->discountPercent !== null) {
+            $context->buildViolation('Vous ne pouvez remplir qu’un seul champ : montant ou pourcentage.')
+                ->atPath('discountAmount')
+                ->addViolation();
+
+            $context->buildViolation('Vous ne pouvez remplir qu’un seul champ : montant ou pourcentage.')
+                ->atPath('discountPercent')
+                ->addViolation();
+        }
+
+        if ($this->discountAmount === null && $this->discountPercent === null) {
+            $context->buildViolation('Vous devez remplir soit le montant, soit le pourcentage.')
+                ->atPath('discountAmount')
+                ->addViolation();
+        }
     }
 }
