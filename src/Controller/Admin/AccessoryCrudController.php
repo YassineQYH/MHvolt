@@ -5,6 +5,7 @@ namespace App\Controller\Admin;
 use App\Entity\Accessory;
 use App\Entity\Illustrationaccess;
 use App\Entity\TrottinetteAccessory;
+use Doctrine\Common\Collections\Collection;
 use EasyCorp\Bundle\EasyAdminBundle\Config\{Crud, Actions, Action};
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -13,6 +14,8 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\{
     IdField, TextField, TextEditorField, BooleanField, ImageField,
     NumberField, AssociationField, CollectionField, DateTimeField
 };
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class AccessoryCrudController extends AbstractCrudController
 {
@@ -20,6 +23,54 @@ class AccessoryCrudController extends AbstractCrudController
     {
         return Accessory::class;
     }
+
+        public function persistEntity(EntityManagerInterface $em, $entityInstance): void
+    {
+        if ($entityInstance instanceof \App\Entity\Accessory) {
+            foreach ($entityInstance->getIllustrations() as $illustration) {
+                $illustration->setProduct($entityInstance); // <--- IMPORTANT
+            }
+            $this->handleIllustrationUploads($entityInstance->getIllustrations());
+        }
+
+        parent::persistEntity($em, $entityInstance);
+    }
+
+    public function updateEntity(EntityManagerInterface $em, $entityInstance): void
+    {
+        if ($entityInstance instanceof \App\Entity\Accessory) {
+            foreach ($entityInstance->getIllustrations() as $illustration) {
+                $illustration->setProduct($entityInstance); // <--- IMPORTANT
+            }
+            $this->handleIllustrationUploads($entityInstance->getIllustrations());
+        }
+
+        parent::updateEntity($em, $entityInstance);
+    }
+    private function handleIllustrationUploads(Collection $illustrations)
+    {
+        $projectDir = $this->getParameter('kernel.project_dir');
+
+        foreach ($illustrations as $illustration) {
+            $file = $illustration->getUploadedFile();
+            if (!$file instanceof UploadedFile) continue;
+
+            $uploadDir = match($illustration->getProduct()->getType()) {
+                'trottinette' => $projectDir . '/public/uploads/trottinettes/',
+                'accessoire' => $projectDir . '/public/uploads/accessoires/',
+                default => $projectDir . '/public/uploads/produits/',
+            };
+
+            if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
+
+            $filename = uniqid() . '.' . $file->guessExtension();
+            $file->move($uploadDir, $filename);
+
+            $illustration->setImage($filename);
+            $illustration->setUploadedFile(null);
+        }
+    }
+
 
     public function configureActions(Actions $actions): Actions
     {

@@ -3,6 +3,9 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Trottinette;
+use App\Entity\Illustration;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Config\{Crud, Actions, Action};
 use Doctrine\ORM\EntityManagerInterface;
@@ -16,8 +19,6 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\{
     CollectionField,
     NumberField,
     AssociationField,
-    IntegerField,
-    DateTimeField,
     MoneyField
 };
 
@@ -44,13 +45,11 @@ class TrottinetteCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
-        return [
-
-            // ======================
-            // IDENTITÉ
-            // ======================
-
-            CollectionField::new('illustrations', 'Images')
+        // ======================
+        // Champs communs à toutes les pages
+        // ======================
+        $commonFields = [
+            CollectionField::new('illustrations')
                 ->onlyOnDetail()
                 ->setTemplatePath('admin/fields/illustrations.html.twig'),
 
@@ -63,18 +62,10 @@ class TrottinetteCrudController extends AbstractCrudController
             TextField::new('name', 'Nom'),
             TextField::new('nameShort', 'Nom court')->hideOnIndex(),
             TextField::new('slug')->setFormTypeOption('disabled', true)->hideOnIndex(),
-            TextField::new('nameShort')->hideOnIndex(),
 
-            // ======================
-            // CONTENU
-            // ======================
             TextEditorField::new('description', 'Description'),
-            /* TextEditorField::new('description', 'Description')->onlyOnForms(), */
-            TextEditorField::new('descriptionShort', 'Courte desc.')/* ->onlyOnForms() */,
+            TextEditorField::new('descriptionShort', 'Courte desc.'),
 
-            // ======================
-            // PRIX / STOCK
-            // ======================
             MoneyField::new('price', 'Prix')
                 ->setCurrency('EUR')
                 ->setStoredAsCents(false)
@@ -86,25 +77,59 @@ class TrottinetteCrudController extends AbstractCrudController
                     return $value->getName() . ' - ' . $value->getValue() . ' %';
                 }),
 
-
             NumberField::new('weight', 'Poids (kg)')
                 ->setHelp('Entrez le poids exact du produit')
                 ->formatValue(function ($value, $entity) {
-                    // On vérifie si c'est un entier
                     if (floor($value) == $value) {
                         return $value . 'kg';
                     }
-                    // Sinon on affiche avec 2 décimales
                     return number_format($value, 2, ',', '') . 'kg';
                 }),
 
-
             NumberField::new('stock', 'Stock'),
             BooleanField::new('isBest', 'Accueil'),
+        ];
 
-            // ======================
-            // INDEX — SYNTHÈSE
-            // ======================
+        // ======================
+        // Champs conditionnels pour le formulaire
+        // ======================
+        $formFields = [
+            CollectionField::new('illustrations')
+                ->onlyOnForms()
+                ->allowAdd()
+                ->allowDelete()
+                ->setEntryType(\App\Form\IllustrationType::class)
+                ->setFormTypeOption('by_reference', false),
+
+            CollectionField::new('trottinetteCaracteristiques')
+                ->onlyOnForms()
+                ->allowAdd()
+                ->allowDelete()
+                ->setEntryType(\App\Form\TrottinetteCaracteristiqueType::class)
+                ->setFormTypeOption('by_reference', false),
+        ];
+
+        if ($pageName !== Crud::PAGE_NEW) {
+            // Ajouter uniquement à l'édition
+            $formFields[] = CollectionField::new('descriptionSections')
+                ->onlyOnForms()
+                ->allowAdd()
+                ->allowDelete()
+                ->setEntryType(\App\Form\TrottinetteDescriptionSectionType::class)
+                ->setFormTypeOption('by_reference', false);
+
+            $formFields[] = CollectionField::new('trottinetteAccessories')
+                ->onlyOnForms()
+                ->allowAdd()
+                ->allowDelete()
+                ->setEntryType(\App\Form\TrottinetteAccessoryType::class)
+                ->setFormTypeOption('by_reference', false);
+        }
+
+        // ======================
+        // Champs pour index et detail
+        // ======================
+        $indexDetailFields = [
             AssociationField::new('descriptionSections', 'Sections')
                 ->onlyOnIndex()
                 ->formatValue(fn ($v, $entity) =>
@@ -123,17 +148,21 @@ class TrottinetteCrudController extends AbstractCrudController
                     count($entity->getTrottinetteAccessories()) . ' accessoires'
                 ),
 
-            // ======================
-            // DETAIL — LISTES COMPLÈTES
-            // ======================
             AssociationField::new('descriptionSections')
                 ->onlyOnDetail()
                 ->formatValue(function ($v, $entity) {
                     $html = '<ul>';
                     foreach ($entity->getDescriptionSections() as $section) {
-                        $html .= '<li><strong>' . $section->getTitle() . '</strong></li>';
+                        $html .= '<li>';
+                        $html .= '<strong>' . $section->getTitle() . '</strong>';
+                        // Affiche le content avec un saut de ligne
+                        $html .= '<div style="margin-left: 10px; margin-top: 5px;">'
+                            . nl2br($section->getContent())
+                            . '</div>';
+                        $html .= '</li>';
                     }
-                    return $html . '</ul>';
+                    $html .= '</ul>';
+                    return $html;
                 })
                 ->renderAsHtml(),
 
@@ -149,7 +178,6 @@ class TrottinetteCrudController extends AbstractCrudController
                 })
                 ->renderAsHtml(),
 
-
             AssociationField::new('trottinetteAccessories')
                 ->onlyOnDetail()
                 ->formatValue(function ($v, $entity) {
@@ -160,44 +188,12 @@ class TrottinetteCrudController extends AbstractCrudController
                     return $html . '</ul>';
                 })
                 ->renderAsHtml(),
-
-            // ======================
-            // FORM — ÉDITION
-            // ======================
-            CollectionField::new('illustrations')
-                ->onlyOnForms()
-                ->allowAdd()
-                ->allowDelete()
-                ->setEntryType(\App\Form\IllustrationType::class)
-                ->setFormTypeOption('by_reference', false),
-
-            CollectionField::new('descriptionSections')
-                ->onlyOnForms()
-                ->allowAdd()
-                ->allowDelete()
-                ->setEntryType(\App\Form\TrottinetteDescriptionSectionType::class)
-                ->setFormTypeOption('by_reference', false),
-
-            CollectionField::new('trottinetteCaracteristiques')
-                ->onlyOnForms()
-                ->allowAdd()
-                ->allowDelete()
-                ->setEntryType(\App\Form\TrottinetteCaracteristiqueType::class)
-                ->setFormTypeOption('by_reference', false),
-
-            CollectionField::new('trottinetteAccessories')
-                ->onlyOnForms()
-                ->allowAdd()
-                ->allowDelete()
-                ->setEntryType(\App\Form\TrottinetteAccessoryType::class)
-                ->setFormTypeOption('by_reference', false),
-
-            // ======================
-            // DATE (facultatif)
-            // ======================
-            /* DateTimeField::new('createdAt')->onlyOnIndex(),
-            DateTimeField::new('updatedAt')->onlyOnIndex(), */
         ];
+
+        // ======================
+        // Fusionner tous les champs
+        // ======================
+        return array_merge($commonFields, $formFields, $indexDetailFields);
     }
 
     public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
@@ -223,7 +219,7 @@ class TrottinetteCrudController extends AbstractCrudController
 
         parent::updateEntity($entityManager, $entityInstance);
     }
-    
+
     private function handleIllustrationsUpload(Trottinette $trottinette): void
     {
         $request = $this->getContext()->getRequest();

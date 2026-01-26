@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\IllustrationRepository;
 use Doctrine\ORM\Mapping as ORM;
 use App\Entity\Product;
+use Symfony\Component\HttpFoundation\File\File;
 
 #[ORM\Entity(repositoryClass: IllustrationRepository::class)]
 class Illustration
@@ -64,6 +65,19 @@ class Illustration
         }
 
         return '/uploads/produits/' . $this->image;
+    }
+
+    private ?File $uploadedFile = null;
+
+    public function setUploadedFile(?File $file): self
+    {
+        $this->uploadedFile = $file;
+        return $this;
+    }
+
+    public function getUploadedFile(): ?File
+    {
+        return $this->uploadedFile;
     }
 
 }
