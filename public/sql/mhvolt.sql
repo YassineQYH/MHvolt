@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : localhost:3306
--- Généré le : ven. 23 jan. 2026 à 19:01
+-- Généré le : mer. 28 jan. 2026 à 16:44
 -- Version du serveur : 8.4.3
 -- Version de PHP : 8.2.30
 
@@ -44,14 +44,15 @@ INSERT INTO `accessory` (`id`, `category_id`) VALUES
 (7, 2),
 (8, 2),
 (11, 2),
+(35, 2),
+(41, 2),
 (4, 3),
 (12, 3),
 (13, 3),
 (5, 4),
 (9, 4),
 (10, 4),
-(18, 5),
-(25, 5);
+(18, 5);
 
 -- --------------------------------------------------------
 
@@ -184,7 +185,8 @@ INSERT INTO `doctrine_migration_versions` (`version`, `executed_at`, `execution_
 ('DoctrineMigrations\\Version20260114131843', '2026-01-14 14:19:00', 202),
 ('DoctrineMigrations\\Version20260121154605', '2026-01-21 16:46:18', 168),
 ('DoctrineMigrations\\Version20260123084635', '2026-01-23 09:47:29', 723),
-('DoctrineMigrations\\Version20260123090023', '2026-01-23 10:00:31', 174);
+('DoctrineMigrations\\Version20260123090023', '2026-01-23 10:00:31', 174),
+('DoctrineMigrations\\Version20260127091047', '2026-01-27 10:11:21', 377);
 
 -- --------------------------------------------------------
 
@@ -210,7 +212,7 @@ CREATE TABLE `home_video` (
 --
 
 INSERT INTO `home_video` (`id`, `title`, `video_file`, `video_url`, `headline`, `subtitle`, `is_active`, `position`, `created_at`, `updated_at`) VALUES
-(1, 'super trott', 'YTDown-com-YouTube-Le-business-model-du-marche-de-la-trotti-Media-82VKfuNn1GQ-001-1080p-69739c0e17cf3.mp4', NULL, 'Avengers Trottinette', 'Trottinette de superHero Marvel', 1, 1, '2026-01-07 16:02:19', '2026-01-23 17:04:30');
+(1, 'super trott', 'videoplayback2-696118d22a825.mp4', NULL, 'Avengers Trottinette', 'Trottinette de superHero Marvel', 1, 1, '2026-01-07 16:02:19', '2026-01-09 16:03:46');
 
 -- --------------------------------------------------------
 
@@ -298,11 +300,17 @@ INSERT INTO `illustration` (`id`, `product_id`, `image`) VALUES
 (76, 18, '002.png'),
 (77, 17, '025 - Pikatchu - LBP.png'),
 (78, 18, '074 - Racailloux - YQ.png'),
-(87, 5, 'FB_IMG_1623620188790.jpg'),
-(88, 23, '6973b1ca81fa4.jpg'),
-(89, 23, '6973b1ca827f5.jpg'),
-(90, 25, '6973b39a7393f.jpg'),
-(91, 25, '6973b39a7488b.jpg');
+(79, 22, '007 - Carapuce - JF.png'),
+(80, 31, 'trott_69776f80d0ddb0.25696080.png'),
+(81, 31, 'trott_69776f80d1dab9.56892398.png'),
+(82, 31, 'trott_69776f5687ced8.36809677.png'),
+(83, 35, 'acc_697771ee88f811.67908333.png'),
+(84, 35, 'acc_697771ee896b48.78112532.png'),
+(85, 40, 'trott_69777b5eca7961.52374360.png'),
+(86, 40, 'trott_69777b5f0c6a25.30312410.png'),
+(87, 41, 'acc_69777bc3b5b0f6.67952341.png'),
+(88, 41, 'acc_69777b8d83aa72.65764610.png'),
+(89, 41, 'acc_69777be034d300.41410851.png');
 
 -- --------------------------------------------------------
 
@@ -869,8 +877,11 @@ INSERT INTO `product` (`id`, `tva_id`, `name`, `slug`, `description`, `price`, `
 (16, 1, 'Guidon Titanium', 'guidon-titanium', '<div>guidon-titanium</div>', 48, 0, 0, '2025-11-18 16:19:20', '2025-11-28 10:11:29', 'accessoire', 6),
 (17, 1, 'Trottinette de test', 'trottinette-de-test', '<div>descrition de la Trottinette de test</div>', 50, 4, 0, '2026-01-22 14:21:27', '2026-01-23 15:54:18', 'trottinette', 5),
 (18, 1, 'access de test', 'access-de-test', '<div>description de access test</div>', 50, 3, 0, '2026-01-22 15:47:12', '2026-01-23 15:53:44', 'accessoire', 4),
-(23, 1, 'Trottinette Ultra Instinct', 'trottinette-ultra-instinct', '<div>Description Trottinette Ultra Instinct</div>', 150, 3, 0, '2026-01-23 18:37:14', '2026-01-23 18:37:14', 'trottinette', 50),
-(25, 1, 'access SSJ', 'access-ssj', '<div>Description access SSJ</div>', 60, 2, 0, '2026-01-23 18:44:58', '2026-01-23 18:44:58', 'accessoire', 20);
+(22, 1, 'Trottinette à eau', 'trottinette-a-eau', NULL, 50, 2, 0, '2026-01-26 09:36:39', '2026-01-26 09:36:48', 'trottinette', 20),
+(31, 1, 'test', 'test', NULL, 600, 3, 0, '2026-01-26 14:41:07', '2026-01-26 15:45:07', 'trottinette', 30),
+(35, 1, 'testaccess', 'testaccess', NULL, 40, 4, 0, '2026-01-26 14:53:50', '2026-01-26 14:53:50', 'accessoire', 20),
+(40, 1, 'tttrooot', 'tttrooot', NULL, 300, 3, 0, '2026-01-26 15:33:58', '2026-01-26 15:34:07', 'trottinette', 20),
+(41, 1, 'accessoire de test avec slug', 'accessoire-de-test-avec-slug', NULL, 40, 3, 0, '2026-01-26 15:34:53', '2026-01-26 15:43:48', 'accessoire', 20);
 
 -- --------------------------------------------------------
 
@@ -965,6 +976,25 @@ CREATE TABLE `reset_password` (
 -- --------------------------------------------------------
 
 --
+-- Structure de la table `site_config`
+--
+
+CREATE TABLE `site_config` (
+  `id` int NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `value` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Déchargement des données de la table `site_config`
+--
+
+INSERT INTO `site_config` (`id`, `name`, `value`) VALUES
+(1, 'maintenance_enabled', '0');
+
+-- --------------------------------------------------------
+
+--
 -- Structure de la table `trottinette`
 --
 
@@ -983,7 +1013,9 @@ INSERT INTO `trottinette` (`id`, `name_short`, `description_short`) VALUES
 (2, 'KUGOO C1 Pro', 'Vitesse 45 km/h, autonomie 100 km, charge max 120 kg'),
 (3, 'Bogist M5 Pro', 'Moteur 500 W, pneus 12 pouces, autonomie 35 km'),
 (17, 'trott test', '<div>court desc trott de test</div>'),
-(23, 'Trott UI', '<div>Desc Trott UI</div>');
+(22, 'carapuce', NULL),
+(31, 'test-c', NULL),
+(40, 'tttrooot', NULL);
 
 -- --------------------------------------------------------
 
@@ -1023,8 +1055,7 @@ INSERT INTO `trottinette_accessory` (`id`, `trottinette_id`, `accessory_id`) VAL
 (19, 3, 16),
 (20, 17, 18),
 (21, 17, 12),
-(22, 17, 14),
-(24, 23, 25);
+(22, 17, 14);
 
 -- --------------------------------------------------------
 
@@ -1075,9 +1106,8 @@ INSERT INTO `trottinette_caracteristique` (`id`, `trottinette_id`, `caracteristi
 (104, 17, 11, 'Info 03'),
 (105, 17, 11, 'Info 03.3'),
 (106, 17, 11, 'Valeur 03'),
-(109, 23, 5, '5h'),
-(110, 23, 2, '56'),
-(111, 23, 4, '90');
+(109, 40, 5, '5h'),
+(110, 40, 6, '105 kg');
 
 -- --------------------------------------------------------
 
@@ -1089,7 +1119,7 @@ CREATE TABLE `trottinette_description_section` (
   `id` int NOT NULL,
   `trottinette_id` int NOT NULL,
   `title` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `content` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `content` longtext COLLATE utf8mb4_unicode_ci,
   `section_order` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -1116,9 +1146,7 @@ INSERT INTO `trottinette_description_section` (`id`, `trottinette_id`, `title`, 
 (31, 17, 'test  DescriptionSection', '<div>test&nbsp; DescriptionSection</div>', 1),
 (32, 17, 'bla bla bla', '<div>bla bla bla</div>', 3),
 (34, 17, 'toto', '<div>toto</div>', 4),
-(40, 17, 'tutu', '<div>tutu</div>', 2),
-(41, 23, 'Option Boost', 'Activé le SSJ afin d\'avoir d\'avoir un boost de vitesse, mais attention, en contrapartie une perte d\'autonomie !', 1),
-(42, 23, 'Style', 'Activé les neon Jaune sous votre trottinette', 2);
+(40, 17, 'tutu', '<div>tutu</div>', 2);
 
 -- --------------------------------------------------------
 
@@ -1371,6 +1399,13 @@ ALTER TABLE `reset_password`
   ADD KEY `IDX_B9983CE5A76ED395` (`user_id`);
 
 --
+-- Index pour la table `site_config`
+--
+ALTER TABLE `site_config`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `UNIQ_A42481235E237E06` (`name`);
+
+--
 -- Index pour la table `trottinette`
 --
 ALTER TABLE `trottinette`
@@ -1463,7 +1498,7 @@ ALTER TABLE `home_video`
 -- AUTO_INCREMENT pour la table `illustration`
 --
 ALTER TABLE `illustration`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=92;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=90;
 
 --
 -- AUTO_INCREMENT pour la table `messenger_messages`
@@ -1487,7 +1522,7 @@ ALTER TABLE `order_details`
 -- AUTO_INCREMENT pour la table `product`
 --
 ALTER TABLE `product`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
 
 --
 -- AUTO_INCREMENT pour la table `product_history`
@@ -1508,22 +1543,28 @@ ALTER TABLE `reset_password`
   MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT pour la table `site_config`
+--
+ALTER TABLE `site_config`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT pour la table `trottinette_accessory`
 --
 ALTER TABLE `trottinette_accessory`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- AUTO_INCREMENT pour la table `trottinette_caracteristique`
 --
 ALTER TABLE `trottinette_caracteristique`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=112;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=111;
 
 --
 -- AUTO_INCREMENT pour la table `trottinette_description_section`
 --
 ALTER TABLE `trottinette_description_section`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
 -- AUTO_INCREMENT pour la table `tva`
