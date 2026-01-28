@@ -1,0 +1,44 @@
+<style>
+    body {
+        font-family: sans-serif;
+        text-align: center;
+        margin: 0; /* supprime le margin-top */
+    }
+
+    h1 { color: #c0392b; font-size: 2.5rem; margin-bottom: 15px; }
+    a.button {
+        display: inline-block;
+        margin-top: 20px;
+        padding: 12px 25px;
+        background: #3498db;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        font-weight: bold;
+        transition: background 0.3s;
+        cursor: pointer;
+    }
+    a.button:hover {
+        background: #2980b9;
+    }
+    .maintenance-wrapper {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        text-align: center;
+        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        padding: 20px;
+    }
+    .wrapper {
+        position: fixed;
+        top: 25%;
+        left: 0%;
+        display: none; /* caché par défaut */
+    }
+    .wrapper.active-popup {
+        display: block;
+    }
+
+</style>
