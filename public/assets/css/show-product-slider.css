@@ -352,3 +352,26 @@
     .cart__details h1{ font-size: 1.2rem !important; }
     .cart__details p{ font-size: 1rem; }
 }
+/* ZOOM sur le produit */
+.image-zoom-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    cursor: zoom-out;
+}
+
+.image-zoom-overlay img {
+    max-width: 90%;
+    max-height: 90%;
+    object-fit: contain;
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+}
+
+.glide__slide--active img {
+    cursor: zoom-in;
+}

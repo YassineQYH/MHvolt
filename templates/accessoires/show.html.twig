@@ -102,6 +102,11 @@
             </div>
         </section></br></br></br></br></br>
 
+        {# Zoom image overlay #}
+        <div id="image-zoom-overlay" class="image-zoom-overlay">
+            <img id="image-zoom-content" src="" alt="Zoom image">
+        </div>
+        
         {# AOS animations #}
         <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
         <script>
@@ -109,5 +114,6 @@
         </script>
 
         <script src="{{ asset('assets/js/slide-img.js') }}" type="text/javascript"></script>
+        <script src="{{ asset('assets/js/zoom-product.js') }}" type="text/javascript"></script>
     </main>
 {% endblock %}
