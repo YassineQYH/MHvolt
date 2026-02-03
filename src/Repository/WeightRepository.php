@@ -19,9 +19,9 @@ class WeightRepository extends ServiceEntityRepository
     public function findPriceByWeight(float $weight): ?Weight
     {
         return $this->createQueryBuilder('w')
-            ->andWhere('w.kg >= :weight')
+            ->andWhere('w.kg <= :weight')
             ->setParameter('weight', $weight)
-            ->orderBy('w.kg', 'ASC')
+            ->orderBy('w.kg', 'DESC')
             ->setMaxResults(1)
             ->getQuery()
             ->getOneOrNullResult();

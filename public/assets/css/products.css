@@ -402,3 +402,21 @@ font-size: 1.1rem;
 .section-product-list .title h1 {
 font-size: 1.6rem;
 }
+
+/* ===================== FIX SLIDER SHOW PRODUCT ===================== */
+
+.page-show-product .image__holder {
+    width: 100%;
+    height: 350px;          /* 👈 même hauteur que l'ancien slider */
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.page-show-product .image__holder img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;     /* même logique que .slide-img img */
+    object-position: center;
+}
