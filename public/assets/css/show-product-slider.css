@@ -163,11 +163,13 @@
 
 /* <= 1680px : miniatures larges, plus de 4 sur une ligne */
 @media (max-width: 1900px) {
+    .image__holder { height: 100%; max-width: 100%; }
     .glide__bullets {left: 45rem; margin-top: 5.5rem;}
     .glide__bullet { flex: 0 1 50%; width: 10rem; height: auto; aspect-ratio: 16/9; margin-bottom: 0.5rem; }
 }
 /* <= 1395px : miniatures larges, plus de 4 sur une ligne */
 @media (max-width: 1395px) {
+    .image__holder { height: 100%; max-width: 100%; }
     .glide__bullets {left: 35rem;}
     .glide__bullet { flex: 0 1 50%; width: 8rem; height: auto; aspect-ratio: 16/9; margin-bottom: 0.5rem; /* margin-top:0.5rem; */}
     /* .glide__arrow { top: 0rem; padding:0.8rem; } */

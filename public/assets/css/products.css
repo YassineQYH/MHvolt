@@ -417,6 +417,7 @@ font-size: 1.6rem;
 .page-show-product .image__holder img {
     width: 100%;
     height: 100%;
+    margin-left: 4rem;
     /* object-fit: cover;   */   /* même logique que .slide-img img */
-    object-position: center;
+    /* object-position: center; */
 }
