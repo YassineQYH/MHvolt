@@ -1,19 +1,49 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Confirmation de commande : Zone-Frais{% endblock %}
+{% block title %}Commande confirmée — MHvolt{% endblock %}
 
 {% block content %}
-<div class="container"><br><br><br><br><br><br><br>
-    <h2>Confirmation de commande</h2>
-    <p>
-        Bonjour <strong>{{ order.user.firstname }} {{ order.user.lastname }},</strong></br></br>
-        Nous vous remercions pour votre commande n°<strong>{{ order.reference }}</strong></br>
-        Une confirmation vient de vous être envoyée par email à l'adresse <strong>{{ order.user.email }}</strong>
-        <hr>
-        Votre commande sera livrée</strong> à l'adresse suivante : </br>
-        {{ order.delivery|raw }}
-        <hr>
-        Pour suivre votre commande, rendez-vous dans votre <a href="{{ path('account_order') }}" style="color:blue;">compte</a>.
-    </p>
-</div><br><br><br><br><br>
+<div class="container py-5" style="max-width: 650px;">
+    <div class="card border border-light-subtle rounded-4 p-4 p-md-5 shadow-sm bg-white text-center">
+        {# Icône de succès sobre #}
+        <div class="d-inline-flex align-items-center justify-content-center bg-dark text-white rounded-circle mx-auto mb-3" style="width: 64px; height: 64px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 6 9 17l-5-5"/>
+            </svg>
+        </div>
+
+        <span class="text-uppercase tracking-wider small fw-semibold text-muted">Confirmation d'achat</span>
+        <h1 class="display-6 fw-bold text-dark mt-1 mb-2">Merci pour votre commande !</h1>
+
+        <p class="text-secondary small leading-relaxed mb-4">
+            Bonjour <strong>{{ order.user.firstname }}</strong>, votre règlement a été validé avec succès. Notre équipe prépare votre colis avec le plus grand soin.
+        </p>
+
+        {# Fiche récapitulative #}
+        <div class="card bg-body-tertiary border border-light-subtle rounded-3 p-3 mb-4 text-start small">
+            <div class="d-flex justify-content-between pb-2 border-bottom border-light-subtle mb-2">
+                <span class="text-secondary">Numéro de référence :</span>
+                <strong class="text-dark font-monospace">{{ order.reference }}</strong>
+            </div>
+            <div class="d-flex justify-content-between pb-2 border-bottom border-light-subtle mb-2">
+                <span class="text-secondary">Confirmation transmise à :</span>
+                <span class="text-dark fw-medium">{{ order.user.email }}</span>
+            </div>
+            <div class="d-flex justify-content-between">
+                <span class="text-secondary">Statut logistique :</span>
+                <span class="badge bg-dark rounded-pill fw-normal">Préparation en atelier</span>
+            </div>
+        </div>
+
+        {# Actions rapides #}
+        <div class="d-flex flex-column sm:flex-row gap-2 justify-content-center">
+            <a href="{{ path('account_order_show', {'reference': order.reference}) }}" class="btn btn-dark rounded-pill px-4 py-2 fw-semibold">
+                Suivre ma commande
+            </a>
+            <a href="{{ path('nos_trottinettes') }}" class="btn btn-outline-dark rounded-pill px-4 py-2 fw-medium">
+                Continuer mes achats
+            </a>
+        </div>
+    </div>
+</div>
 {% endblock %}

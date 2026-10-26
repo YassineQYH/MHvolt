@@ -1,41 +1,138 @@
-<div class="container-footer">
-    <!-- Section A propos -->
-    <div class="sec-footer about-us-footer">
-        <h2>À propos</h2>
-        <p>MHvolt est votre boutique en ligne dédiée aux trottinettes et accessoires. Qualité, performance et service client sont nos priorités.</p>
-        <ul class="sci-footer">
-            <li><a href="#"><i class="fab fa-facebook-f" aria-hidden="true"></i></a></li>
-            <li><a href="#"><i class="fab fa-instagram" aria-hidden="true"></i></a></li>
-            <li><a href="#"><i class="fab fa-youtube" aria-hidden="true"></i></a></li>
-        </ul>
-    </div>
-
-    <!-- Section Liens utiles -->
-    <div class="sec-footer quickLinks-footer">
-        <h2>Liens utiles</h2>
-        <ul class="liens-footer">
-            <li><a href="{{ path('app_cgv') }}">Conditions générales de vente</a></li>
-            <li><a href="{{ path('app_confidentialite') }}">Politique de confidentialité</a></li>
-            <li><a href="{{ path('app_livraison_retours') }}">Livraison & retours</a></li>
-        </ul>
-    </div>
-
-    <!-- Section Contact -->
-    <div class="sec-footer contact-footer">
-        <h2>Contact</h2>
-        <ul class="info-footer">
-            <li>
-                <span><i class="fa fa-map-marker" aria-hidden="true"></i></span>
-                <span>51 Boulevard Vincent Auriol<br>4031 Angleur, BE</span>
-            </li>
-            <li>
-                <span><i class="fa fa-phone" aria-hidden="true"></i></span>
-                <p><a href="tel:+3300223344">+33 00 22 33 44</a></p>
-            </li>
-            <li>
-                <span><i class="fa fa-envelope" aria-hidden="true"></i></span>
-                <p><a href="mailto:admin@mhvolt.com">admin@mhvolt.com</a></p>
-            </li>
-        </ul>
+{# 1. Bandeau de réassurance avant footer #}
+<div class="border-top border-bottom border-light-subtle bg-light py-4">
+    <div class="container">
+        <div class="row g-4 text-center text-md-start">
+            <div class="col-6 col-md-3 d-flex align-items-center gap-3">
+                <div class="rounded-circle bg-white border p-2 d-flex align-items-center justify-content-center shadow-sm" style="width: 46px; height: 46px; flex-shrink: 0;">
+                    <i class="bx bx-shield-quarter fs-4 text-dark"></i>
+                </div>
+                <div>
+                    <span class="fw-bold text-dark small d-block">Garantie 2 ans</span>
+                    <span class="text-secondary small" style="font-size: 0.75rem;">Constructeur certifié</span>
+                </div>
+            </div>
+            <div class="col-6 col-md-3 d-flex align-items-center gap-3">
+                <div class="rounded-circle bg-white border p-2 d-flex align-items-center justify-content-center shadow-sm" style="width: 46px; height: 46px; flex-shrink: 0;">
+                    <i class="bx bx-package fs-4 text-dark"></i>
+                </div>
+                <div>
+                    <span class="fw-bold text-dark small d-block">Livraison bpost</span>
+                    <span class="text-secondary small" style="font-size: 0.75rem;">Suivi en direct</span>
+                </div>
+            </div>
+            <div class="col-6 col-md-3 d-flex align-items-center gap-3">
+                <div class="rounded-circle bg-white border p-2 d-flex align-items-center justify-content-center shadow-sm" style="width: 46px; height: 46px; flex-shrink: 0;">
+                    <i class="bx bx-wrench fs-4 text-dark"></i>
+                </div>
+                <div>
+                    <span class="fw-bold text-dark small d-block">Pièces & Atelier</span>
+                    <span class="text-secondary small" style="font-size: 0.75rem;">Stock permanent</span>
+                </div>
+            </div>
+            <div class="col-6 col-md-3 d-flex align-items-center gap-3">
+                <div class="rounded-circle bg-white border p-2 d-flex align-items-center justify-content-center shadow-sm" style="width: 46px; height: 46px; flex-shrink: 0;">
+                    <i class="bx bx-lock-alt fs-4 text-dark"></i>
+                </div>
+                <div>
+                    <span class="fw-bold text-dark small d-block">Paiement 100% sûr</span>
+                    <span class="text-secondary small" style="font-size: 0.75rem;">Stripe SSL chiffré</span>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+
+{# 2. Bloc sombre principal #}
+<div class="pt-5 pb-4" style="background-color: #09090b !important; color: #ffffff !important;">
+    <div class="container">
+        <div class="row g-4 justify-content-between mb-5">
+            {# Marque & Présentation #}
+            <div class="col-lg-4 col-md-6">
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <img src="{{ asset('/img/logo-mhvolt.png') }}" alt="MHvolt" height="32" class="bg-white rounded-2 p-1">
+                    <span class="fs-5 fw-bold tracking-tight text-white">MHVOLT</span>
+                </div>
+                <p class="small leading-relaxed mb-4" style="color: #a1a1aa !important;">
+                    Expert en mobilité électrique urbaine. Sélection de trottinettes électriques homologuées et d'équipements de sécurité certifiés.
+                </p>
+                <div class="d-flex gap-2">
+                    <a href="#" class="btn btn-outline-light btn-sm rounded-circle p-0 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                        <i class="bx bxl-facebook fs-5"></i>
+                    </a>
+                    <a href="#" class="btn btn-outline-light btn-sm rounded-circle p-0 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                        <i class="bx bxl-instagram fs-5"></i>
+                    </a>
+                    <a href="#" class="btn btn-outline-light btn-sm rounded-circle p-0 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                        <i class="bx bxl-youtube fs-5"></i>
+                    </a>
+                </div>
+            </div>
+
+            {# Liens Catalogue #}
+            <div class="col-lg-2 col-6">
+                <h6 class="text-white fw-bold small text-uppercase tracking-wider mb-3">Catalogue</h6>
+                <ul class="list-unstyled d-flex flex-column gap-2 small">
+                    <li><a href="{{ path('nos_trottinettes') }}" class="footer-link">Trottinettes</a></li>
+                    <li><a href="{{ path('accessoires') }}" class="footer-link">Accessoires</a></li>
+                    <li><a href="{{ path('app_home') }}#selection" class="footer-link">Nouveautés</a></li>
+                    <li><a href="{{ path('cart') }}" class="footer-link">Mon Panier</a></li>
+                </ul>
+            </div>
+
+            {# Informations Légales #}
+            <div class="col-lg-3 col-6">
+                <h6 class="text-white fw-bold small text-uppercase tracking-wider mb-3">Informations</h6>
+                <ul class="list-unstyled d-flex flex-column gap-2 small">
+                    <li><a href="{{ path('app_cgv') }}" class="footer-link">Conditions Générales de Vente</a></li>
+                    <li><a href="{{ path('app_confidentialite') }}" class="footer-link">Politique de Confidentialité</a></li>
+                    <li><a href="{{ path('app_livraison_retours') }}" class="footer-link">Livraison & Retours</a></li>
+                    <li><button type="button" class="footer-link bg-transparent border-0 p-0 text-start" data-bs-toggle="modal" data-bs-target="#contactModal">Assistance & Contact</button></li>
+                </ul>
+            </div>
+
+            {# Atelier & Contact #}
+            <div class="col-lg-3 col-md-6">
+                <h6 class="text-white fw-bold small text-uppercase tracking-wider mb-3">Atelier & Contact</h6>
+                <ul class="list-unstyled d-flex flex-column gap-3 small mb-0" style="color: #a1a1aa !important;">
+                    <li class="d-flex align-items-start gap-2">
+                        <i class="bx bx-map-pin fs-5 text-white flex-shrink-0 mt-1"></i>
+                        <span>51 Boulevard Vincent Auriol, 4031 Angleur, Belgique</span>
+                    </li>
+                    <li class="d-flex align-items-center gap-2">
+                        <i class="bx bx-phone fs-5 text-white flex-shrink-0"></i>
+                        <a href="tel:+3300223344" class="footer-link">+33 00 22 33 44</a>
+                    </li>
+                    <li class="d-flex align-items-center gap-2">
+                        <i class="bx bx-envelope fs-5 text-white flex-shrink-0"></i>
+                        <a href="mailto:admin@mhvolt.com" class="footer-link">admin@mhvolt.com</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        {# Copyright et Badges de Paiement #}
+        <div class="pt-4 d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 small" style="border-top: 1px solid #27272a; color: #a1a1aa !important;">
+            <div>
+                © {{ "now"|date("Y") }} MHVOLT. Tous droits réservés. Mobilité urbaine certifiée.
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <span class="me-1" style="font-size: 0.75rem;">Paiement sécurisé</span>
+                <span class="badge border fw-medium" style="background-color: #18181b; color: #f4f4f5; border-color: #3f3f46 !important;">Stripe</span>
+                <span class="badge border fw-medium" style="background-color: #18181b; color: #f4f4f5; border-color: #3f3f46 !important;">CB / Visa</span>
+                <span class="badge border fw-medium" style="background-color: #18181b; color: #f4f4f5; border-color: #3f3f46 !important;">Mastercard</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .footer-link {
+        color: #a1a1aa !important;
+        text-decoration: none;
+        transition: color 0.2s ease;
+    }
+    .footer-link:hover {
+        color: #ffffff !important;
+        text-decoration: underline !important;
+    }
+</style>

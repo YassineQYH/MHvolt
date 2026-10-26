@@ -1,106 +1,322 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}MHvolt{% endblock %}
-
-{# {% block carrousel %}
-    {{ include('partials/carrousel.html.twig', { headers: headers }) }}
-{% endblock %} #}
-
-{% block carrousel %}
-    {{ include('partials/home-video.html.twig', { video_header: video_header }) }}
-{% endblock %}
+{% block title %}MHvolt — Mobilité Électrique & Performance Urbaine{% endblock %}
 
 {% block content %}
-    {% include 'partials/promos.html.twig' %}
+    {# 1. BANDEAU PROMOTIONNEL #}
+    {% if homepagePromo is defined and homepagePromo %}
+        <div class="bg-black text-white text-center py-2 px-3 small border-bottom border-dark">
+            <span class="badge bg-white text-dark rounded-pill px-2 py-1 me-2 fw-semibold">Offre</span>
+            {{ homepagePromo.name|default(homepagePromo.titre|default('Promotion exclusive en cours')) }}
+            {% if homepagePromo.code is defined and homepagePromo.code %}
+                — Code : <strong class="text-white text-decoration-underline">{{ homepagePromo.code }}</strong>
+            {% endif %}
+        </div>
+    {% endif %}
 
-    <section class="section bg-image" id="about">
-        <div class="container-home about">
-            <div class="right" data-aos="fade-left" data-aos-duration="2000">
-                <img src="{{ asset('/img/mhvolt-logo.jpg') }}" alt="Logo trott" />
-            </div>
-            <div class="left" data-aos="fade-down" data-aos-delay="70" data-aos-duration="2000">
-                <div class="title-home">
-                    <h1>MHvolt</h1>
+    {# 2. HERO SECTION : VIDÉO MODERNE #}
+    {% if video_header is defined and video_header|length > 0 %}
+        {% set heroVideo = video_header|first %}
+        <section class="position-relative overflow-hidden bg-black text-white d-flex align-items-center" style="min-height: 72vh;">
+            <video autoplay muted loop playsinline class="position-absolute top-50 start-50 translate-middle w-100 h-100 object-fit-cover" style="opacity: 0.45; filter: contrast(1.05) grayscale(20%); pointer-events: none; z-index: 1;">
+                {% set videoFile = heroVideo.videoName|default(heroVideo.video|default(heroVideo.url|default(heroVideo.name|default('videoplayback2-696118d22a825.mp4')))) %}
+                <source src="/uploads/home_videos/{{ videoFile }}" type="video/mp4">
+            </video>
+
+            <div class="position-absolute top-0 start-0 w-100 h-100" style="background: linear-gradient(180deg, rgba(9,9,11,0.5) 0%, rgba(9,9,11,0.85) 100%); z-index: 2;"></div>
+
+            <div class="container position-relative py-5" style="z-index: 3;">
+                <div class="row">
+                    <div class="col-lg-8" data-aos="fade-up" data-aos-duration="800">
+                        <span class="badge bg-white text-dark rounded-pill px-3 py-2 small fw-semibold text-uppercase tracking-wider mb-3 shadow-sm">
+                            Mobilité Urbaine
+                        </span>
+                        <h1 class="display-3 fw-bold tracking-tight text-white mb-3">
+                            L'ingénierie urbaine sans compromis.
+                        </h1>
+                        <p class="fs-5 text-white-50 mb-4 leading-relaxed" style="max-width: 580px;">
+                            Design minimaliste, puissance instantanée et sécurité certifiée pour redéfinir chacun de vos trajets quotidiens.
+                        </p>
+                        <div class="d-flex flex-wrap gap-3">
+                            <a href="#catalogue" class="btn btn-light rounded-pill px-4 py-3 fw-semibold text-dark shadow-sm">
+                                Explorer le catalogue <i class="fas fa-arrow-down ms-2 fs-6"></i>
+                            </a>
+                            <button type="button" class="btn btn-outline-light rounded-pill px-4 py-3 fw-medium" data-bs-toggle="modal" data-bs-target="#contactModal">
+                                Nous contacter
+                            </button>
+                        </div>
+                    </div>
                 </div>
-                <p>Bienvenue sur MHvolt, votre expert en trottinettes électriques et accessoires. Nous combinons design, performance et sécurité pour vous offrir une expérience de mobilité urbaine inégalée.</p>
+            </div>
+        </section>
+    {% endif %}
+
+    {# 3. SECTION ENGAGEMENTS & CERTIFICATIONS #}
+    <section class="py-5 border-bottom border-light-subtle bg-white">
+        <div class="container py-4">
+            <div class="row g-4 text-center">
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+                    <div class="p-4 rounded-4 border border-light-subtle h-100 bg-body-tertiary">
+                        <div class="d-inline-flex align-items-center justify-content-center bg-black text-white rounded-circle mb-3" style="width: 48px; height: 48px;">
+                            <i class="fas fa-bolt fs-5"></i>
+                        </div>
+                        <h2 class="fs-5 fw-bold text-dark mb-2">Performance & Autonomie</h2>
+                        <p class="text-secondary small mb-0">Moteurs optimisés et cellules haute capacité pour une endurance constante au quotidien.</p>
+                    </div>
+                </div>
+
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+                    <div class="p-4 rounded-4 border border-light-subtle h-100 bg-body-tertiary">
+                        <div class="d-inline-flex align-items-center justify-content-center bg-black text-white rounded-circle mb-3" style="width: 48px; height: 48px;">
+                            <i class="fas fa-shield-alt fs-5"></i>
+                        </div>
+                        <h2 class="fs-5 fw-bold text-dark mb-2">Normes & Sécurité Strictes</h2>
+                        <p class="text-secondary small mb-0">Conformité aux législations européennes, double freinage et visibilité nocturne garantie.</p>
+                    </div>
+                </div>
+
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
+                    <div class="p-4 rounded-4 border border-light-subtle h-100 bg-body-tertiary">
+                        <div class="d-inline-flex align-items-center justify-content-center bg-black text-white rounded-circle mb-3" style="width: 48px; height: 48px;">
+                            <i class="fas fa-tools fs-5"></i>
+                        </div>
+                        <h2 class="fs-5 fw-bold text-dark mb-2">Garanties & Support Réactif</h2>
+                        <p class="text-secondary small mb-0">Garantie complète 2 ans et stock permanent de pièces détachées pour l'entretien.</p>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
 
-    <section class="section bg-image" id="about">
-        <div class="container-home about">
-            <div class="left" data-aos="fade-down" data-aos-delay="70" data-aos-duration="2000">
-                <div class="title-home">
-                    <h1>Homologations !</h1>
+    {# 4. SECTION CATALOGUE INTERACTIF UNIFIÉ #}
+    <section class="py-5 bg-white" id="catalogue">
+        <div class="container py-4">
+            <div class="d-flex flex-wrap justify-content-between align-items-end mb-4 pb-3 border-bottom border-light-subtle">
+                <div>
+                    <span class="text-uppercase tracking-wider small fw-semibold text-muted">Sélection MHvolt</span>
+                    <h2 class="display-6 fw-bold text-dark mt-1 mb-0">Notre Catalogue & Nouveautés</h2>
                 </div>
-                <p>Toutes nos trottinettes respectent les normes en vigueur pour garantir votre sécurité et celle de votre entourage. Nos produits sont testés et certifiés pour rouler sereinement en ville ou sur vos trajets quotidiens.</p>
+
+                {# Onglets de filtres #}
+                <div class="nav nav-pills gap-2 mt-3 mt-sm-0" id="catalogTabs" role="tablist">
+                    <button class="btn btn-dark rounded-pill px-3 py-1.5 btn-sm active" id="tab-all" data-bs-toggle="pill" data-bs-target="#pane-all" type="button" role="tab">Tout voir</button>
+                    <button class="btn btn-outline-dark rounded-pill px-3 py-1.5 btn-sm" id="tab-trott" data-bs-toggle="pill" data-bs-target="#pane-trott" type="button" role="tab">Trottinettes</button>
+                    <button class="btn btn-outline-dark rounded-pill px-3 py-1.5 btn-sm" id="tab-acc" data-bs-toggle="pill" data-bs-target="#pane-acc" type="button" role="tab">Accessoires</button>
+                </div>
             </div>
-            <div class="right" data-aos="fade-left" data-aos-duration="2000">
-                <img src="{{ asset('/img/logo-trott.png') }}" alt="Logo trott" />
+
+            <div class="tab-content" id="catalogTabContent">
+                {# PANE 1 : TOUT VOIR #}
+                <div class="tab-pane fade show active" id="pane-all" role="tabpanel">
+                    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+                        {# Nouveautés Trottinettes #}
+                        {% for trott in latestTrottinettes|default([]) %}
+                            {% set imgObj = trott.illustrations is defined and trott.illustrations|length > 0 ? trott.illustrations|first : null %}
+                            {% set rawImg = imgObj ? imgObj.image : (trott.image ?? 'default.jpg') %}
+                            {% set imgPath = rawImg starts with 'http' ? rawImg : '/uploads/trottinettes/' ~ rawImg %}
+                            {% set tvaRate = trott.tva ? (trott.tva.value / 100) : 0.2 %}
+                            {% set priceTTC = trott.price * (1 + tvaRate) %}
+                            {% set promoTTC = (trott.promoPrice is defined and trott.promoPrice is not null and trott.promoPrice > 0) ? (trott.promoPrice * (1 + tvaRate)) : null %}
+                            <div class="col" data-aos="fade-up">
+                                <div class="card h-100 border border-light-subtle rounded-4 p-3 bg-white product-card shadow-sm">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <div class="d-flex align-items-center gap-1">
+                                            <span class="badge rounded-pill px-2.5 py-1 fw-semibold border" style="background-color: #000000; color: #ffffff !important; font-size: 0.7rem;">Nouveau</span>
+                                            {% if promoTTC %}
+                                                <span class="badge bg-danger rounded-pill px-2 py-1 fw-semibold" style="font-size: 0.65rem;">Promo</span>
+                                            {% endif %}
+                                        </div>
+                                        {% if trott.stock < 1 %}
+                                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle">Rupture</span>
+                                        {% else %}
+                                            <span class="badge bg-success-subtle text-success border border-success-subtle">En stock</span>
+                                        {% endif %}
+                                    </div>
+                                    <a href="{{ path('trottinette_show', {'slug': trott.slug}) }}" class="d-flex align-items-center justify-content-center my-3 text-decoration-none" style="height: 180px;">
+                                        <img src="{{ imgPath }}" alt="{{ trott.name }}" class="img-fluid object-fit-contain h-100 w-100 product-img-zoom">
+                                    </a>
+                                    <div class="card-body p-0 pt-2 d-flex flex-column justify-content-end">
+                                        <h3 class="fs-6 fw-bold text-dark mb-1 text-truncate">
+                                            <a href="{{ path('trottinette_show', {'slug': trott.slug}) }}" class="text-dark text-decoration-none">{{ trott.name }}</a>
+                                        </h3>
+                                        <div class="d-flex justify-content-between align-items-baseline mb-3">
+                                            <div>
+                                                {% if promoTTC %}
+                                                    <span class="fs-5 fw-bold text-danger">{{ promoTTC|number_format(2, ',', ' ') }} €</span>
+                                                    <span class="text-muted text-decoration-line-through small ms-1">{{ priceTTC|number_format(2, ',', ' ') }} €</span>
+                                                {% else %}
+                                                    <span class="fs-5 fw-bold text-dark">{{ priceTTC|number_format(2, ',', ' ') }} €</span>
+                                                {% endif %}
+                                            </div>
+                                            <span class="text-secondary small">TTC</span>
+                                        </div>
+                                        <a href="{{ path('trottinette_show', {'slug': trott.slug}) }}" class="btn btn-outline-dark rounded-pill w-100 btn-sm py-2 fw-medium">Découvrir</a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+
+                        {# Nouveautés Accessoires #}
+                        {% for acc in latestAccessories|default([]) %}
+                            {% set imgObjAcc = acc.illustrations is defined and acc.illustrations|length > 0 ? acc.illustrations|first : null %}
+                            {% set rawAccImg = imgObjAcc ? imgObjAcc.image : (acc.image ?? 'default.jpg') %}
+                            {% set imgAccPath = rawAccImg starts with 'http' ? rawAccImg : '/uploads/accessoires/' ~ rawAccImg %}
+                            {% set tvaRateAcc = acc.tva ? (acc.tva.value / 100) : 0.2 %}
+                            {% set priceTTCAcc = acc.price * (1 + tvaRateAcc) %}
+                            {% set promoTTCAcc = (acc.promoPrice is defined and acc.promoPrice is not null and acc.promoPrice > 0) ? (acc.promoPrice * (1 + tvaRateAcc)) : null %}
+                            <div class="col" data-aos="fade-up">
+                                <div class="card h-100 border border-light-subtle rounded-4 p-3 bg-white product-card shadow-sm">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <div class="d-flex align-items-center gap-1">
+                                            <span class="badge rounded-pill px-2.5 py-1 fw-semibold border" style="background-color: #000000; color: #ffffff !important; font-size: 0.7rem;">Nouveau</span>
+                                            {% if promoTTCAcc %}
+                                                <span class="badge bg-danger rounded-pill px-2 py-1 fw-semibold" style="font-size: 0.65rem;">Promo</span>
+                                            {% endif %}
+                                        </div>
+                                        {% if acc.stock < 1 %}
+                                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle">Rupture</span>
+                                        {% else %}
+                                            <span class="badge bg-success-subtle text-success border border-success-subtle">En stock</span>
+                                        {% endif %}
+                                    </div>
+                                    <a href="{{ path('accessory_show', {'slug': acc.slug}) }}" class="d-flex align-items-center justify-content-center my-3 text-decoration-none" style="height: 180px;">
+                                        <img src="{{ imgAccPath }}" alt="{{ acc.name }}" class="img-fluid object-fit-contain h-100 w-100 product-img-zoom">
+                                    </a>
+                                    <div class="card-body p-0 pt-2 d-flex flex-column justify-content-end">
+                                        <h3 class="fs-6 fw-bold text-dark mb-1 text-truncate">
+                                            <a href="{{ path('accessory_show', {'slug': acc.slug}) }}" class="text-dark text-decoration-none">{{ acc.name }}</a>
+                                        </h3>
+                                        <div class="d-flex justify-content-between align-items-baseline mb-3">
+                                            <div>
+                                                {% if promoTTCAcc %}
+                                                    <span class="fs-5 fw-bold text-danger">{{ promoTTCAcc|number_format(2, ',', ' ') }} €</span>
+                                                    <span class="text-muted text-decoration-line-through small ms-1">{{ priceTTCAcc|number_format(2, ',', ' ') }} €</span>
+                                                {% else %}
+                                                    <span class="fs-5 fw-bold text-dark">{{ priceTTCAcc|number_format(2, ',', ' ') }} €</span>
+                                                {% endif %}
+                                            </div>
+                                            <span class="text-secondary small">TTC</span>
+                                        </div>
+                                        <a href="{{ path('accessory_show', {'slug': acc.slug}) }}" class="btn btn-outline-dark rounded-pill w-100 btn-sm py-2 fw-medium">Découvrir</a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                {# PANE 2 : TROTTINETTES #}
+                <div class="tab-pane fade" id="pane-trott" role="tabpanel">
+                    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4 mb-5">
+                        {% for trott in latestTrottinettes|default([]) %}
+                            {% set imgObj = trott.illustrations is defined and trott.illustrations|length > 0 ? trott.illustrations|first : null %}
+                            {% set rawImg = imgObj ? imgObj.image : (trott.image ?? 'default.jpg') %}
+                            {% set imgPath = rawImg starts with 'http' ? rawImg : '/uploads/trottinettes/' ~ rawImg %}
+                            {% set tvaRate = trott.tva ? (trott.tva.value / 100) : 0.2 %}
+                            {% set priceTTC = trott.price * (1 + tvaRate) %}
+                            {% set promoTTC = (trott.promoPrice is defined and trott.promoPrice is not null and trott.promoPrice > 0) ? (trott.promoPrice * (1 + tvaRate)) : null %}
+                            <div class="col">
+                                <div class="card h-100 border border-light-subtle rounded-4 p-3 bg-white product-card shadow-sm">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <div class="d-flex align-items-center gap-1">
+                                            <span class="badge rounded-pill px-2.5 py-1 fw-semibold border" style="background-color: #000000; color: #ffffff !important; font-size: 0.7rem;">Nouveau</span>
+                                            {% if promoTTC %}
+                                                <span class="badge bg-danger rounded-pill px-2 py-1 fw-semibold" style="font-size: 0.65rem;">Promo</span>
+                                            {% endif %}
+                                        </div>
+                                        {% if trott.stock < 1 %}
+                                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle">Rupture</span>
+                                        {% else %}
+                                            <span class="badge bg-success-subtle text-success border border-success-subtle">En stock</span>
+                                        {% endif %}
+                                    </div>
+                                    <a href="{{ path('trottinette_show', {'slug': trott.slug}) }}" class="d-flex align-items-center justify-content-center my-3 text-decoration-none" style="height: 180px;">
+                                        <img src="{{ imgPath }}" alt="{{ trott.name }}" class="img-fluid object-fit-contain h-100 w-100 product-img-zoom">
+                                    </a>
+                                    <div class="card-body p-0 pt-2 d-flex flex-column justify-content-end">
+                                        <h3 class="fs-6 fw-bold text-dark mb-1 text-truncate">
+                                            <a href="{{ path('trottinette_show', {'slug': trott.slug}) }}" class="text-dark text-decoration-none">{{ trott.name }}</a>
+                                        </h3>
+                                        <div class="d-flex justify-content-between align-items-baseline mb-3">
+                                            <div>
+                                                {% if promoTTC %}
+                                                    <span class="fs-5 fw-bold text-danger">{{ promoTTC|number_format(2, ',', ' ') }} €</span>
+                                                    <span class="text-muted text-decoration-line-through small ms-1">{{ priceTTC|number_format(2, ',', ' ') }} €</span>
+                                                {% else %}
+                                                    <span class="fs-5 fw-bold text-dark">{{ priceTTC|number_format(2, ',', ' ') }} €</span>
+                                                {% endif %}
+                                            </div>
+                                            <span class="text-secondary small">TTC</span>
+                                        </div>
+                                        <a href="{{ path('trottinette_show', {'slug': trott.slug}) }}" class="btn btn-outline-dark rounded-pill w-100 btn-sm py-2 fw-medium">Découvrir</a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="text-center pt-3 border-top border-light-subtle">
+                        <a href="{{ path('nos_trottinettes') }}" class="btn btn-dark rounded-pill px-5 py-3 small fw-semibold shadow-sm">
+                            Voir toutes les trottinettes <i class="fas fa-arrow-right ms-2"></i>
+                        </a>
+                    </div>
+                </div>
+
+                {# PANE 3 : ACCESSOIRES #}
+                <div class="tab-pane fade" id="pane-acc" role="tabpanel">
+                    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4 mb-5">
+                        {% for acc in latestAccessories|default([]) %}
+                            {% set imgObjAcc = acc.illustrations is defined and acc.illustrations|length > 0 ? acc.illustrations|first : null %}
+                            {% set rawAccImg = imgObjAcc ? imgObjAcc.image : (acc.image ?? 'default.jpg') %}
+                            {% set imgAccPath = rawAccImg starts with 'http' ? rawAccImg : '/uploads/accessoires/' ~ rawAccImg %}
+                            {% set tvaRateAcc = acc.tva ? (acc.tva.value / 100) : 0.2 %}
+                            {% set priceTTCAcc = acc.price * (1 + tvaRateAcc) %}
+                            {% set promoTTCAcc = (acc.promoPrice is defined and acc.promoPrice is not null and acc.promoPrice > 0) ? (acc.promoPrice * (1 + tvaRateAcc)) : null %}
+                            <div class="col">
+                                <div class="card h-100 border border-light-subtle rounded-4 p-3 bg-white product-card shadow-sm">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <div class="d-flex align-items-center gap-1">
+                                            <span class="badge rounded-pill px-2.5 py-1 fw-semibold border" style="background-color: #000000; color: #ffffff !important; font-size: 0.7rem;">Nouveau</span>
+                                            {% if promoTTCAcc %}
+                                                <span class="badge bg-danger rounded-pill px-2 py-1 fw-semibold" style="font-size: 0.65rem;">Promo</span>
+                                            {% endif %}
+                                        </div>
+                                        {% if acc.stock < 1 %}
+                                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle">Rupture</span>
+                                        {% else %}
+                                            <span class="badge bg-success-subtle text-success border border-success-subtle">En stock</span>
+                                        {% endif %}
+                                    </div>
+                                    <a href="{{ path('accessory_show', {'slug': acc.slug}) }}" class="d-flex align-items-center justify-content-center my-3 text-decoration-none" style="height: 180px;">
+                                        <img src="{{ imgAccPath }}" alt="{{ acc.name }}" class="img-fluid object-fit-contain h-100 w-100 product-img-zoom">
+                                    </a>
+                                    <div class="card-body p-0 pt-2 d-flex flex-column justify-content-end">
+                                        <h3 class="fs-6 fw-bold text-dark mb-1 text-truncate">
+                                            <a href="{{ path('accessory_show', {'slug': acc.slug}) }}" class="text-dark text-decoration-none">{{ acc.name }}</a>
+                                        </h3>
+                                        <div class="d-flex justify-content-between align-items-baseline mb-3">
+                                            <div>
+                                                {% if promoTTCAcc %}
+                                                    <span class="fs-5 fw-bold text-danger">{{ promoTTCAcc|number_format(2, ',', ' ') }} €</span>
+                                                    <span class="text-muted text-decoration-line-through small ms-1">{{ priceTTCAcc|number_format(2, ',', ' ') }} €</span>
+                                                {% else %}
+                                                    <span class="fs-5 fw-bold text-dark">{{ priceTTCAcc|number_format(2, ',', ' ') }} €</span>
+                                                {% endif %}
+                                            </div>
+                                            <span class="text-secondary small">TTC</span>
+                                        </div>
+                                        <a href="{{ path('accessory_show', {'slug': acc.slug}) }}" class="btn btn-outline-dark rounded-pill w-100 btn-sm py-2 fw-medium">Découvrir</a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="text-center pt-3 border-top border-light-subtle">
+                        <a href="{{ path('accessoires') }}" class="btn btn-dark rounded-pill px-5 py-3 small fw-semibold shadow-sm">
+                            Voir tous les accessoires <i class="fas fa-arrow-right ms-2"></i>
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
-
-    <section class="section bg-image" id="about">
-        <div class="container-home about">
-            <div class="right" data-aos="fade-left" data-aos-duration="2000">
-                <img src="{{ asset('/img/logo-trott.png') }}" alt="Logo trott" />
-            </div>
-            <div class="left" data-aos="fade-down" data-aos-delay="70" data-aos-duration="2000">
-                <div class="title-home">
-                    <h1>Nos garanties !</h1>
-                </div>
-                <p>Nous offrons des garanties complètes sur toutes nos trottinettes et accessoires. Profitez d’un service client réactif et d’une assistance fiable pour prolonger la durée de vie de vos équipements et rouler en toute tranquillité.</p>
-            </div>
-        </div>
-    </section>
-
-    {# Slider pour les meilleurs accessoires #}
-    {{ include('partials/slider_isbest_all.html.twig') }}
-
-    {# Formulaire de contact #}
-    <article>
-        {{ include('partials/contact-form.html.twig') }}
-    </article>
-
-    {# AOS animations #}
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script>
-        AOS.init();
-    </script>
-
-    {# Scripts personnalisés #}
-    <script src="{{ asset('assets/js/slide-product.js') }}"></script>
-
-    {# Styles personnalisés #}
-    <style>
-        .section {
-        position: relative;
-        padding: 100px 0;
-        background-color: #f9f9f9;
-        }
-
-        .section.bg-image {
-            /* background-image: url("{{ asset('img/accueil/istockphoto-1164959623-2048x2048.webp') }}"); */
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed; /* effet premium */
-        }
-
-        .section.bg-image::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(  /* overlay clair */
-                rgba(255,255,255,0.7),
-                rgba(255,255,255,0.7)
-            );
-            z-index: 0;
-        }
-
-        .section .container-home {
-            position: relative;
-            z-index: 1;
-        }
-    </style>
 {% endblock %}

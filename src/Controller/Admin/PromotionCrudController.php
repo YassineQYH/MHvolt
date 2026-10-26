@@ -45,14 +45,22 @@ class PromotionCrudController extends AbstractCrudController
 
             FormField::addPanel('Réduction'),
 
-            MoneyField::new('discountAmount', 'Montant')
-                ->setCurrency('EUR')
-                ->setStoredAsCents(false),
+            ChoiceField::new('discountType', 'Type de réduction')
+                ->setChoices([
+                    'Pourcentage (%)' => Promotion::TYPE_PERCENTAGE,
+                    'Montant fixe / Prix promo (€)' => Promotion::TYPE_FIXED_AMOUNT,
+                ])
+                ->setHelp('Choisissez s\'il s\'agit d\'une réduction en % ou d\'un montant fixe'),
 
-            NumberField::new('discountPercent', 'Pourcentage')
+            MoneyField::new('discountAmount', 'Montant (€)')
+                ->setCurrency('EUR')
+                ->setStoredAsCents(false)
+                ->setHelp('Entrez le montant de la réduction (ex : 15 pour 15,00 €)'),
+
+            NumberField::new('discountPercent', 'Pourcentage (%)')
                 ->setNumDecimals(0)
                 ->setHelp('Entrez la valeur en % (ex : 25 pour 25%)')
-                ->formatValue(fn($value) => $value . ' %'),
+                ->formatValue(fn($value) => $value ? $value . ' %' : ''),
 
             DateTimeField::new('startDate', 'Début'),
             DateTimeField::new('endDate', 'Fin'),

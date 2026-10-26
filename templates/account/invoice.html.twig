@@ -4,120 +4,206 @@
     <meta charset="UTF-8">
     <title>Facture {{ order.reference }}</title>
     <style>
+        @page {
+            margin: 15mm;
+            size: A4 portrait;
+        }
         body {
-            font-family: Arial, sans-serif;
-            font-size: 12px;
+            font-family: -apple-system, BlinkMacSystemFont, "DejaVu Sans", Arial, sans-serif;
+            font-size: 11px;
+            color: #111827;
+            line-height: 1.5;
             margin: 0;
-            padding: 5mm;
+            padding: 0;
         }
-        .facture {
-            width: 150mm;
-            padding: 5mm;
-            border: 1px solid #000;
-            box-sizing: border-box;
+        .header {
+            width: 100%;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 20px;
+            margin-bottom: 25px;
         }
-        .facture div { margin-bottom: 8px; }
-        h1 { font-size: 14px; margin-bottom: 5px; }
-        table { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 5px; }
-        th, td { border: 1px solid #000; padding: 5px; text-align: left; }
-        th:nth-child(4), td:nth-child(4),
-        th:nth-child(5), td:nth-child(5),
-        th:nth-child(6), td:nth-child(6),
-        th:nth-child(7), td:nth-child(7) { min-width: 60px; white-space: nowrap; }
-        .totals td { border: none; padding: 5px; }
-        .footer { font-size: 10px; margin-top: 5px; color: gray; }
+        .header-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .brand {
+            font-size: 22px;
+            font-weight: bold;
+            color: #000000;
+            letter-spacing: -0.5px;
+        }
+        .doc-title {
+            text-align: right;
+        }
+        .doc-title h1 {
+            font-size: 18px;
+            margin: 0 0 4px 0;
+            color: #111827;
+        }
+        .addresses {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+        .addresses td {
+            width: 50%;
+            vertical-align: top;
+        }
+        .section-label {
+            font-size: 9px;
+            text-transform: uppercase;
+            font-weight: bold;
+            color: #6b7280;
+            margin-bottom: 6px;
+        }
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 25px;
+        }
+        .items-table th {
+            background-color: #f9fafb;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: left;
+            padding: 8px 10px;
+            font-size: 9px;
+            text-transform: uppercase;
+            color: #4b5563;
+        }
+        .items-table td {
+            padding: 10px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        .totals-table {
+            width: 45%;
+            margin-left: auto;
+            border-collapse: collapse;
+            margin-bottom: 40px;
+        }
+        .totals-table td {
+            padding: 5px 8px;
+        }
+        .totals-table .total-line {
+            border-top: 1px solid #111827;
+            font-weight: bold;
+            font-size: 13px;
+        }
+        .text-right { text-align: right; }
+        .text-center { text-align: center; }
+        .footer {
+            border-top: 1px solid #e5e7eb;
+            padding-top: 15px;
+            text-align: center;
+            font-size: 9px;
+            color: #9ca3af;
+        }
     </style>
 </head>
 <body>
-<div class="facture">
-    <h1>Facture - {{ order.reference }}</h1>
 
-    <div>
-        <strong>Vendeur :</strong> mhvolt<br>
-        <strong>Adresse :</strong> 123 Rue Exemple, 75000 Paris<br>
-        <strong>Email :</strong> contact@mhvolt.fr
+    {# En-tête #}
+    <div class="header">
+        <table class="header-table">
+            <tr>
+                <td>
+                    <div class="brand">MHVOLT</div>
+                    <div style="color: #4b5563;">
+                        51 Boulevard Vincent Auriol<br>
+                        4031 Angleur, BE<br>
+                        contact@mhvolt.com
+                    </div>
+                </td>
+                <td class="doc-title">
+                    <h1>FACTURE</h1>
+                    <div><strong>Réf :</strong> {{ order.reference }}</div>
+                    <div><strong>Date :</strong> {{ order.createdAt|date('d/m/Y') }}</div>
+                    <div><strong>Statut :</strong> Payée</div>
+                </td>
+            </tr>
+        </table>
     </div>
 
-    <div style="margin-top:5px;">
-        <strong>Client :</strong> {{ order.user.firstName }} {{ order.user.lastName }}<br>
-        <strong>Adresse :</strong> {{ order.delivery|raw }}
-    </div>
+    {# Coordonnées client #}
+    <table class="addresses">
+        <tr>
+            <td>
+                <div class="section-label">Émetteur</div>
+                <strong>MHvolt Mobilité Électrique</strong><br>
+                Service Ventes & Expéditions
+            </td>
+            <td>
+                <div class="section-label">Facturé à</div>
+                <strong>{{ order.user.firstName }} {{ order.user.lastName }}</strong><br>
+                {{ order.delivery|raw }}
+            </td>
+        </tr>
+    </table>
 
-    <hr>
-
-    <table>
+    {# Tableau des lignes de commande #}
+    <table class="items-table">
         <thead>
             <tr>
-                <th>Produit</th>
-                <th>Quantité</th>
-                <th>Poids</th>
-                <th>Prix unitaire HT</th>
-                <th>Total HT</th>
-                <th>TVA</th>
-                <th>Total TTC</th>
+                <th>Désignation</th>
+                <th class="text-center">Qté</th>
+                <th class="text-right">Prix unit. HT</th>
+                <th class="text-right">TVA</th>
+                <th class="text-right">Total TTC</th>
             </tr>
         </thead>
         <tbody>
-            {% set totalHT = 0 %}
+            {% set totalProduitsHT = 0 %}
             {% set totalTVA = 0 %}
             {% for item in order.orderDetails %}
                 {% set totalItemHT = item.price * item.quantity %}
                 {% set tvaItem = totalItemHT * (item.tva / 100) %}
                 {% set totalItemTTC = totalItemHT + tvaItem %}
-                <tr>
-                    <td>{{ item.product }}</td>
-                    <td>{{ item.quantity }}</td>
-                    <td>{{ item.weight * item.quantity }} kg</td>
-                    <td>{{ item.price|number_format(2, ',', '.') }} €</td>
-                    <td>{{ totalItemHT|number_format(2, ',', '.') }} €</td>
-                    <td>{{ tvaItem|number_format(2, ',', '.') }} €</td>
-                    <td>{{ totalItemTTC|number_format(2, ',', '.') }} €</td>
-                </tr>
-                {% set totalHT = totalHT + totalItemHT %}
+                {% set totalProduitsHT = totalProduitsHT + totalItemHT %}
                 {% set totalTVA = totalTVA + tvaItem %}
+                <tr>
+                    <td><strong>{{ item.product }}</strong></td>
+                    <td class="text-center">{{ item.quantity }}</td>
+                    <td class="text-right">{{ item.price|number_format(2, ',', ' ') }} €</td>
+                    <td class="text-right">{{ item.tva }}%</td>
+                    <td class="text-right">{{ totalItemTTC|number_format(2, ',', ' ') }} €</td>
+                </tr>
             {% endfor %}
         </tbody>
     </table>
 
-    {% set totalProduitsTTC = totalHT + totalTVA %}
+    {# Totaux #}
+    {% set totalProduitsTTC = totalProduitsHT + totalTVA %}
     {% set promo = order.promoReduction ?? 0 %}
     {% set totalCommande = totalProduitsTTC - promo + order.carrierPrice %}
 
-    <table style="width:100%; border-collapse:collapse; font-size:11px; margin-top:5px;">
-        <tbody>
-            <tr>
-                <td>Sous-total HT :</td>
-                <td>{{ totalHT|number_format(2, ',', '.') }} €</td>
-            </tr>
-            <tr>
-                <td>TVA :</td>
-                <td>{{ totalTVA|number_format(2, ',', '.') }} €</td>
-            </tr>
-            <tr>
-                <td><strong>Total TTC produits :</strong></td>
-                <td>{{ totalProduitsTTC|number_format(2, ',', '.') }} €</td>
-            </tr>
-            {% if promo > 0 %}
-            <tr>
-                <td><strong>Réduction ({{ order.promoTitre ?? order.promoCode }}):</strong></td>
-                <td>-{{ promo|number_format(2, ',', '.') }} €</td>
-            </tr>
-            {% endif %}
-            <tr>
-                <td>Frais de livraison :</td>
-                <td>{{ order.carrierPrice|number_format(2, ',', '.') }} €</td>
-            </tr>
-            <tr>
-                <td><strong>Total TTC :</strong></td>
-                <td><strong>{{ totalCommande|number_format(2, ',', '.') }} €</strong></td>
-            </tr>
-        </tbody>
+    <table class="totals-table">
+        <tr>
+            <td>Sous-total HT :</td>
+            <td class="text-right">{{ totalProduitsHT|number_format(2, ',', ' ') }} €</td>
+        </tr>
+        <tr>
+            <td>TVA :</td>
+            <td class="text-right">{{ totalTVA|number_format(2, ',', ' ') }} €</td>
+        </tr>
+        {% if promo > 0 %}
+        <tr>
+            <td style="color:#047857;">Remise :</td>
+            <td class="text-right" style="color:#047857;">-{{ promo|number_format(2, ',', ' ') }} €</td>
+        </tr>
+        {% endif %}
+        <tr>
+            <td>Frais d'expédition :</td>
+            <td class="text-right">{{ order.carrierPrice|number_format(2, ',', ' ') }} €</td>
+        </tr>
+        <tr class="total-line">
+            <td>Total TTC acquitté :</td>
+            <td class="text-right">{{ totalCommande|number_format(2, ',', ' ') }} €</td>
+        </tr>
     </table>
 
+    {# Pied de page légal #}
     <div class="footer">
-        Merci pour votre commande !<br>
-        mhvolt - Tous droits réservés.
+        MHvolt — Numéro d'entreprise & TVA intracommunautaire : BE 0000.000.000 &bull; Facture acquittée électroniquement.
     </div>
-</div>
+
 </body>
 </html>

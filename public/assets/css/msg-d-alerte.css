@@ -1,49 +1,141 @@
+/* ==========================================================================
+   NOTIFICATIONS FLASH FLOTTANTES (TOASTS ÉPURÉS)
+   ========================================================================== */
+
 .flash-container {
     position: fixed;
-    /* ou absolute si tu veux qu’il disparaisse avec le scroll */
-    top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 9999;
-    /* au-dessus de tout */
-}
-
-.flash.notice {
-    background-color: #ffeeba;
-    /* jaune clair */
-    color: #856404;
-    /* orange foncé pour le texte */
-    border: 1px solid #ffeeba;
+    top: 85px; /* Décalage sous la navbar fixe */
+    right: 24px;
+    z-index: 1080;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 380px;
+    pointer-events: none;
 }
 
 .flash {
-    padding: 4px 8px;
+    pointer-events: auto;
+    background: #09090b;
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 9999px; /* Forme pilule */
+    padding: 10px 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.35);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    animation: slideInFlash 0.35s ease forwards;
+}
+
+/* Succès (Validation, Connexion, Inscription) */
+.flash.success,
+.flash.register-success,
+.flash.login_success {
+    background-color: #ffffff;
+    color: #09090b;
+    border: 1px solid #e4e4e7;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
+}
+
+.flash.success::before,
+.flash.register-success::before,
+.flash.login_success::before {
+    content: "✓";
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: #09090b;
+    color: #ffffff;
+    font-size: 11px;
     font-weight: bold;
-    text-align: center;
-    font-size: 1rem;
-    animation: fadeInDown 0.6s ease;
+    margin-right: 12px;
+    flex-shrink: 0;
 }
 
+/* Avertissement / Notice */
+.flash.notice,
+.flash.warning {
+    background-color: #ffffff;
+    color: #09090b;
+    border: 1px solid #e4e4e7;
+}
+
+.flash.notice::before,
+.flash.warning::before {
+    content: "!";
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: #71717a;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: bold;
+    margin-right: 12px;
+    flex-shrink: 0;
+}
+
+/* Erreurs */
+.flash.error,
+.flash.danger,
 .flash.register-error {
-    background-color: #fff3cd;
-    /* jaune clair */
-    color: #856404;
-    /* orange foncé */
-    border: 1px solid #ffeeba;
+    background-color: #09090b;
+    color: #ffffff;
+    border: 1px solid #27272a;
 }
 
-.flash.register-success {
-    background-color: #d4edda;
-    /* vert clair */
-    color: #155724;
-    /* vert foncé */
-    border: 1px solid #c3e6cb;
+.flash.error::before,
+.flash.danger::before,
+.flash.register-error::before {
+    content: "✕";
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: #ef4444;
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: bold;
+    margin-right: 12px;
+    flex-shrink: 0;
 }
 
-@keyframes fadeInDown {
+/* Animation d'entrée fluide depuis la droite */
+@keyframes toastSlideIn {
     from {
         opacity: 0;
-        transform: translateY(-20px);
+        transform: translateY(-10px) scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@media (max-width: 576px) {
+    .flash-container {
+        top: 16px;
+        right: 16px;
+        left: 16px;
+        width: auto;
+    }
+}
+
+@keyframes slideInFlash {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
     }
     to {
         opacity: 1;

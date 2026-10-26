@@ -2,26 +2,133 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Nouvelle demande de contact</title>
+    <title>Nouveau message de contact — MHvolt</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0; }
-        .container { width: 100%; max-width: 600px; margin: 20px auto; background: #ffffff; border-radius: 8px; padding: 20px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-        h2 { color: #333333; }
-        p { color: #555555; line-height: 1.5; }
-        .message { background: #f9f9f9; padding: 15px; border-radius: 5px; margin: 15px 0; }
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f9fafb;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            color: #111827;
+        }
+        .wrapper {
+            width: 100%;
+            background-color: #f9fafb;
+            padding: 30px 0;
+        }
+        .main {
+            background-color: #ffffff;
+            margin: 0 auto;
+            width: 100%;
+            max-width: 580px;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+            overflow: hidden;
+        }
+        .header {
+            padding: 24px 32px;
+            background-color: #09090b;
+            color: #ffffff;
+        }
+        .brand {
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+        .content {
+            padding: 32px;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #374151;
+        }
+        .title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #111827;
+            margin: 0 0 20px 0;
+        }
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 24px;
+        }
+        .info-table td {
+            padding: 8px 0;
+            border-bottom: 1px solid #f3f4f6;
+            vertical-align: top;
+        }
+        .info-label {
+            width: 120px;
+            font-weight: 600;
+            color: #6b7280;
+            font-size: 13px;
+        }
+        .info-value {
+            color: #111827;
+            font-size: 14px;
+        }
+        .message-box {
+            background-color: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px;
+            font-size: 14px;
+            color: #111827;
+            white-space: pre-line;
+            line-height: 1.6;
+        }
+        .footer {
+            padding: 16px 32px;
+            background-color: #fafafa;
+            border-top: 1px solid #f3f4f6;
+            text-align: center;
+            font-size: 12px;
+            color: #9ca3af;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>Nouvelle demande de contact reçue</h2>
-        <p>Un utilisateur a rempli le formulaire de contact sur <strong>HichTrott</strong> :</p>
-        <div class="message">
-            <strong>Nom & Prénom :</strong> {{ name }}<br>
-            <strong>Société :</strong> {{ company }}<br>
-            <strong>Téléphone :</strong> {{ tel }}<br>
-            <strong>Email :</strong> {{ email }}<br><br>
-            <strong>Message :</strong><br>{{ message }}
-        </div>
+    <div class="wrapper">
+        <table class="main" width="100%" align="center">
+            <tr>
+                <td class="header">
+                    <span class="brand">MHVOLT &bull; Notification Admin</span>
+                </td>
+            </tr>
+            <tr>
+                <td class="content">
+                    <h1 class="title">Nouveau message reçu</h1>
+
+                    <table class="info-table">
+                        <tr>
+                            <td class="info-label">Expéditeur :</td>
+                            <td class="info-value"><strong>{{ name }}</strong></td>
+                        </tr>
+                        <tr>
+                            <td class="info-label">E-mail :</td>
+                            <td class="info-value"><a href="mailto:{{ email }}" style="color: #09090b; text-decoration: underline;">{{ email }}</a></td>
+                        </tr>
+                        <tr>
+                            <td class="info-label">Téléphone :</td>
+                            <td class="info-value">{{ tel ? tel : 'Non renseigné' }}</td>
+                        </tr>
+                        <tr>
+                            <td class="info-label">Société :</td>
+                            <td class="info-value">{{ company ? company : 'Particulier' }}</td>
+                        </tr>
+                    </table>
+
+                    <div style="font-weight: 600; font-size: 13px; color: #6b7280; margin-bottom: 8px;">Message :</div>
+                    <div class="message-box">{{ message }}</div>
+                </td>
+            </tr>
+            <tr>
+                <td class="footer">
+                    Message transmis depuis le formulaire de contact du site MHvolt.
+                </td>
+            </tr>
+        </table>
     </div>
 </body>
 </html>

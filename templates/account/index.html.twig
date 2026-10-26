@@ -1,50 +1,78 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Mon compte : HichTrott{% endblock %}
+{% block title %}Mon Compte — MHvolt{% endblock %}
 
-{% block content %} <br><br><br><br><br><br><br>
-    <div class="container">
-        <h1>Mon compte</h1>
+{% block content %}
+<div class="container py-5">
+    {# En-tête de bienvenue #}
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-5 pb-3 border-bottom border-light-subtle">
+        <div>
+            <span class="text-uppercase tracking-wider small fw-semibold text-muted">Espace Client</span>
+            <h1 class="display-6 fw-bold text-dark mt-1">Bonjour, {{ app.user.firstname }}</h1>
+            <p class="text-secondary small mb-0">Gérez vos commandes, vos adresses de livraison et vos informations personnelles.</p>
+        </div>
 
         {% if is_granted('ROLE_ADMIN') %}
-        <small><a href="/admin">Accéder au BackOffice</a></small></br>
+            <div>
+                <a href="/admin" class="btn btn-outline-dark btn-sm rounded-pill px-3 fw-medium">
+                    <i class="bx bx-cog me-1"></i>Accéder au BackOffice
+                </a>
+            </div>
         {% endif %}
-
-        Bonjour {{ app.user.firstname }} , bienvenu dans votre compte.</br>
-        C'est ici que vous allez pouvoir gérer toutes vos informations personnelles.
-        <hr>
-
-        <div class="row">
-
-            <div class="col-md-3">
-                <div class="account-item text-center">
-                <img src="{{ asset('assets/img/password.png') }}" alt=""></br>
-                    <a style="color:blue;" href="{{ path('account_password') }}">Modifier mon mot de passe</a>
-                </div>
-            </div>
-
-            <div class="col-md-3">
-                <div class="account-item text-center">
-                <img src="{{ asset('assets/img/home.png') }}" alt=""></br>
-                    <a style="color:blue;" href="{{ path('account_address') }}">Gérer mes adresses</a>
-                </div>
-            </div>
-
-            <div class="col-md-3">
-                <div class="account-item text-center">
-                <img src="{{ asset('assets/img/product.png') }}" alt=""></br>
-                    <a style="color:blue;" href="{{ path('account_order') }}">Mes commandes</a>
-                </div>
-            </div>
-
-            <div class="col-md-3">
-                <div class="account-item text-center">
-                    <img src="{{ asset('assets/img/user.png') }}" alt=""><br>
-                    <a style="color:blue;" href="{{ path('account_profile') }}">Mes informations</a>
-                </div>
-            </div>
-
-        </div>
-        <hr>
     </div>
+
+    {# Grille des 4 modules clés #}
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-4">
+        {# 1. Commandes #}
+        <div class="col">
+            <a href="{{ path('account_order') }}" class="card h-100 border border-light-subtle rounded-4 p-4 text-decoration-none product-card bg-white">
+                <div class="d-flex align-items-center justify-content-center bg-body-tertiary border rounded-3 mb-3" style="width: 52px; height: 52px;">
+                    <i class="bx bx-package fs-3 text-dark"></i>
+                </div>
+                <h2 class="fs-6 fw-bold text-dark mb-1">Mes commandes</h2>
+                <p class="text-secondary small mb-0">Suivi d'expédition, historique et téléchargement des factures.</p>
+            </a>
+        </div>
+
+        {# 2. Adresses #}
+        <div class="col">
+            <a href="{{ path('account_address') }}" class="card h-100 border border-light-subtle rounded-4 p-4 text-decoration-none product-card bg-white">
+                <div class="d-flex align-items-center justify-content-center bg-body-tertiary border rounded-3 mb-3" style="width: 52px; height: 52px;">
+                    <i class="bx bx-map-pin fs-3 text-dark"></i>
+                </div>
+                <h2 class="fs-6 fw-bold text-dark mb-1">Mes adresses</h2>
+                <p class="text-secondary small mb-0">Gérez vos adresses de livraison et de facturation enregistrées.</p>
+            </a>
+        </div>
+
+        {# 3. Profil #}
+        <div class="col">
+            <a href="{{ path('account_profile') }}" class="card h-100 border border-light-subtle rounded-4 p-4 text-decoration-none product-card bg-white">
+                <div class="d-flex align-items-center justify-content-center bg-body-tertiary border rounded-3 mb-3" style="width: 52px; height: 52px;">
+                    <i class="bx bx-user fs-3 text-dark"></i>
+                </div>
+                <h2 class="fs-6 fw-bold text-dark mb-1">Informations</h2>
+                <p class="text-secondary small mb-0">Nom, prénom et numéro de téléphone de contact.</p>
+            </a>
+        </div>
+
+        {# 4. Sécurité / Mot de passe #}
+        <div class="col">
+            <a href="{{ path('account_password') }}" class="card h-100 border border-light-subtle rounded-4 p-4 text-decoration-none product-card bg-white">
+                <div class="d-flex align-items-center justify-content-center bg-body-tertiary border rounded-3 mb-3" style="width: 52px; height: 52px;">
+                    <i class="bx bx-lock-alt fs-3 text-dark"></i>
+                </div>
+                <h2 class="fs-6 fw-bold text-dark mb-1">Sécurité</h2>
+                <p class="text-secondary small mb-0">Mettez à jour le mot de passe de votre compte.</p>
+            </a>
+        </div>
+    </div>
+
+    {# Raccourci Déconnexion #}
+    <div class="mt-5 pt-4 border-top border-light-subtle text-end">
+        <a href="{{ path('app_logout') }}" class="text-danger small text-decoration-none fw-medium">
+            <i class="bx bx-log-out me-1"></i>Se déconnecter de la session
+        </a>
+    </div>
+</div>
 {% endblock %}

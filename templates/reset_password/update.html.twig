@@ -1,16 +1,76 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Mot de place oublié : SY-Shop{% endblock %}
+{% block title %}Définir un nouveau mot de passe — MHvolt{% endblock %}
 
 {% block content %}
-    <div class="block-small">
-        <h1 class="h3 mb-3 font-weight-normal">Réinitialiser mon mot de passe</h1>
-        {% for message in app.flashes('notice') %}
-            <div class="alert alert-info">{{ message }}</div>
-        {% endfor %}
-        {% for message in app.flashes('notice') %}
-            <div class="alert alert-info">{{ message }}</div>
-        {% endfor %}
-        {{ form(form) }}
+<div class="container py-5" style="max-width: 520px;">
+    <div class="text-center mb-4">
+        <span class="text-uppercase tracking-wider small fw-semibold text-muted">Nouveau mot de passe</span>
+        <h1 class="display-6 fw-bold text-dark mt-1">Réinitialisation</h1>
+        <p class="text-secondary small mb-0">
+            Choisissez un nouveau mot de passe solide pour votre compte.
+        </p>
     </div>
+
+    {% for message in app.flashes('notice') %}
+        <div class="alert alert-dark border shadow-sm small text-center mb-4">
+            {{ message }}
+        </div>
+    {% endfor %}
+
+    <div class="card border border-light-subtle rounded-4 p-4 p-md-5 shadow-sm bg-white">
+        {% if form is defined %}
+            {{ form_start(form) }}
+                <div class="d-flex flex-column gap-3">
+                    <div>
+                        {{ form_row(form.password.first, {
+                            'attr': {'class': 'form-control rounded-3 py-2 px-3 small', 'placeholder': 'Nouveau mot de passe'}
+                        }) }}
+                    </div>
+                    <div>
+                        {{ form_row(form.password.second, {
+                            'attr': {'class': 'form-control rounded-3 py-2 px-3 small', 'placeholder': 'Confirmez le nouveau mot de passe'}
+                        }) }}
+                    </div>
+                    <button class="btn btn-dark rounded-pill py-2 w-100 fw-semibold mt-2" type="submit">
+                        Mettre à jour mon mot de passe
+                    </button>
+                </div>
+            {{ form_end(form) }}
+        {% else %}
+            {# Formulaire POST standard si vous n'utilisez pas de FormType dédié #}
+            <form method="post">
+                <div class="mb-3">
+                    <label for="password" class="form-label small fw-semibold text-dark">Nouveau mot de passe</label>
+                    <input type="password"
+                           name="password"
+                           id="password"
+                           class="form-control rounded-3 py-2 px-3 small"
+                           placeholder="10 caractères minimum"
+                           required>
+                </div>
+
+                <div class="mb-4">
+                    <label for="password_confirm" class="form-label small fw-semibold text-dark">Confirmez le mot de passe</label>
+                    <input type="password"
+                           name="password_confirm"
+                           id="password_confirm"
+                           class="form-control rounded-3 py-2 px-3 small"
+                           placeholder="Répétez le mot de passe"
+                           required>
+                </div>
+
+                <button class="btn btn-dark rounded-pill py-2 w-100 fw-semibold mb-3" type="submit">
+                    Mettre à jour mon mot de passe
+                </button>
+            </form>
+        {% endif %}
+
+        <div class="text-center pt-3 border-top border-light-subtle">
+            <a href="{{ path('app_home') }}" class="text-secondary text-decoration-none small">
+                Annuler et revenir au site
+            </a>
+        </div>
+    </div>
+</div>
 {% endblock %}

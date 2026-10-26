@@ -1,43 +1,42 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Mes informations - HichTrott{% endblock %}
+{% block title %}Mes Informations — MHvolt{% endblock %}
 
 {% block content %}
-<div class="container py-5" style="max-width: 600px;">
-    <h1 class="mb-4 text-center">Mes informations personnelles</h1>
-
-    <div class="mb-3 text-center">
-        <a href="{{ path('account') }}" class="btn btn-outline-secondary btn-sm">
-            <i class="fas fa-arrow-left"></i> Retourner à mon compte
+<div class="container py-5" style="max-width: 580px;">
+    <div class="mb-4">
+        <a href="{{ path('account') }}" class="text-secondary text-decoration-none small mb-2 d-inline-block">
+            <i class="bx bx-arrow-back me-1"></i>Retour à mon compte
         </a>
+        <h1 class="display-6 fw-bold text-dark mb-1">Mes informations personnelles</h1>
+        <p class="text-secondary small mb-0">Modifiez vos données de contact associées à votre profil client.</p>
     </div>
 
     {% for message in app.flashes('success') %}
-        <div class="alert alert-success text-center">{{ message }}</div>
+        <div class="alert alert-dark border shadow-sm small mb-4">{{ message }}</div>
     {% endfor %}
 
-    <div class="card shadow-sm">
-        <div class="card-body">
-            {{ form_start(form) }}
+    <div class="card border border-light-subtle rounded-4 p-4 p-md-5 shadow-sm bg-white">
+        {{ form_start(form) }}
+            <div class="d-flex flex-column gap-3">
+                {{ form_row(form.firstname, {'attr': {'class': 'form-control rounded-3 py-2 px-3 small'}}) }}
+                {{ form_row(form.lastname, {'attr': {'class': 'form-control rounded-3 py-2 px-3 small'}}) }}
+                {{ form_row(form.tel, {'attr': {'class': 'form-control rounded-3 py-2 px-3 small'}}) }}
 
-                {{ form_row(form.firstname) }}
-                {{ form_row(form.lastname) }}
-                {{ form_row(form.tel) }}
+                <div>
+                    {{ form_row(form.email, {'attr': {'class': 'form-control rounded-3 py-2 px-3 small bg-light', 'readonly': true}}) }}
+                    <small class="text-secondary d-block mt-1" style="font-size: 0.75rem;">
+                        Pour changer votre adresse email, veuillez <a href="{{ path('app_home') }}#contact" class="text-dark fw-semibold">contacter l'assistance</a>.
+                    </small>
+                </div>
 
-                {{ form_row(form.email) }}
-                <small class="text-muted d-block mb-3">
-                    Pour modifier votre adresse email, merci de
-                    <a href="/#contact" class="text-primary">contacter le support</a>.
-                </small>
-
-                <div class="text-center mt-3">
-                    <button type="submit" class="btn btn-primary">
+                <div class="mt-3">
+                    <button type="submit" class="btn btn-dark rounded-pill w-100 py-2 fw-semibold">
                         Enregistrer les modifications
                     </button>
                 </div>
-
-            {{ form_end(form, { render_rest: false }) }}
-        </div>
+            </div>
+        {{ form_end(form, { render_rest: false }) }}
     </div>
 </div>
 {% endblock %}

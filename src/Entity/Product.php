@@ -67,6 +67,9 @@ class Product
     #[ORM\Column(type:"datetime")]
     protected \DateTimeInterface $updatedAt;
 
+    #[ORM\Column(type: 'float', nullable: true)]
+    private ?float $promoPrice = null;
+
     // Permet de récupérer automatiquement le bon dossier uploads
     public function getUploadDirectory(): string
     {
@@ -113,6 +116,17 @@ class Product
 
     public function getIsBest(): bool { return $this->isBest; }
     public function setIsBest(bool $isBest): self { $this->isBest = $isBest; return $this; }
+
+    public function getPromoPrice(): ?float
+    {
+        return $this->promoPrice;
+    }
+
+    public function setPromoPrice(?float $promoPrice): static
+    {
+        $this->promoPrice = $promoPrice;
+        return $this;
+    }
 
     public function getWeight(): ?float{return $this->weight;}
     public function setWeight(float $weight): self

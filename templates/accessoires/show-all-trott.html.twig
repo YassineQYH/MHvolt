@@ -1,31 +1,49 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Trottinettes compatibles avec {{ accessory.name }}{% endblock %}
-
-{% block stylesheets %}
-    <link rel="stylesheet" href="{{ asset('assets/css/nav.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/products.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/footer.css') }}">
-{% endblock %}
+{% block title %}Trottinettes compatibles avec {{ accessory.name }} — MHvolt{% endblock %}
 
 {% block content %}
-    <section class="section-product-list" id="product-list">
-        <div class="title">
-            <h1>Trottinettes compatibles avec {{ accessory.name }}</h1>
-            <p>Découvrez toutes les trottinettes pour cet accessoire</p>
-        </div>
+    <section class="py-5 bg-white">
+        <div class="container py-3">
+            <div class="text-center mb-5" data-aos="fade-up">
+                <span class="text-uppercase tracking-wider small fw-semibold text-muted">Compatibilité certifiée</span>
+                <h1 class="display-6 fw-bold text-dark mt-1">Trottinettes compatibles</h1>
+                <p class="text-secondary small mt-2">Modèles sur lesquels vous pouvez installer cet accessoire : <strong>{{ accessory.name }}</strong></p>
+            </div>
 
-        <div class="container-product-list product-list-center">
-            {% for trott in trotinettes %}
-                <div class="product-list-box" data-aos="fade" data-aos-duration="2000">
-                    <a href="{{ path('app_trotinette_show', { slug: trott.slug }) }}">
-                        <img src="/uploads/{{ trott.image }}" alt="{{ trott.name }}">
-                    </a>
-                    <p>{{ trott.name }}</p>
-                </div>
-            {% else %}
-                <p style="text-align:center;">Aucune trottinette trouvée pour cet accessoire.</p>
-            {% endfor %}
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+                {% for trott in trotinettes %}
+                    {% set imgObj = trott.illustrations|first %}
+                    {% set rawImg = imgObj ? imgObj.image : (trott.image ?? 'default.jpg') %}
+                    {% set imgPath = rawImg starts with 'http' ? rawImg : '/uploads/trottinettes/' ~ rawImg %}
+                    <div class="col" data-aos="fade-up" data-aos-duration="600">
+                        <div class="card h-100 border border-light-subtle rounded-4 p-3 bg-white product-card">
+                            <span class="badge bg-light text-dark fw-normal border align-self-start mb-2">Trottinette</span>
+
+                            <a href="{{ path('trottinette_show', { slug: trott.slug }) }}" class="d-flex align-items-center justify-content-center my-3 text-decoration-none" style="height: 180px;">
+                                <img src="{{ imgPath }}" alt="{{ trott.name }}" class="img-fluid object-fit-contain h-100 w-100 product-img-zoom">
+                            </a>
+
+                            <div class="card-body p-0 pt-2 d-flex flex-column justify-content-end">
+                                <h3 class="fs-6 fw-semibold text-dark mb-3 text-truncate">
+                                    <a href="{{ path('trottinette_show', { slug: trott.slug }) }}" class="text-dark text-decoration-none">
+                                        {{ trott.name }}
+                                    </a>
+                                </h3>
+                                <a href="{{ path('trottinette_show', { slug: trott.slug }) }}" class="btn btn-outline-dark rounded-pill w-100 btn-sm py-2 fw-medium">
+                                    Voir la trottinette
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="col-12 text-center py-5 text-secondary">
+                        <i class="bx bx-info-circle fs-1 mb-2"></i>
+                        <p>Aucune trottinette compatible n'est répertoriée pour cet accessoire.</p>
+                        <a href="{{ path('accessoires') }}" class="btn btn-dark rounded-pill px-4 btn-sm">Retour aux accessoires</a>
+                    </div>
+                {% endfor %}
+            </div>
         </div>
     </section>
 {% endblock %}

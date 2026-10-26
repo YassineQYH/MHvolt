@@ -37,7 +37,7 @@ class HomeController extends AbstractController
         PromotionService $promotionService,
     ): Response
     {
-        $cart = $cart->getFull();
+        $cartFull = $cart->getFull();
 
         /* =====================================================
          * 📩 FORMULAIRE DE CONTACT
@@ -46,8 +46,6 @@ class HomeController extends AbstractController
         $formcontact->handleRequest($request);
 
         if ($formcontact->isSubmitted() && $formcontact->isValid()) {
-
-            // 🕵️‍♂️ Honeypot anti-bot
             if (!empty($formcontact->get('honeypot')->getData())) {
                 $this->addFlash('error', "Spam détecté, message non envoyé.");
                 return $this->redirectToRoute('app_home');
@@ -61,7 +59,6 @@ class HomeController extends AbstractController
             $data = $formcontact->getData();
             $mail = new Mail();
 
-            // --- Mail admin ---
             $mail->send(
                 'yassine.qyh@gmail.com',
                 'HichTrott',
@@ -69,7 +66,6 @@ class HomeController extends AbstractController
                 $this->renderView('emails/contact_admin.html.twig', $data)
             );
 
-            // --- Mail utilisateur ---
             $mail->send(
                 $data['email'],
                 'HichTrott',
@@ -81,51 +77,34 @@ class HomeController extends AbstractController
         }
 
         /* =====================================================
-         * 🔐 LOGIN
+         * 🔐 LOGIN & INSCRIPTION
          * ===================================================== */
         $error = $authenticationUtils->getLastAuthenticationError();
         $lastUsername = $authenticationUtils->getLastUsername();
 
-        /* =====================================================
-         * 🧍‍♂️ INSCRIPTION (TOKEN UNIQUEMENT)
-         * ===================================================== */
         $user = new User();
         $formregister = $this->createForm(RegisterType::class, $user);
         $formregister->handleRequest($request);
 
         if ($formregister->isSubmitted() && $formregister->isValid()) {
-
-            // 🔍 Vérification email déjà existant
             $existingUser = $this->entityManager
                 ->getRepository(User::class)
                 ->findOneByEmail($user->getEmail());
 
             if ($existingUser) {
-                $this->addFlash(
-                    'info-alert',
-                    "L'email que vous avez renseigné existe déjà."
-                );
-
+                $this->addFlash('info-alert', "L'email que vous avez renseigné existe déjà.");
                 return $this->redirectToRoute('app_home');
             }
 
-            // 🔐 Hash du mot de passe (UNE SEULE FOIS)
-            $hashedPassword = $passwordHasher->hashPassword(
-                $user,
-                $user->getPassword()
-            );
-
-            // 🔑 Génération du token
+            $hashedPassword = $passwordHasher->hashPassword($user, $user->getPassword());
             $token = bin2hex(random_bytes(32));
 
-            // 1 - créer le lien de confirmation
             $verificationUrl = $this->generateUrl(
-                'verify_account',   // nom de la route
-                ['token' => $token], // paramètre token
-                UrlGeneratorInterface::ABSOLUTE_URL // lien absolu
+                'verify_account',
+                ['token' => $token],
+                UrlGeneratorInterface::ABSOLUTE_URL
             );
 
-            // 🧾 Création de l'entité temporaire
             $registration = new UserRegistrationToken();
             $registration->setEmail($user->getEmail());
             $registration->setPasswordHash($hashedPassword);
@@ -138,28 +117,23 @@ class HomeController extends AbstractController
             $this->entityManager->persist($registration);
             $this->entityManager->flush();
 
-            // 2 - envoyer le mail avec ta classe Mail
             $mail = new Mail();
             $mail->send(
-                $user->getEmail(),         // email du destinataire
-                $user->getFirstName(),     // nom du destinataire
-                "Confirmation de votre inscription", // sujet
+                $user->getEmail(),
+                $user->getFirstName(),
+                "Confirmation de votre inscription",
                 $this->renderView('emails/confirm_registration.html.twig', [
                     'firstName' => $user->getFirstName(),
                     'verificationUrl' => $verificationUrl
                 ])
             );
 
-            $this->addFlash(
-                'info-alert',
-                "Un email de confirmation vient de vous être envoyé. Veuillez valider votre compte."
-            );
-
+            $this->addFlash('info-alert', "Un email de confirmation vient de vous être envoyé. Veuillez valider votre compte.");
             return $this->redirectToRoute('app_home');
         }
 
         /* =====================================================
-         * 🏠 DONNÉES PAGE D’ACCUEIL
+         * 🏠 DONNÉES PAGE D’ACCUEIL (CATALOGUE MIXTE)
          * ===================================================== */
         $video_header = $this->entityManager
             ->getRepository(\App\Entity\HomeVideo::class)
@@ -169,21 +143,22 @@ class HomeController extends AbstractController
             ->getRepository(Trottinette::class)
             ->findAll();
 
-        $trottinettes = $this->entityManager
+        // ⚡ Nouveautés (limités pour l'accueil, ex: 4 par catégorie)
+        $latestTrottinettes = $this->entityManager
             ->getRepository(Trottinette::class)
-            ->findBy(['isBest' => 1]);
+            ->findBy([], ['id' => 'DESC'], 4);
 
-        $accessories = $this->entityManager
+        $latestAccessories = $this->entityManager
             ->getRepository(Accessory::class)
-            ->findBy(['isBest' => 1]);
+            ->findBy([], ['id' => 'DESC'], 4);
 
         $homepagePromo = $promoFinder->findHomepagePromo();
 
         return $this->render('home/index.html.twig', [
             'video_header' => $video_header,
-            'trottinettes' => $trottinettes,
-            'accessories' => $accessories,
-            'cart' => $cart,
+            'latestTrottinettes' => $latestTrottinettes,
+            'latestAccessories' => $latestAccessories,
+            'cart' => $cartFull,
             'formcontact' => $formcontact->createView(),
             'formregister' => $formregister->createView(),
             'last_username' => $lastUsername,

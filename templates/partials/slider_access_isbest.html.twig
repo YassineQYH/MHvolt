@@ -1,33 +1,35 @@
-<section class="slider" id="slider">
-  <div class="container">
-    <h3 class="text-center">Nouveautés</h3>
-    <p class="text-center">Découvrez nos derniers articles</p>
-    <ul id="autoWidth" class="cs-hidden">
-      <!-- n°1 -->
-      {% for accessory in accessories %}
-        <li class="item-a">
-          <!-- box-slider -->
-          <div class="box">
-            <!-- img-box -->
-            <div class="slide-img">
-              <img src="/uploads/accessoires/{{ accessory.image }}" alt="accessoire isBest"/>
-              <!-- overlayer -->
-              <div class="overlay">
-                <!-- buy-btn -->
-                <a href="{{ path('accessory_show', { 'slug' : accessory.slug } ) }}" class="buy-btn">Voir</a>
-              </div>
+<section class="py-5 bg-body-tertiary border-bottom border-light-subtle">
+    <div class="container py-4">
+        <div class="d-flex justify-content-between align-items-end mb-4">
+            <div>
+                <span class="text-uppercase tracking-wider small fw-semibold text-muted">Équipements</span>
+                <h2 class="display-6 fw-bold text-dark mb-0">Accessoires Recommandés</h2>
             </div>
-            <!-- detail-box -->
-            <div class="detail-box">
-              <!-- type -->
-              <div class="type">
-                <a href="{{ path('accessory_show', { 'slug' : accessory.slug } ) }}">{{ accessory.name }}</a>
-              </div>
-              <a href="{{ path('accessory_show', { 'slug' : accessory.slug } ) }}" class="buy-btn">Voir</a>
-            </div>
-          </div>
-        </li>
-      {% endfor %}
-    </ul>
-  </div>
+        </div>
+
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+            {% for accessory in accessories %}
+                {% set image = accessory.illustrations|first %}
+                <div class="col" data-aos="fade-up" data-aos-duration="600">
+                    <div class="card h-100 border border-light-subtle rounded-4 p-3 bg-white product-card">
+                        <a href="{{ path('accessory_show', { 'slug': accessory.slug }) }}" class="d-flex align-items-center justify-content-center my-3 text-decoration-none" style="height: 200px;">
+                            <img src="/uploads/accessoires/{{ image ? image.image : 'default.jpg' }}"
+                                 alt="{{ accessory.name }}"
+                                 class="img-fluid object-fit-contain h-100 w-100 product-img-zoom">
+                        </a>
+                        <div class="card-body p-0 pt-2 d-flex flex-column justify-content-end">
+                            <h3 class="fs-6 fw-semibold text-dark mb-3 text-truncate">
+                                <a href="{{ path('accessory_show', { 'slug': accessory.slug }) }}" class="text-dark text-decoration-none">
+                                    {{ accessory.name }}
+                                </a>
+                            </h3>
+                            <a href="{{ path('accessory_show', { 'slug': accessory.slug }) }}" class="btn btn-outline-dark rounded-pill w-100 btn-sm py-2 fw-medium">
+                                Voir l'accessoire
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
 </section>

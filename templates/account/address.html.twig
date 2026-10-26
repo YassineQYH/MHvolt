@@ -1,36 +1,53 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Mes adresses : Zone-Frais{% endblock %}
+{% block title %}Mes Adresses — MHvolt{% endblock %}
 
 {% block content %}
 <div class="container py-5">
-    <a href="{{ path('account_address_add') }}" class="btn btn-info btn-sm float-right mb-3">Ajouter une adresse</a>
-    <h1>Mes adresses</h1>
-    <p>C'est dans cet espace que vous allez pouvoir gérer toutes vos adresses.</p>
-    <a href="{{ path('account') }}" style="color: blue;">Retour</a>
-
-    <hr>
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <a href="{{ path('account') }}" class="text-secondary text-decoration-none small mb-2 d-inline-block">
+                <i class="bx bx-arrow-back me-1"></i>Retour à mon compte
+            </a>
+            <h1 class="display-6 fw-bold text-dark mb-0">Mes adresses de livraison</h1>
+        </div>
+        <a href="{{ path('account_address_add') }}" class="btn btn-dark btn-sm rounded-pill px-4">
+            <i class="bx bx-plus me-1"></i>Ajouter une adresse
+        </a>
+    </div>
 
     {% if app.user.addresses|length == 0 %}
-        <p class="text-center mt-4">
-            Vous n'avez pas encore ajouté d'adresse dans votre compte client. Pour en ajouter une, veuillez <a href="{{ path('account_address_add') }}">cliquer ici</a>.
-        </p>
+        <div class="text-center py-5 border rounded-4 bg-body-tertiary">
+            <i class="bx bx-map-pin fs-1 text-secondary mb-2"></i>
+            <p class="text-secondary small mb-3">Vous n'avez pas encore enregistré d'adresse de livraison.</p>
+            <a href="{{ path('account_address_add') }}" class="btn btn-dark btn-sm rounded-pill px-4">Enregistrer une adresse</a>
+        </div>
     {% else %}
         <div class="row g-4">
             {% for address in app.user.addresses %}
-                <div class="col-md-4">
-                    <div class="card h-100 shadow-sm">
-                        <div class="card-body">
-                            <h5 class="card-title">{{ address.name }}</h5>
-                            <p class="card-text">
-                                {{ address.address }}<br>
-                                {{ address.postal }} - {{ address.city }} - {{ address.country }}<br>
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 border border-light-subtle rounded-4 p-4 shadow-sm d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="badge bg-light text-dark border fw-medium">{{ address.name }}</span>
                                 {% if address.company %}
-                                    Société : {{ address.company }}
+                                    <span class="text-muted small">{{ address.company }}</span>
                                 {% endif %}
+                            </div>
+                            <p class="text-secondary small leading-relaxed mb-4">
+                                {{ address.address }}<br>
+                                {{ address.postal }} {{ address.city }}<br>
+                                {{ address.country }}
                             </p>
-                            <a href="{{ path('account_address_edit', { 'id' : address.id }) }}" class="text-primary">Modifier</a> |
-                            <a href="{{ path('account_address_delete', { 'id' : address.id }) }}" class="text-primary">Supprimer</a>
+                        </div>
+                        <div class="pt-3 border-top border-light-subtle d-flex gap-3 small">
+                            <a href="{{ path('account_address_edit', { 'id': address.id }) }}" class="text-dark fw-semibold text-decoration-none">
+                                <i class="bx bx-edit me-1"></i>Modifier
+                            </a>
+                            <span class="text-secondary">•</span>
+                            <a href="{{ path('account_address_delete', { 'id': address.id }) }}" class="text-danger text-decoration-none">
+                                <i class="bx bx-trash me-1"></i>Supprimer
+                            </a>
                         </div>
                     </div>
                 </div>

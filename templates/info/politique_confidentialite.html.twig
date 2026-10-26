@@ -1,37 +1,50 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Politique de Confidentialité{% endblock %}
-
-{% block stylesheets %}
-    {{ parent() }}
-    <link rel="stylesheet" href="{{ asset('assets/css/legal-page.css') }}">
-{% endblock %}
+{% block title %}Politique de Confidentialité — MHvolt{% endblock %}
 
 {% block content %}
-<section class="legal-page">
-    <h1>Politique de Confidentialité</h1>
+<div class="container py-5" style="max-width: 820px;">
+    <div class="mb-5 pb-3 border-bottom border-light-subtle">
+        <span class="text-uppercase tracking-wider small fw-semibold text-muted">Protection des données personnelles (RGPD)</span>
+        <h1 class="display-6 fw-bold text-dark mt-1">Politique de confidentialité</h1>
+        <p class="text-secondary small mb-0">Engagements de MHvolt relatifs au traitement et à la sécurité de vos données.</p>
+    </div>
 
-    <h2>1. Collecte des données</h2>
-    <p>Lors de votre navigation sur notre site, nous pouvons collecter des informations personnelles telles que votre nom, prénom, adresse e-mail, adresse de livraison et numéro de téléphone, notamment lors de la création de compte, de la commande ou via le formulaire de contact.</p>
+    <div class="d-flex flex-column gap-4 text-secondary small leading-relaxed">
+        <section>
+            <h2 class="fs-6 fw-bold text-dark text-uppercase tracking-wider mb-2">1. Responsable du traitement</h2>
+            <p class="mb-0">Les données collectées sur la plateforme sont traitées sous la responsabilité de <strong>MHvolt</strong>, établie au 51 Boulevard Vincent Auriol, 4031 Angleur, Belgique.</p>
+        </section>
 
-    <h2>2. Utilisation des données</h2>
-    <p>Les données collectées sont utilisées exclusivement pour :
-    - le traitement et la livraison de vos commandes,
-    - la gestion de votre compte client,
-    - la communication d’informations et d’offres promotionnelles (si vous y avez consenti).</p>
+        <section>
+            <h2 class="fs-6 fw-bold text-dark text-uppercase tracking-wider mb-2">2. Données collectées</h2>
+            <p class="mb-2">Dans le cadre de l'exploitation de la boutique en ligne, les éléments suivants sont traités :</p>
+            <ul class="list-unstyled d-flex flex-column gap-1 mb-0 ps-3 border-start border-light-subtle">
+                <li><strong>Gestion de compte :</strong> nom, prénom, adresse e-mail, numéro de téléphone, mot de passe chiffré.</li>
+                <li><strong>Livraison :</strong> adresses postales de livraison et de facturation.</li>
+                <li><strong>Facturation :</strong> historique des commandes, montants, adresses IP et identifiants de transaction Stripe.</li>
+            </ul>
+        </section>
 
-    <h2>3. Partage des données</h2>
-    <p>Vos données ne sont <strong>jamais vendues</strong> ni transmises à des tiers, sauf à nos prestataires techniques (livraison, paiement) dans le strict cadre de la gestion de vos commandes.</p>
+        <section>
+            <h2 class="fs-6 fw-bold text-dark text-uppercase tracking-wider mb-2">3. Finalités du traitement</h2>
+            <p class="mb-0">Ces informations sont collectées pour exécuter les commandes, éditer les bordereaux et factures légales, assurer le suivi après-vente et prévenir la fraude aux moyens de paiement.</p>
+        </section>
 
-    <h2>4. Sécurité</h2>
-    <p>MHvolt met en œuvre toutes les mesures nécessaires pour protéger vos données contre toute perte, altération ou accès non autorisé.</p>
+        <section>
+            <h2 class="fs-6 fw-bold text-dark text-uppercase tracking-wider mb-2">4. Destinataires et sous-traitants</h2>
+            <p class="mb-0">Vos données ne sont ni cédées ni commercialisées. Elles sont exclusivement transmises à nos sous-traitants techniques indispensables : le prestataire de paiement (Stripe) et nos transporteurs pour l'acheminement de vos colis.</p>
+        </section>
 
-    <h2>5. Cookies</h2>
-    <p>Notre site utilise des cookies pour améliorer votre expérience utilisateur. Vous pouvez les gérer ou les désactiver depuis les paramètres de votre navigateur.</p>
+        <section>
+            <h2 class="fs-6 fw-bold text-dark text-uppercase tracking-wider mb-2">5. Durée de conservation</h2>
+            <p class="mb-0">Les données du compte client sont conservées tant que le profil reste actif. Les pièces comptables et factures sont archivées pendant dix ans conformément aux obligations du Code de commerce.</p>
+        </section>
 
-    <h2>6. Vos droits</h2>
-    <p>Conformément au RGPD, vous disposez d’un droit d’accès, de rectification, de suppression et d’opposition sur vos données personnelles.
-    Vous pouvez exercer ces droits en nous contactant à :
-    <a href="mailto:admin@hictrott.com">admin@hictrott.com</a></p>
-</section>
+        <section>
+            <h2 class="fs-6 fw-bold text-dark text-uppercase tracking-wider mb-2">6. Vos droits (RGPD)</h2>
+            <p class="mb-0">Conformément à la réglementation européenne, vous disposez d'un droit d'accès, de rectification, de portabilité et de suppression de vos données personnelles. Vous pouvez exercer ces droits depuis votre espace client ou en écrivant à : <a href="mailto:admin@mhvolt.com" class="text-dark fw-semibold text-decoration-none">admin@mhvolt.com</a>.</p>
+        </section>
+    </div>
+</div>
 {% endblock %}

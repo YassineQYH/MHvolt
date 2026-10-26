@@ -1,257 +1,122 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
     <head>
         <meta charset="UTF-8">
-        <meta http-equiv="X-UA_Compatible" content="IE=edge">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>{% block title %}MHvolt!{% endblock %}</title>
+        <title>{% block title %}MHvolt — Mobilité Électrique{% endblock %}</title>
 
         {% block stylesheets %}
-            {# Icones réseaux sociaux #}
-            <link rel="stylesheet" href="https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css" />
-            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" />
-            <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" crossorigin="anonymous">
+            {# Polices & Icônes unifiées #}
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+            <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" />
 
-            {# Bootstrap #}
+            {# Bootstrap 5.3 & Animations #}
             <link rel="stylesheet" href="{{ asset('assets/css/bootstrap.min.css') }}">
+            <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css" />
 
-            {# AOS #}
-            <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
-
-            {# Glidejs #}
-            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Glide.js/3.4.1/css/glide.core.css" />
-            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Glide.js/3.4.1/css/glide.theme.css" />
-
-            {# CSS personnalisées #}
-            <link rel="stylesheet" href="{{ asset('assets/css/cart.css') }}">
-            <link rel="stylesheet" href="{{ asset('assets/css/nav.css') }}">
-            <link rel="stylesheet" href="{{ asset('assets/css/carrousel.css') }}">
-            <link rel="stylesheet" href="{{ asset('assets/css/section.css') }}">
-            <link rel="stylesheet" href="{{ asset('assets/css/product-is-best.css') }}">
-            <link rel="stylesheet" href="{{ asset('assets/css/lightslider.css') }}">
-            <link rel="stylesheet" href="{{ asset('assets/css/login-register.css') }}">
-            <link rel="stylesheet" href="{{ asset('assets/css/contact-form.css') }}">
-            <link rel="stylesheet" href="{{ asset('assets/css/footer.css') }}">
-            <link rel="stylesheet" href="{{ asset('assets/css/invoice.css') }}">
-            <link rel="stylesheet" href="{{ asset('assets/css/slide-img-product-show.css') }}">
+            {# Styles du site unifiés #}
+            <link rel="stylesheet" href="{{ asset('assets/css/theme-black-and-white.css') }}">
             <link rel="stylesheet" href="{{ asset('assets/css/msg-d-alerte.css') }}">
-            <link rel="stylesheet" href="{{ asset('assets/css/promos-site.css') }}">
-            <link rel="stylesheet" href="{{ asset('assets/css/show-product-slider.css') }}">
-            <link rel="stylesheet" href="{{ asset('assets/css/products.css') }}">
-            {# <link rel="stylesheet" href="{{ asset('assets/css/bpost-label.css') }}"> #}
         {% endblock %}
     </head>
 
-    <body>
-        {# 🔔 Messages flash au-dessus de la nav #}
-        <style>
-            .flash.login_success {
-                color: orange;
-                font-weight: bold;
-            }
-        </style>
+    <body class="d-flex flex-column min-vh-100 bg-white text-dark">
+        {# 1. Bannière de maintenance réservée aux administrateurs #}
+        {% if app.user and is_granted('ROLE_ADMIN') and site_config is defined and site_config.isMaintenanceEnabled() %}
+            <div class="bg-danger text-white text-center py-2 px-3 small fw-bold fixed-top" style="z-index: 1070;">
+                <i class="fas fa-tools me-2"></i>MODE MAINTENANCE ACTIF — Accès restreint aux visiteurs
+            </div>
+        {% endif %}
 
-        {# 🔔 Messages flash au-dessus de la nav #}
+        {# 2. Notifications Flash flottantes #}
         <div class="flash-container">
             {% for label, messages in app.flashes %}
                 {% for message in messages %}
-                    <div class="flash {{ label }}">{{ message }}</div>
+                    <div class="flash {{ label }}" onclick="this.style.opacity='0'; setTimeout(() => this.remove(), 250);" role="alert" style="cursor: pointer;">
+                        <span>{{ message }}</span>
+                    </div>
                 {% endfor %}
             {% endfor %}
         </div>
 
-        {# Login overlay #}
-        <login>
-            {% block login %}
-                {{ include('partials/login-register.html.twig') }}
-            {% endblock %}
-        </login>
-
+        {# 3. En-tête et Navigation principale #}
         <header>
             {% block menu %}
-                {# Bannière maintenance pour les admins #}
-                {% if app.user and is_granted('ROLE_ADMIN') and site_config.isMaintenanceEnabled() %}
-                    <div style="
-                        position: fixed;
-                        top: 0;
-                        left: 0;
-                        right: 0;
-                        background: #c0392b;
-                        color: white;
-                        text-align: center;
-                        padding: 8px;
-                        z-index: 9999;
-                        font-weight: bold;
-                    ">
-                        🚧 MODE MAINTENANCE ACTIF
-                    </div>
-                {% endif %}
-
                 {{ include('partials/menu.html.twig') }}
             {% endblock %}
 
-            {# ✅ Messages d’inscription (erreur et succès) #}
-            {% for message in app.flashes('register_error') %}
-                <div class="info-alert register-error">{{ message }}
-            {% endfor %}
-            {% for message in app.flashes('register_success') %}
-                <div class="info-alert register-success">{{ message }}
-            {% endfor %}
-
             {% block carrousel %}{% endblock %}
-
-            <style>
-                .info-alert {
-                    padding: 4px 8px;
-                    font-weight: bold;
-                    text-align: center;
-                    margin: 0;
-                    font-size: 1rem;
-                    z-index: 9999;
-                    background-color: #fff3cd; /* jaune clair */
-                    color: #856404; /* orange foncé */
-                    border: 1px solid #ffeeba;
-                }
-
-                .register-error {
-                    background-color: #fff3cd; /* jaune clair */
-                    color: #856404; /* orange foncé */
-                    border: 1px solid #ffeeba;
-                }
-
-                .register-success {
-                    background-color: #d4edda; /* vert clair */
-                    color: #155724; /* vert foncé */
-                    border: 1px solid #c3e6cb;
-                }
-
-                @keyframes fadeInDown {
-                    from { opacity: 0; transform: translateY(-20px); }
-                    to { opacity: 1; transform: translateY(0); }
-                }
-            </style>
         </header>
 
-        <main>
+        {# 4. Contenu principal #}
+        <main class="flex-grow-1">
             {% block content %}{% endblock %}
         </main>
 
-        <footer id="footer">
+        {# 5. Pied de page #}
+        <footer id="footer" class="mt-auto">
             {% block footer %}
                 {{ include('partials/footer.html.twig') }}
             {% endblock %}
         </footer>
 
-        <div class="copyrightText">
-            <p>Copyright © 2026 Yassine QYH. All Rights Reserved.</p>
-        </div>
-        {# Bannière maintenance pour les admins #}
-        {% if app.user and is_granted('ROLE_ADMIN') and site_config.isMaintenanceEnabled() %}
-            <div style="
-                position: fixed;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                background: #c0392b;
-                color: white;
-                text-align: center;
-                padding: 8px;
-                z-index: 9999;
-                font-weight: bold;
-            ">
-                🚧 MODE MAINTENANCE ACTIF
-            </div>
-        {% endif %}
+        {# 6. Modale d'authentification #}
+        {% block login %}
+            {{ include('partials/login-register.html.twig') }}
+        {% endblock %}
 
+        {# 7. Modales de contact#}
+        {% block contact %}
+            {{ include('partials/contact-modal.html.twig') }}
+        {% endblock %}
+
+
+        {# 8. Scripts JavaScript #}
         {% block javascripts %}
             {# jQuery #}
             <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-            {# Popper.js et Bootstrap #}
-            <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+            {# Bootstrap 5.3 Bundle (contient Popper.js) #}
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-            <script src="{{ asset('assets/js/bootstrap.bundle.js') }}"></script>
 
-            {# Carrousel / Glidejs #}
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/Glide.js/3.4.1/glide.min.js"></script>
-            <script src="{{ asset('assets/js/slide-product.js') }}"></script>
-            <script src="{{ asset('assets/js/lightslider.js') }}"></script>
-            <script src="{{ asset('assets/js/slider-show-product.js') }}"></script>
-
-            {# Login / register scripts #}
-            <script src="{{ asset('assets/js/script-login-register.js') }}"></script>
-            <script src="{{ asset('assets/js/erreur-register.js') }}"></script>
-            <script src="{{ asset('assets/js/show-pwd-login.js') }}"></script>
-            <script src="{{ asset('assets/js/show-pwd-register.js') }}"></script>
-
-            {# Panier scripts #}
-            <script src="{{ asset('assets/js/cart.js') }}"></script>
-
-            {# Mini-panier toggle #}
+            {# Animations AOS #}
+            <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
             <script>
-                $(document).ready(function(){
-                    // Gestion du mini-panier
-                    $('#cart-toggle').click(function(e){
-                        e.preventDefault();
-                        $('.cart__slide').toggleClass('open');
-                    });
-
-                    // Gestion des sous-menus
-                    $('ul li').click(function(){
-                        $(this).siblings().removeClass('active');
-                        $(this).toggleClass('active');
-                    });
-
-                    // Afficher/Masquer le mot de passe login
-                    $('.show-password-login').on('click', function() {
-                        const passwordField = $('#inputPassword');
-                        const type = passwordField.attr('type') === 'text' ? 'password' : 'text';
-                        passwordField.attr('type', type);
-                        $(this).text(type === 'text' ? 'Cacher' : 'Afficher');
-                    });
-
-                    // Afficher/Masquer mot de passe register
-                    $('.show-password').click(function() {
-                        const passwordField = $('#register_password_first');
-                        const type = passwordField.attr('type') === 'text' ? 'password' : 'text';
-                        passwordField.attr('type', type);
-                        $(this).text(type === 'text' ? 'cacher' : 'afficher');
-                    });
-
-                    $('.show-password-retype').click(function() {
-                        const passwordField = $('#register_password_second');
-                        const type = passwordField.attr('type') === 'text' ? 'password' : 'text';
-                        passwordField.attr('type', type);
-                        $(this).text(type === 'text' ? 'cacher' : 'afficher');
-                    });
-                });
-
-                // 🔔 Ouvrir automatiquement le modal d'inscription si erreur
                 document.addEventListener('DOMContentLoaded', function() {
-                    {% if app.flashes('register_error') is not empty %}
-                        const registerModal = document.querySelector('login');
-                        if(registerModal) {
-                            registerModal.style.display = 'block';
+                    AOS.init({
+                        once: true,
+                        duration: 600,
+                        offset: 50
+                    });
+
+                    // Ouverture automatique de la modale si ?login=1
+                    const urlParams = new URLSearchParams(window.location.search);
+                    if (urlParams.has('login')) {
+                        const authModalEl = document.getElementById('authModal');
+                        if (authModalEl) {
+                            const authModal = new bootstrap.Modal(authModalEl);
+                            authModal.show();
                         }
-                    {% endif %}
+                    }
 
-                    // 🔔 Ouvrir automatiquement le modal login si ?login=1
-                    {% if app.request.get('login') %}
-                        const wrapper = document.querySelector('.wrapper');
-                        if(wrapper) wrapper.classList.add('active-popup');
-                    {% endif %}
-                });
-
-                // 🔔 Ouvrir automatiquement le modal d'inscription si erreur
-                document.addEventListener('DOMContentLoaded', function() {
+                    // Bascule automatique sur l'onglet inscription en cas d'erreur
                     {% if app.flashes('register_error') is not empty %}
-                        const registerModal = document.querySelector('login');
-                        if(registerModal) {
-                            registerModal.style.display = 'block';
+                        const authModalEl = document.getElementById('authModal');
+                        if (authModalEl) {
+                            const authModal = new bootstrap.Modal(authModalEl);
+                            authModal.show();
+                            const registerTab = document.getElementById('register-tab');
+                            if (registerTab) {
+                                bootstrap.Tab.getOrCreateInstance(registerTab).show();
+                            }
                         }
                     {% endif %}
                 });
             </script>
+
+            {# Script Panier #}
+            <script src="{{ asset('assets/js/cart.js') }}"></script>
         {% endblock %}
     </body>
 </html>

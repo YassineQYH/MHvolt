@@ -7,12 +7,10 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Entity\Product;
 use App\Entity\CategoryAccessory;
-use App\Validator\UniqueAutoPromo;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity]
-#[UniqueAutoPromo]
 class Promotion
 {
     public const TARGET_ALL = 'all';
@@ -20,18 +18,28 @@ class Promotion
     public const TARGET_PRODUCT = 'product';
     public const TARGET_PRODUCT_LIST = 'product_list';
 
+    public const TYPE_PERCENTAGE = 'PERCENTAGE';
+    public const TYPE_FIXED_AMOUNT = 'FIXED_AMOUNT';
+
     #[ORM\Id, ORM\GeneratedValue, ORM\Column(type:"integer")]
     private ?int $id = null;
 
     #[ORM\Column(type:"string", length:255, nullable:true)]
     private ?string $titre = null;
 
-    #[ORM\Column(type:"string", length:100, nullable:true)]
+    #[ORM\Column(type:"string", length:100, unique:true, nullable:true)]
     private ?string $code = null;
 
     #[ORM\Column(type:"string", length:30)]
-    private string $targetType;
+    private string $targetType = self::TARGET_ALL;
 
+    #[ORM\Column(type:"string", length:20)]
+    private string $discountType = self::TYPE_PERCENTAGE;
+
+    #[ORM\Column(type:"integer", nullable:true)]
+    private ?int $discountValue = null; // En % (ex: 20) ou en centimes (ex: 1500 pour 15,00€)
+
+    // Propriétés de rétrocompatibilité
     #[ORM\Column(type:"float", nullable:true)]
     private ?float $discountAmount = null;
 
@@ -45,7 +53,7 @@ class Promotion
     private ?\DateTimeInterface $endDate = null;
 
     #[ORM\Column(type:"integer")]
-    private int $quantity = 1;
+    private int $quantity = 100;
 
     #[ORM\Column(type:"integer")]
     private int $used = 0;
@@ -71,35 +79,60 @@ class Promotion
 
     // ----------------- GETTERS / SETTERS ------------------
     public function getId(): ?int { return $this->id; }
+
     public function getTitre(): ?string { return $this->titre; }
     public function setTitre(?string $titre): self { $this->titre = $titre; return $this; }
 
     public function getCode(): ?string { return $this->code; }
-    public function setCode(?string $code): self { $this->code = $code; return $this; }
+    public function setCode(?string $code): self
+    {
+        $this->code = $code ? strtoupper(trim($code)) : null;
+        return $this;
+    }
 
     public function getTargetType(): string { return $this->targetType; }
     public function setTargetType(string $type): self
     {
-        $allowed = [
-            self::TARGET_ALL,
-            self::TARGET_CATEGORY_ACCESS,
-            self::TARGET_PRODUCT,
-            self::TARGET_PRODUCT_LIST
-        ];
-
-        if (!in_array($type, $allowed, true)) {
-            throw new \InvalidArgumentException("Invalid targetType '$type'");
-        }
-
         $this->targetType = $type;
         return $this;
     }
 
+    public function getDiscountType(): string { return $this->discountType; }
+    public function setDiscountType(string $discountType): self { $this->discountType = $discountType; return $this; }
+
+    public function getDiscountValue(): ?int { return $this->discountValue; }
+    public function setDiscountValue(?int $discountValue): self
+    {
+        $this->discountValue = $discountValue;
+        if ($this->discountType === self::TYPE_PERCENTAGE) {
+            $this->discountPercent = $discountValue ? (float)$discountValue : null;
+        } else {
+            $this->discountAmount = $discountValue ? ($discountValue / 100) : null;
+        }
+        return $this;
+    }
+
     public function getDiscountAmount(): ?float { return $this->discountAmount; }
-    public function setDiscountAmount(?float $discountAmount): self { $this->discountAmount = $discountAmount; return $this; }
+    public function setDiscountAmount(?float $discountAmount): self
+    {
+        $this->discountAmount = $discountAmount;
+        if ($discountAmount !== null) {
+            $this->discountType = self::TYPE_FIXED_AMOUNT;
+            $this->discountValue = (int)($discountAmount * 100);
+        }
+        return $this;
+    }
 
     public function getDiscountPercent(): ?float { return $this->discountPercent; }
-    public function setDiscountPercent(?float $discountPercent): self { $this->discountPercent = $discountPercent; return $this; }
+    public function setDiscountPercent(?float $discountPercent): self
+    {
+        $this->discountPercent = $discountPercent;
+        if ($discountPercent !== null) {
+            $this->discountType = self::TYPE_PERCENTAGE;
+            $this->discountValue = (int)$discountPercent;
+        }
+        return $this;
+    }
 
     public function getStartDate(): \DateTimeInterface { return $this->startDate; }
     public function setStartDate(\DateTimeInterface $start): self { $this->startDate = $start; return $this; }
@@ -117,31 +150,14 @@ class Promotion
     public function setAutoApply(bool $auto): self { $this->autoApply = $auto; return $this; }
 
     public function getCategoryAccess(): ?CategoryAccessory { return $this->categoryAccess; }
-    public function setCategoryAccess(?CategoryAccessory $category): self
-    {
-        if ($this->targetType !== self::TARGET_CATEGORY_ACCESS && $category !== null) {
-            throw new \LogicException("Cannot set categoryAccess when targetType is '{$this->targetType}'");
-        }
-        $this->categoryAccess = $category;
-        return $this;
-    }
+    public function setCategoryAccess(?CategoryAccessory $category): self { $this->categoryAccess = $category; return $this; }
 
     public function getProduct(): ?Product { return $this->product; }
-    public function setProduct(?Product $product): self
-    {
-        if ($this->targetType !== self::TARGET_PRODUCT && $product !== null) {
-            throw new \LogicException("Cannot set product when targetType is '{$this->targetType}'");
-        }
-        $this->product = $product;
-        return $this;
-    }
+    public function setProduct(?Product $product): self { $this->product = $product; return $this; }
 
     public function getProducts(): Collection { return $this->products; }
     public function addProduct(Product $product): self
     {
-        if ($this->targetType !== self::TARGET_PRODUCT_LIST) {
-            throw new \LogicException("Cannot add products when targetType is '{$this->targetType}'");
-        }
         if (!$this->products->contains($product)) {
             $this->products->add($product);
         }
@@ -160,17 +176,10 @@ class Promotion
 
     public function canBeUsed(): bool { return $this->isActive() && $this->isAvailable(); }
 
-    public function isDiscountValid(): bool { return $this->discountAmount !== null || $this->discountPercent !== null; }
-
-    public function isValidForTarget(): bool
+    // 🔍 Méthode rajoutée pour résoudre l'erreur
+    public function isDiscountValid(): bool
     {
-        return match($this->targetType) {
-            self::TARGET_ALL => $this->categoryAccess === null && $this->product === null && $this->products->isEmpty(),
-            self::TARGET_CATEGORY_ACCESS => $this->categoryAccess !== null && $this->product === null && $this->products->isEmpty(),
-            self::TARGET_PRODUCT => $this->categoryAccess === null && $this->product !== null && $this->products->isEmpty(),
-            self::TARGET_PRODUCT_LIST => $this->categoryAccess === null && $this->product === null && !$this->products->isEmpty(),
-            default => false,
-        };
+        return $this->discountValue !== null || $this->discountAmount !== null || $this->discountPercent !== null;
     }
 
     public function isExpired(): bool
@@ -179,25 +188,12 @@ class Promotion
         return $this->endDate !== null && $this->endDate < $now;
     }
 
-    // -------------------------
-    // VALIDATION CUSTOM
-    // -------------------------
     #[Assert\Callback]
     public function validateDiscount(ExecutionContextInterface $context): void
     {
-        if ($this->discountAmount !== null && $this->discountPercent !== null) {
-            $context->buildViolation('Vous ne pouvez remplir qu’un seul champ : montant ou pourcentage.')
-                ->atPath('discountAmount')
-                ->addViolation();
-
-            $context->buildViolation('Vous ne pouvez remplir qu’un seul champ : montant ou pourcentage.')
-                ->atPath('discountPercent')
-                ->addViolation();
-        }
-
-        if ($this->discountAmount === null && $this->discountPercent === null) {
-            $context->buildViolation('Vous devez remplir soit le montant, soit le pourcentage.')
-                ->atPath('discountAmount')
+        if ($this->discountValue === null && $this->discountAmount === null && $this->discountPercent === null) {
+            $context->buildViolation('Vous devez définir une valeur de réduction.')
+                ->atPath('discountValue')
                 ->addViolation();
         }
     }

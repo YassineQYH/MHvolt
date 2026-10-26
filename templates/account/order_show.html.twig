@@ -1,133 +1,141 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Ma commande : mhvolt{% endblock %}
+{% block title %}Commande {{ order.reference }} — MHvolt{% endblock %}
 
 {% block content %}
-<div class="container mt-5" style="max-width: 80%;">
-    <h1>Ma commande {{ order.reference }}</h1>
-    <a href="{{ path('account_order') }}">← Retour</a>
+<div class="container py-5">
+    {# En-tête commande #}
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <a href="{{ path('account_order') }}" class="text-secondary text-decoration-none small mb-2 d-inline-block">
+                <i class="bx bx-arrow-back me-1"></i>Retour à mes commandes
+            </a>
+            <h1 class="display-6 fw-bold text-dark mb-0">Commande #{{ order.reference }}</h1>
+            <span class="text-secondary small">Passée le {{ order.createdAt|date('d/m/Y à H:i') }}</span>
+        </div>
 
-    {# 🧾 Boutons PDF #}
-    <div class="d-flex mt-3 mb-3">
-        <a href="{{ path('account_order_invoice_web', { reference: order.reference }) }}"
-           class="btn btn-secondary btn-sm w-auto me-2"
-           target="_blank">
-            Voir la facture
-        </a>
-
-        <a href="{{ path('account_order_invoice', { reference: order.reference }) }}?download=1"
-           class="btn btn-primary btn-sm w-auto">
-            Télécharger la facture (PDF)
-        </a>
+        <div class="d-flex gap-2">
+            <a href="{{ path('account_order_invoice_web', { reference: order.reference }) }}"
+               class="btn btn-outline-dark btn-sm rounded-pill px-3"
+               target="_blank">
+                <i class="bx bx-show me-1"></i>Voir facture
+            </a>
+            <a href="{{ path('account_order_invoice', { reference: order.reference }) }}?download=1"
+               class="btn btn-dark btn-sm rounded-pill px-3">
+                <i class="bx bx-download me-1"></i>Télécharger PDF
+            </a>
+        </div>
     </div>
 
-    <hr>
+    {# Statut #}
+    <div class="card border border-light-subtle rounded-4 p-3 shadow-sm bg-body-tertiary mb-4">
+        <div class="d-flex align-items-center gap-2">
+            <span class="small fw-semibold text-secondary">Statut de la livraison :</span>
+            {% if order.deliveryState == 4 %}
+                <span class="badge bg-danger-subtle text-danger border border-danger-subtle fw-normal">Annulée</span>
+            {% elseif order.paymentState == 0 %}
+                <span class="badge bg-danger-subtle text-danger border border-danger-subtle fw-normal">Paiement non confirmé</span>
+            {% elseif order.deliveryState == 0 %}
+                <span class="badge bg-light text-secondary border fw-normal">Commande validée</span>
+            {% elseif order.deliveryState == 1 %}
+                <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle fw-normal">Préparation logistique en cours</span>
+            {% elseif order.deliveryState == 2 %}
+                <span class="badge bg-info-subtle text-info-emphasis border border-info-subtle fw-normal">Colis expédié</span>
+            {% elseif order.deliveryState == 3 %}
+                <span class="badge bg-success-subtle text-success border border-success-subtle fw-normal">Livraison effectuée</span>
+            {% else %}
+                <span class="badge bg-light text-secondary border fw-normal">En attente</span>
+            {% endif %}
+        </div>
+    </div>
 
-    {# Statut de la commande #}
-    <strong>Statut de la commande :</strong>
-    <div>
-        {% if order.deliveryState == 4 %}
-            <span class="badge bg-danger">Annulée</span>
-        {% elseif order.paymentState == 0 %}
-            <span class="badge bg-danger">Non payée</span>
-        {% elseif order.deliveryState == 0 %}
-            <span class="badge bg-secondary">Commande validée</span>
-        {% elseif order.deliveryState == 1 %}
-            <span class="badge bg-warning">Préparation en cours</span>
-        {% elseif order.deliveryState == 2 %}
-            <span class="badge bg-info">Livraison en cours</span>
-        {% elseif order.deliveryState == 3 %}
-            <span class="badge bg-success">Livraison terminée</span>
-        {% else %}
-            <span class="badge bg-secondary">En attente</span>
-        {% endif %}
-    </div><br>
+    {# Tableau des articles commandés #}
+    <div class="card border border-light-subtle rounded-4 shadow-sm mb-4">
+        <div class="table-responsive">
+            <table class="table align-middle mb-0">
+                <thead class="bg-light-subtle border-bottom border-light-subtle small text-uppercase text-secondary">
+                    <tr>
+                        <th class="ps-4 py-3">Produit</th>
+                        <th class="py-3 text-center">Quantité</th>
+                        <th class="py-3">Poids</th>
+                        <th class="py-3 text-end">Prix Unit. HT</th>
+                        <th class="py-3 text-end">Total HT</th>
+                        <th class="pe-4 py-3 text-end">Total TTC</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% set totalHT = 0 %}
+                    {% set totalTTC = 0 %}
 
-    <strong>Commande passée le :</strong> {{ order.createdAt|date('d/m/Y') }}<br>
-    <strong>Référence de ma commande :</strong> <small>{{ order.reference }}</small><br>
-    <hr>
-
-    <strong>Détails :</strong>
-
-    <table class="table table-striped mt-4">
-        <thead class="thead-dark">
-            <tr>
-                <th>Produit</th>
-                <th>Quantité</th>
-                <th>Poids</th>
-                <th>Prix unitaire HT</th>
-                <th>Prix unitaire TTC</th>
-                <th>Total HT</th>
-                <th>Total TTC</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% set totalHT = 0 %}
-            {% set totalTTC = 0 %}
-
-            {% for item in order.orderDetails %}
-                {% set totalItemHT = item.price * item.quantity %}
-                {% set totalItemTTC = totalItemHT * (1 + (item.tva / 100)) %}
-                <tr>
-                    <td>
+                    {% for item in order.orderDetails %}
+                        {% set totalItemHT = item.price * item.quantity %}
+                        {% set totalItemTTC = totalItemHT * (1 + (item.tva / 100)) %}
                         {% set illustration = (item.productEntity is defined and item.productEntity and item.productEntity.illustrations|length > 0)
                             ? item.productEntity.illustrations|first
                             : null %}
-                        <img src="/uploads/{{ item.productEntity.uploadDirectory }}/{{ illustration ? illustration.image : 'default.jpg' }}"
-                            alt="{{ item.product }}"
-                            style="width:50px; height:auto; margin-right:10px;">
-                        {{ item.product }}
-                    </td>
-                    <td>x{{ item.quantity }}</td>
-                    <td>{{ (item.productEntity.weight ?? item.weight) * item.quantity }} kg</td>
-                    <td>{{ item.price|number_format(2, ',', '.') }} €</td>
-                    <td>{{ (item.price * (1 + item.tva / 100))|number_format(2, ',', '.') }} €</td>
-                    <td>{{ totalItemHT|number_format(2, ',', '.') }} €</td>
-                    <td>{{ totalItemTTC|number_format(2, ',', '.') }} €</td>
-                </tr>
-                {% set totalHT = totalHT + totalItemHT %}
-                {% set totalTTC = totalTTC + totalItemTTC %}
-            {% endfor %}
-        </tbody>
-    </table>
+                        <tr>
+                            <td class="ps-4 py-3">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="bg-body-tertiary border rounded-3 p-1 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; flex-shrink: 0;">
+                                        <img src="/uploads/{{ item.productEntity.uploadDirectory }}/{{ illustration ? illustration.image : 'default.jpg' }}"
+                                             alt="{{ item.product }}"
+                                             class="img-fluid object-fit-contain" style="max-height: 40px;">
+                                    </div>
+                                    <span class="fw-semibold text-dark small">{{ item.product }}</span>
+                                </div>
+                            </td>
+                            <td class="py-3 text-center small">x{{ item.quantity }}</td>
+                            <td class="py-3 text-secondary small">{{ (item.productEntity.weight ?? item.weight) * item.quantity }} kg</td>
+                            <td class="py-3 text-end text-secondary small">{{ item.price|number_format(2, ',', ' ') }} €</td>
+                            <td class="py-3 text-end text-secondary small">{{ totalItemHT|number_format(2, ',', ' ') }} €</td>
+                            <td class="pe-4 py-3 text-end fw-bold text-dark small">{{ totalItemTTC|number_format(2, ',', ' ') }} €</td>
+                        </tr>
+                        {% set totalHT = totalHT + totalItemHT %}
+                        {% set totalTTC = totalTTC + totalItemTTC %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-    {# Totaux de la commande #}
+    {# Totaux & Transport #}
     {% set promo = order.promoReduction ?? 0 %}
     {% set totalCommande = totalTTC - promo + order.carrierPrice %}
 
-    <table class="table table-bordered mt-4" style="max-width: 400px; float: right;">
-        <tbody>
-            <tr>
-                <td><strong>Total produits HT :</strong></td>
-                <td class="text-end">{{ totalHT|number_format(2, ',', '.') }} €</td>
-            </tr>
-            <tr>
-                <td><strong>TVA :</strong></td>
-                <td class="text-end">{{ (totalTTC - totalHT)|number_format(2, ',', '.') }} €</td>
-            </tr>
-            <tr>
-                <td><strong>Total produits TTC :</strong></td>
-                <td class="text-end">{{ totalTTC|number_format(2, ',', '.') }} €</td>
-            </tr>
-            {% if promo > 0 %}
-            <tr>
-                <td><strong>Réduction ({{ order.promoTitre ?? order.promoCode }}):</strong></td>
-                <td class="text-end">-{{ promo|number_format(2, ',', '.') }} €</td>
-            </tr>
-            {% endif %}
-            <tr>
-                <td><strong>Frais de livraison :</strong></td>
-                <td class="text-end">{{ order.carrierPrice|number_format(2, ',', '.') }} €</td>
-            </tr>
-            <tr>
-                <td><strong>Total commande :</strong></td>
-                <td class="text-end">{{ totalCommande|number_format(2, ',', '.') }} €</td>
-            </tr>
-            <tr>
-                <td><strong>Transporteur :</strong></td>
-                <td class="text-end">{{ order.carrier ?? 'Non renseigné' }}</td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="row justify-content-end">
+        <div class="col-md-5 col-lg-4">
+            <div class="card border border-light-subtle rounded-4 p-4 shadow-sm bg-body-tertiary">
+                <div class="d-flex justify-content-between small text-secondary mb-2">
+                    <span>Total articles HT</span>
+                    <span class="text-dark">{{ totalHT|number_format(2, ',', ' ') }} €</span>
+                </div>
+                <div class="d-flex justify-content-between small text-secondary mb-2">
+                    <span>TVA</span>
+                    <span class="text-dark">{{ (totalTTC - totalHT)|number_format(2, ',', ' ') }} €</span>
+                </div>
+                <div class="d-flex justify-content-between small text-secondary mb-2">
+                    <span>Total articles TTC</span>
+                    <span class="text-dark">{{ totalTTC|number_format(2, ',', ' ') }} €</span>
+                </div>
+
+                {% if promo > 0 %}
+                    <div class="d-flex justify-content-between small text-success mb-2">
+                        <span>Réduction ({{ order.promoTitre ?? order.promoCode }})</span>
+                        <span>-{{ promo|number_format(2, ',', ' ') }} €</span>
+                    </div>
+                {% endif %}
+
+                <div class="d-flex justify-content-between small text-secondary mb-3 pb-3 border-bottom border-light-subtle">
+                    <span>Frais de port ({{ order.carrier ?? 'Standard' }})</span>
+                    <span class="text-dark">{{ order.carrierPrice|number_format(2, ',', ' ') }} €</span>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-baseline">
+                    <span class="fw-bold text-dark">Total réglé</span>
+                    <span class="fs-5 fw-bold text-dark">{{ totalCommande|number_format(2, ',', ' ') }} €</span>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

@@ -1,64 +1,185 @@
-<nav class="menu-nav">
-    <!-- logo -->
-    <a href="{{ path('app_home') }}" class="logo">
-        <img src="{{ asset('/img/logo-mhvolt.png') }}" alt="Logo Hich" />
-    </a>
+<style>
+    /* Boutons d'action navbar */
+    .nav-action-btn {
+        background-color: transparent;
+        color: #111827;
+        transition: background-color 0.2s ease, transform 0.15s ease;
+    }
+    .nav-action-btn:hover,
+    .nav-action-btn:focus,
+    .nav-action-btn[aria-expanded="true"] {
+        background-color: #f4f4f5 !important;
+        color: #000000 !important;
+    }
+    .nav-action-btn:active {
+        transform: scale(0.95);
+    }
 
-    <!-- messages flash -->
-    {# {% for message in app.flashes('notice') %}
-        <div class="alert alert-info" style="color: orange; font-weight: bold;">
-            {{ message }}
-        </div>
-    {% endfor %} #}
+    /* Lignes du dropdown trottinettes */
+    .trott-menu-row {
+        transition: background-color 0.15s ease;
+        border-radius: 10px;
+    }
+    .trott-menu-row:hover {
+        background-color: #f4f4f5;
+    }
+    .trott-badge-access {
+        transition: all 0.2s ease;
+        background-color: #ffffff;
+        color: #52525b;
+        border: 1px solid #e4e4e7;
+    }
+    .trott-badge-access:hover {
+        background-color: #000000;
+        color: #ffffff !important;
+        border-color: #000000;
+    }
+</style>
 
-    <!-- menu mobile toggle -->
-    <input class="menu-btn" type="checkbox" id="menu-btn"/>
-    <label class="menu-icon" for="menu-btn">
-        <span class="nav-icon"></span>
-    </label>
+<nav class="navbar navbar-expand-lg navbar-light bg-white py-3 border-bottom border-light-subtle fixed-top shadow-sm" style="z-index: 1050; top: 0;">
+    <div class="container">
+        {# Logo #}
+        <a class="navbar-brand fw-bold text-dark tracking-tight d-flex align-items-center" href="{{ path('app_home') }}">
+            <img src="{{ asset('/img/logo-mhvolt.png') }}" alt="MHvolt" height="34" class="me-2">
+            <span class="fs-5 fw-bold text-dark">MHVOLT</span>
+        </a>
 
-    {% set cart = cart() %} {# Panier global #}
+        {# Bouton Hamburger Mobile #}
+        <button class="navbar-toggler border-0 p-2 rounded-circle nav-action-btn shadow-none d-flex align-items-center justify-content-center"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#mainNavbar"
+                aria-controls="mainNavbar"
+                aria-expanded="false"
+                aria-label="Afficher le menu"
+                style="width: 42px; height: 42px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+        </button>
 
-    <!-- menu principal -->
-    <ul class="menu">
-        <li><a href="{{ path('app_home') }}">Accueil</a></li>
+        {# Menu & Liens #}
+        <div class="collapse navbar-collapse" id="mainNavbar">
+            <ul class="navbar-nav mx-auto mb-2 mb-lg-0 gap-lg-3">
+                <li class="nav-item">
+                    <a class="nav-link text-dark fw-medium px-2" href="{{ path('app_home') }}">Accueil</a>
+                </li>
 
-        <li class="menu-deroulant">
-            <a href="javascript:void(0)">Nos trottinettes <span><i class="fas fa-chevron-down"></i></span></a>
-            <ul class="sous-menu-trottinettes">
-                {% for trottinette in trottinettes_menu %}
-                    <li class="trottinette-pair">
-                        <a href="{{ path('trottinette_show', {'slug': trottinette.slug}) }}">
-                            {{ trottinette.nameShort }}
-                        </a>
-                        <span class="separator">|</span>
-                        <a class="accessoire-item" href="{{ path('trottinette_accessoires', {'slug': trottinette.slug}) }}">
-                            Accessoires
-                        </a>
-                    </li>
-                {% endfor %}
+                {# Dropdown stylisé Nos Trottinettes #}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle text-dark fw-medium px-2" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Nos trottinettes
+                    </a>
+                    <div class="dropdown-menu border border-light-subtle shadow-lg rounded-4 p-3 mt-2" style="width: 380px;">
+                        <div class="d-flex justify-content-between align-items-center pb-2 mb-2 border-bottom border-light-subtle px-2">
+                            <span class="text-uppercase tracking-wider small fw-bold text-muted" style="font-size: 0.7rem;">Gamme de modèles</span>
+                            <span class="badge bg-light text-secondary border fw-normal" style="font-size: 0.7rem;">
+                                {{ trottinettes_menu|default([])|length }} modèles
+                            </span>
+                        </div>
 
-                <li style="color:white;">
-                    {% set total = cart|reduce((carry, item) => carry + (item.product.price * item.quantity), 0) %}
-                    <small><strong>{{ (total / 100)|number_format(2, ',','.') }} €</strong></small>
+                        {# Liste avec défilement discret si longue #}
+                        <div class="d-flex flex-column gap-1 overflow-y-auto pe-1" style="max-height: 320px;">
+                            {% for trottinette in trottinettes_menu|default([]) %}
+                                <div class="trott-menu-row p-2 d-flex justify-content-between align-items-center gap-2">
+                                    <a class="text-decoration-none text-dark fw-semibold small d-flex align-items-center gap-2 flex-grow-1 text-truncate"
+                                       href="{{ path('trottinette_show', {'slug': trottinette.slug}) }}">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-secondary flex-shrink-0">
+                                            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                                        </svg>
+                                        <span class="text-truncate">{{ trottinette.nameShort|default(trottinette.name) }}</span>
+                                    </a>
+
+                                    <a class="trott-badge-access badge rounded-pill px-2 py-1 text-decoration-none small fw-medium flex-shrink-0"
+                                       href="{{ path('trottinette_accessoires', {'slug': trottinette.slug}) }}"
+                                       title="Accessoires compatibles">
+                                        Accessoires
+                                    </a>
+                                </div>
+                            {% else %}
+                                <div class="text-center py-3 text-secondary small">
+                                    Aucune trottinette enregistrée
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        {# Pied de menu avec redirection globale #}
+                        <div class="pt-2 mt-2 border-top border-light-subtle">
+                            <a href="{{ path('nos_trottinettes') }}" class="btn btn-outline-dark rounded-pill w-100 btn-sm py-2 fw-medium text-center d-flex align-items-center justify-content-center gap-2">
+                                <span>Voir tout le catalogue</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                    <polyline points="12 5 19 12 12 19"></polyline>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </li>
+
+                <li class="nav-item">
+                    <button type="button" class="nav-link text-secondary fw-medium px-2 bg-transparent border-0" data-bs-toggle="modal" data-bs-target="#contactModal">
+                        Contact
+                    </button>
                 </li>
             </ul>
-        </li>
 
-        <li><a href="/#contact">Nous contacter</a></li>
+            {# Actions droite (Panier & Compte) #}
+            <div class="d-flex align-items-center gap-2">
+                {% set cart = cart() %}
+                {% set totalQuantity = 0 %}
+                {% for item in cart %}
+                    {% set totalQuantity = totalQuantity + item.quantity %}
+                {% endfor %}
 
-        <!-- 🛒 Panier -->
-        <li class="menu-panier">
-            {{ include('partials/cart.html.twig', {
-                cart: cart,
-                cartObject: cart
-            }) }}
-        </li>
+                <div class="dropdown">
+                    <button class="btn border-0 position-relative p-2 rounded-circle nav-action-btn d-flex align-items-center justify-content-center shadow-none"
+                            type="button"
+                            id="cartDropdown"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                            style="width: 42px; height: 42px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
+                            <path d="M3 6h18"></path>
+                            <path d="M16 10a4 4 0 0 1-8 0"></path>
+                        </svg>
 
-        {% if app.user %}
-        <button class="btnLogin-popup">Mon Compte</button>
-        {% else %}
-        <button class="btnLogin-popup">Connexion</button>
-        {% endif %}
-    </ul>
+                        {% if totalQuantity > 0 %}
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill"
+                                  style="background-color: #000000 !important; color: #ffffff !important; font-size: 0.65rem; min-width: 18px; height: 18px; display: inline-flex; align-items: center; justify-content: center; padding: 0 4px; border: 1.5px solid #ffffff;">
+                                {{ totalQuantity }}
+                            </span>
+                        {% endif %}
+                    </button>
+
+                    {# Mini-panier déroulant #}
+                    <div class="dropdown-menu dropdown-menu-end shadow-lg border border-light-subtle p-3 rounded-4 mt-2" aria-labelledby="cartDropdown" style="width: 340px;">
+                        {{ include('partials/cart.html.twig', { cart: cart }) }}
+                    </div>
+                </div>
+
+                {% if app.user %}
+                    <div class="dropdown">
+                        <button class="btn btn-dark rounded-pill px-4 btn-sm fw-medium dropdown-toggle shadow-none" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Mon Compte
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow border border-light-subtle rounded-3 mt-2">
+                            {% if is_granted('ROLE_ADMIN') %}
+                                <li><a class="dropdown-item py-2 small" href="/admin"><i class="fas fa-cog me-2 text-muted"></i>Administration</a></li>
+                            {% endif %}
+                            <li><a class="dropdown-item py-2 small" href="/compte"><i class="fas fa-user me-2 text-muted"></i>Espace Client</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item py-2 small text-danger" href="{{ path('app_logout') }}"><i class="fas fa-sign-out-alt me-2"></i>Déconnexion</a></li>
+                        </ul>
+                    </div>
+                {% else %}
+                    <button class="btn btn-dark rounded-pill px-4 btn-sm fw-medium shadow-none" type="button" data-bs-toggle="modal" data-bs-target="#authModal">
+                        Connexion
+                    </button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
 </nav>

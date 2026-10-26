@@ -1,15 +1,46 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Erreur de paiement : Zone-Frais{% endblock %}
+{% block title %}Paiement non abouti — MHvolt{% endblock %}
 
-{% block content %}<br><br><br><br><br><br><br>
-    <h2>Erreur de paiement</h2>
-    <p>
-        Bonjour <strong>{{ order.user.firstname }} {{ order.user.lastname }},</strong></br></br>
-        Il semblerait que votre paiement est échoué pour votre commande n°<strong>{{ order.reference }}</strong></br>
-        Une confirmation de l'échec du paiement vient de vous être envoyé par email à l'adresse <strong>{{ order.user.email }}</strong>
-        <hr>
-        <a href="{{ path('order') }}" class="btn btn-success">Réessayer le paiement</a>.
-    </p>
-    </div><br><br><br><br><br>
+{% block content %}
+<div class="container py-5" style="max-width: 620px;">
+    <div class="card border border-light-subtle rounded-4 p-4 p-md-5 shadow-sm bg-white text-center">
+        {# Icône d'alerte #}
+        <div class="d-inline-flex align-items-center justify-content-center bg-danger-subtle border border-danger-subtle rounded-circle mx-auto mb-3" style="width: 64px; height: 64px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="15" y1="9" x2="9" y2="15"/>
+                <line x1="9" y1="9" x2="15" y2="15"/>
+            </svg>
+        </div>
+
+        <span class="text-uppercase tracking-wider small fw-semibold text-danger">Transaction interrompue</span>
+        <h1 class="fs-4 fw-bold text-dark mt-1 mb-2">Échec du règlement</h1>
+
+        <p class="text-secondary small leading-relaxed mb-4">
+            Bonjour <strong>{{ order.user.firstname }} {{ order.user.lastname }}</strong>,<br>
+            Le paiement de votre commande <span class="font-monospace fw-semibold text-dark">#{{ order.reference }}</span> n'a pas été finalisé. Aucun montant n'a été prélevé sur votre compte bancaire.
+        </p>
+
+        <div class="bg-body-tertiary border rounded-3 p-3 mb-4 text-start small text-secondary">
+            <div class="d-flex justify-content-between mb-1">
+                <span>Numéro de référence :</span>
+                <strong class="text-dark font-monospace">{{ order.reference }}</strong>
+            </div>
+            <div class="d-flex justify-content-between">
+                <span>E-mail rattaché :</span>
+                <span class="text-dark">{{ order.user.email }}</span>
+            </div>
+        </div>
+
+        <div class="d-flex flex-column gap-2">
+            <a href="{{ path('cart') }}" class="btn btn-dark rounded-pill py-2 fw-semibold">
+                Retourner à mon panier
+            </a>
+            <a href="{{ path('app_home') }}#contact" class="btn btn-link text-secondary text-decoration-none small">
+                Besoin d'aide ? Contacter le support client
+            </a>
+        </div>
+    </div>
+</div>
 {% endblock %}

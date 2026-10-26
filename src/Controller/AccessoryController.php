@@ -23,17 +23,17 @@ class AccessoryController extends BaseController
     }
 
     #[Route('/accessoires', name: 'accessoires')]
-    public function index(Request $request, UserPasswordHasherInterface $encoder): Response
-    {
-        $accessories = $this->entityManager->getRepository(Accessory::class)->findAll();
+        public function index(Request $request, UserPasswordHasherInterface $encoder): Response
+        {
+            $accessories = $this->entityManager->getRepository(Accessory::class)->findAll();
 
-        $formregister = $this->createRegisterForm($request, $encoder);
+            $formregister = $this->createRegisterForm($request, $encoder);
 
-        return $this->render('accessoires/show.html.twig', [
-            'accessories' => $accessories,
-            'formregister' => $formregister->createView(),
-        ]);
-    }
+            return $this->render('accessoires/index.html.twig', [ // <--- Correction ici (index.html.twig au lieu de show.html.twig)
+                'accessories' => $accessories,
+                'formregister' => $formregister->createView(),
+            ]);
+        }
 
     #[Route('/accessoire/{slug}', name: 'accessory_show')]
     public function show(

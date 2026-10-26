@@ -45,9 +45,6 @@ class TrottinetteCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
-        // ======================
-        // Champs communs à toutes les pages
-        // ======================
         $commonFields = [
             CollectionField::new('illustrations')
                 ->onlyOnDetail()
@@ -71,6 +68,12 @@ class TrottinetteCrudController extends AbstractCrudController
                 ->setStoredAsCents(false)
                 ->setHelp('Entrez le prix en euros.'),
 
+            MoneyField::new('promoPrice', 'Prix promo')
+                ->setCurrency('EUR')
+                ->setStoredAsCents(false)
+                ->setRequired(false)
+                ->setHelp('Laisser vide si aucune promotion directe.'),
+
             AssociationField::new('tva', 'TVA')
                 ->formatValue(function ($value, $entity) {
                     if (!$value) return '';
@@ -90,9 +93,6 @@ class TrottinetteCrudController extends AbstractCrudController
             BooleanField::new('isBest', 'Accueil'),
         ];
 
-        // ======================
-        // Champs conditionnels pour le formulaire
-        // ======================
         $formFields = [
             CollectionField::new('illustrations')
                 ->onlyOnForms()
@@ -110,7 +110,6 @@ class TrottinetteCrudController extends AbstractCrudController
         ];
 
         if ($pageName !== Crud::PAGE_NEW) {
-            // Ajouter uniquement à l'édition
             $formFields[] = CollectionField::new('descriptionSections')
                 ->onlyOnForms()
                 ->allowAdd()
@@ -126,9 +125,6 @@ class TrottinetteCrudController extends AbstractCrudController
                 ->setFormTypeOption('by_reference', false);
         }
 
-        // ======================
-        // Champs pour index et detail
-        // ======================
         $indexDetailFields = [
             AssociationField::new('descriptionSections', 'Sections')
                 ->onlyOnIndex()
@@ -155,7 +151,6 @@ class TrottinetteCrudController extends AbstractCrudController
                     foreach ($entity->getDescriptionSections() as $section) {
                         $html .= '<li>';
                         $html .= '<strong>' . $section->getTitle() . '</strong>';
-                        // Affiche le content avec un saut de ligne
                         $html .= '<div style="margin-left: 10px; margin-top: 5px;">'
                             . nl2br($section->getContent())
                             . '</div>';
@@ -190,9 +185,6 @@ class TrottinetteCrudController extends AbstractCrudController
                 ->renderAsHtml(),
         ];
 
-        // ======================
-        // Fusionner tous les champs
-        // ======================
         return array_merge($commonFields, $formFields, $indexDetailFields);
     }
 
@@ -230,7 +222,6 @@ class TrottinetteCrudController extends AbstractCrudController
 
         $files = $request->files->all();
 
-        // Nom du formulaire EasyAdmin (important)
         if (!isset($files['Trottinette']['illustrations'])) {
             return;
         }
@@ -243,7 +234,6 @@ class TrottinetteCrudController extends AbstractCrudController
         }
 
         foreach ($trottinette->getIllustrations() as $index => $illustration) {
-
             if (
                 !isset($files['Trottinette']['illustrations'][$index]['image']) ||
                 !$files['Trottinette']['illustrations'][$index]['image'] instanceof UploadedFile
@@ -254,16 +244,11 @@ class TrottinetteCrudController extends AbstractCrudController
             /** @var UploadedFile $file */
             $file = $files['Trottinette']['illustrations'][$index]['image'];
 
-            // Génération d’un nom propre
             $filename = uniqid('trott_', true) . '.' . $file->guessExtension();
-
-            // Déplacement physique du fichier
             $file->move($uploadDir, $filename);
 
-            // 🔥 LE POINT CLÉ : on remplit AVANT le flush
             $illustration->setImage($filename);
             $illustration->setProduct($trottinette);
         }
     }
-
 }

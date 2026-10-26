@@ -72,6 +72,10 @@ class ProductCrudController extends AbstractCrudController
 
             // ----------- PRIX / STOCK -----------
             FormField::addPanel('Prix & Stock'),
+            NumberField::new('promoPrice', 'Prix promo HT')
+                ->setNumDecimals(2)
+                ->setRequired(false)
+                ->setHelp('Laisse vide s\'il n\'y a pas de promotion sur ce produit'),
 
             // Index : affichage avec €
             NumberField::new('price', 'Prix HT')

@@ -1,52 +1,102 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Accessoires pour {{ trottinette.name }}{% endblock %}
-
-{% block stylesheets %}
-    {{ parent() }}
-    {# CSS spécifiques à cette page #}
-    <link rel="stylesheet" href="{{ asset('assets/css/products.css') }}">
-
-    <style>
-        /* Remonte uniquement la section accessoires */
-        .accessoires-wrapper {
-            margin-top: -300px; /* Ajuste la valeur selon ce que tu veux */
-        }
-    </style>
-
-{% endblock %}
+{% block title %}Accessoires compatibles avec {{ trottinette.name }} — MHvolt{% endblock %}
 
 {% block content %}
     {% include 'partials/promos.html.twig' %}
 
-    <div class="accessoires-wrapper">
-        <section class="section-product-list" id="product-list">
-            <div class="title">
-                <h1>Accessoires pour {{ trottinette.name }}</h1>
-                <p>Découvrez tous les accessoires compatibles</p>
-            </div>
+    <div class="container py-5">
+        {# Fil d'Ariane #}
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb small">
+                <li class="breadcrumb-item"><a href="{{ path('app_home') }}" class="text-secondary text-decoration-none">Accueil</a></li>
+                <li class="breadcrumb-item"><a href="{{ path('nos_trottinettes') }}" class="text-secondary text-decoration-none">Trottinettes</a></li>
+                <li class="breadcrumb-item"><a href="{{ path('trottinette_show', {'slug': trottinette.slug}) }}" class="text-secondary text-decoration-none">{{ trottinette.name }}</a></li>
+                <li class="breadcrumb-item active text-dark fw-semibold" aria-current="page">Accessoires compatibles</li>
+            </ol>
+        </nav>
 
-            <div class="container-product-list product-list-center">
-                {% if accessoires is not empty %}
-                    {% for item in accessoires %}
-                        <div class="product-list-box" data-aos="fade" data-aos-duration="2000">
-                            <a href="{{ path('accessory_show', { 'slug' : item.slug }) }}">
-                                {% set image = item.illustrations|first %}
-                                <img src="/uploads/accessoires/{{ image ? image.image : 'default.jpg' }}" alt="{{ item.name }}">
+        {# En-tête de section #}
+        <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-5 pb-3 border-bottom border-light-subtle">
+            <div>
+                <span class="text-uppercase tracking-wider small fw-semibold text-muted">Compatibilité certifiée</span>
+                <h1 class="display-6 fw-bold text-dark mt-1 mb-2">Accessoires pour {{ trottinette.name }}</h1>
+                <p class="text-secondary small mb-0">Découvrez l'ensemble des équipements et pièces détachées compatibles avec votre trottinette.</p>
+            </div>
+            <a href="{{ path('trottinette_show', {'slug': trottinette.slug}) }}" class="btn btn-outline-dark btn-sm rounded-pill px-3">
+                <i class="fas fa-arrow-left me-1"></i>Retour à la trottinette
+            </a>
+        </div>
+
+        {# Grille d'accessoires #}
+        {% if accessoires is not empty %}
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+                {% for item in accessoires %}
+                    {% set imgObj = item.illustrations|first %}
+                    {% set rawImg = imgObj ? imgObj.image : (item.image ?? 'default.jpg') %}
+                    {% set imgPath = rawImg starts with 'http' ? rawImg : '/uploads/accessoires/' ~ rawImg %}
+                    {% set tvaRate = item.tva ? (item.tva.value / 100) : 0.2 %}
+                    {% set priceTTC = item.price * (1 + tvaRate) %}
+                    {% set promoTTC = (item.promoPrice is defined and item.promoPrice is not null and item.promoPrice > 0) ? (item.promoPrice * (1 + tvaRate)) : null %}
+
+                    <div class="col" data-aos="fade-up" data-aos-duration="600">
+                        <div class="card h-100 border border-light-subtle rounded-4 p-3 bg-white product-card shadow-sm">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <div class="d-flex align-items-center gap-1">
+                                    <span class="badge bg-light text-secondary fw-normal border">Accessoire</span>
+                                    {% if promoTTC %}
+                                        <span class="badge bg-danger rounded-pill px-2 py-1 fw-semibold" style="font-size: 0.65rem;">Promo</span>
+                                    {% endif %}
+                                </div>
+                                {% if item.stock is defined and item.stock < 1 %}
+                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle fw-normal">Rupture</span>
+                                {% else %}
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle fw-normal">En stock</span>
+                                {% endif %}
+                            </div>
+
+                            <a href="{{ path('accessory_show', {'slug': item.slug}) }}" class="d-flex align-items-center justify-content-center my-3 text-decoration-none" style="height: 180px;">
+                                <img src="{{ imgPath }}"
+                                     alt="{{ item.name }}"
+                                     class="img-fluid object-fit-contain h-100 w-100 product-img-zoom">
                             </a>
-                            <p>{{ item.name }}</p>
-                        </div>
-                    {% endfor %}
-                {% else %}
-                    <p style="text-align:center;">Aucun accessoire disponible pour cette trottinette.</p>
-                {% endif %}
-            </div>
-        </section>
-    </div>
 
-    {# AOS animations #}
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script>
-        AOS.init();
-    </script>
+                            <div class="card-body p-0 pt-2 d-flex flex-column justify-content-end">
+                                <h2 class="fs-6 fw-semibold text-dark mb-1 text-truncate">
+                                    <a href="{{ path('accessory_show', {'slug': item.slug}) }}" class="text-dark text-decoration-none">
+                                        {{ item.name }}
+                                    </a>
+                                </h2>
+
+                                <div class="d-flex justify-content-between align-items-baseline mb-3">
+                                    <div>
+                                        {% if promoTTC %}
+                                            <span class="fs-5 fw-bold text-danger">{{ promoTTC|number_format(2, ',', ' ') }} €</span>
+                                            <span class="text-muted text-decoration-line-through small ms-1">{{ priceTTC|number_format(2, ',', ' ') }} €</span>
+                                        {% else %}
+                                            <span class="fs-5 fw-bold text-dark">{{ priceTTC|number_format(2, ',', ' ') }} €</span>
+                                        {% endif %}
+                                    </div>
+                                    <span class="text-secondary small">TTC</span>
+                                </div>
+
+                                <a href="{{ path('accessory_show', {'slug': item.slug}) }}" class="btn btn-outline-dark rounded-pill w-100 btn-sm py-2 fw-medium">
+                                    Découvrir l'accessoire
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center py-5 border rounded-4 bg-body-tertiary">
+                <i class="fas fa-box-open fs-1 text-secondary mb-3"></i>
+                <h2 class="fs-5 fw-bold text-dark mb-2">Aucun accessoire associé</h2>
+                <p class="text-secondary small mb-4">Il n'y a pour l'instant aucun accessoire répertorié pour ce modèle.</p>
+                <a href="{{ path('trottinette_show', {'slug': trottinette.slug}) }}" class="btn btn-dark rounded-pill px-4 btn-sm">
+                    Retourner à la fiche produit
+                </a>
+            </div>
+        {% endif %}
+    </div>
 {% endblock %}

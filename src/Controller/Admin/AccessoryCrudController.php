@@ -54,7 +54,13 @@ class AccessoryCrudController extends AbstractCrudController
 
             TextEditorField::new('description', 'Description'),
 
-            NumberField::new('price', 'Prix (€)')->setNumDecimals(2),
+            NumberField::new('price', 'Prix de base (€)')->setNumDecimals(2),
+
+            NumberField::new('promoPrice', 'Prix promo (€)')
+                ->setNumDecimals(2)
+                ->setRequired(false)
+                ->setHelp('Laisser vide si aucune promotion directe.'),
+
             AssociationField::new('tva', 'TVA')
                 ->formatValue(function ($value, $entity) {
                     if (!$value) return '';
@@ -64,14 +70,11 @@ class AccessoryCrudController extends AbstractCrudController
             NumberField::new('weight', 'Poids (kg)')
                 ->setHelp('Entrez le poids exact du produit')
                 ->formatValue(function ($value, $entity) {
-                    // On vérifie si c'est un entier
                     if (floor($value) == $value) {
                         return $value . 'kg';
                     }
-                    // Sinon on affiche avec 2 décimales
                     return number_format($value, 2, ',', '') . 'kg';
                 }),
-
 
             NumberField::new('stock', 'Stock'),
 
@@ -86,7 +89,7 @@ class AccessoryCrudController extends AbstractCrudController
                 ->allowDelete()
                 ->setEntryType(\App\Form\IllustrationType::class)
                 ->setFormTypeOption('by_reference', false)
-                ->onlyOnForms(), // visible uniquement dans le formulaire
+                ->onlyOnForms(),
 
             AssociationField::new('trottinetteAccessories', 'Trottinettes associées')
                 ->onlyOnDetail()
@@ -99,15 +102,9 @@ class AccessoryCrudController extends AbstractCrudController
                     return $html;
                 })
                 ->renderAsHtml(),
-
-
-            // ======================
-            // DATE (facultatif)
-            // ======================
-            /* DateTimeField::new('createdAt')->onlyOnIndex(),
-            DateTimeField::new('updatedAt')->onlyOnIndex(), */
         ];
     }
+
     public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
         if (!$entityInstance instanceof Accessory) {
@@ -142,7 +139,6 @@ class AccessoryCrudController extends AbstractCrudController
 
         $files = $request->files->all();
 
-        // Nom du formulaire EasyAdmin (important)
         if (!isset($files['Accessory']['illustrations'])) {
             return;
         }
@@ -155,7 +151,6 @@ class AccessoryCrudController extends AbstractCrudController
         }
 
         foreach ($accessory->getIllustrations() as $index => $illustration) {
-
             if (
                 !isset($files['Accessory']['illustrations'][$index]['image']) ||
                 !$files['Accessory']['illustrations'][$index]['image'] instanceof UploadedFile
@@ -166,16 +161,11 @@ class AccessoryCrudController extends AbstractCrudController
             /** @var UploadedFile $file */
             $file = $files['Accessory']['illustrations'][$index]['image'];
 
-            // Nom unique
             $filename = uniqid('acc_', true) . '.' . $file->guessExtension();
-
-            // Déplacement physique
             $file->move($uploadDir, $filename);
 
-            // 🔥 AVANT le flush Doctrine
             $illustration->setImage($filename);
             $illustration->setProduct($accessory);
         }
     }
-
 }

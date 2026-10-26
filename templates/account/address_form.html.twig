@@ -1,48 +1,44 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Gérer mes adresses - HichTrott{% endblock %}
+{% block title %}Gérer mon adresse — MHvolt{% endblock %}
 
 {% block content %}
-<div class="container py-5" style="max-width: 900px;"> {# un peu plus large pour 2 colonnes #}
-    <h1 class="mb-4 text-center">Gérer mes adresses</h1>
-
-    <div class="mb-3 text-center">
-        <a href="{{ path('account') }}" class="btn btn-outline-secondary btn-sm">
-            <i class="fas fa-arrow-left"></i> Retourner à mon compte
+<div class="container py-5" style="max-width: 820px;">
+    <div class="mb-4">
+        <a href="{{ path('account_address') }}" class="text-secondary text-decoration-none small mb-2 d-inline-block">
+            <i class="bx bx-arrow-back me-1"></i>Retour à mes adresses
         </a>
+        <h1 class="display-6 fw-bold text-dark mb-1">Gérer l'adresse de livraison</h1>
+        <p class="text-secondary small mb-0">Renseignez vos coordonnées complètes pour acheminer vos commandes.</p>
     </div>
 
-    {{ form_start(form) }}
-    <div class="card shadow-sm">
-        <div class="card-body">
-            <div class="row">
-                <!-- COLONNE GAUCHE : Infos personnelles -->
-                <div class="col-md-6">
-                    <h4 class="mb-3">Infos personnelles</h4>
-                    {{ form_row(form.name) }}
-                    {{ form_row(form.firstname) }}
-                    {{ form_row(form.lastname) }}
-                    {{ form_row(form.phone) }}
-                    {{ form_row(form.company) }}
-                </div>
-
-                <!-- COLONNE DROITE : Adresse de livraison -->
-                <div class="col-md-6">
-                    <h4 class="mb-3">Adresse de livraison</h4>
-                    {{ form_row(form.country) }}
-                    {{ form_row(form.city) }}
-                    {{ form_row(form.address) }}
-                    {{ form_row(form.postal) }}
-                </div>
+    <div class="card border border-light-subtle rounded-4 p-4 p-md-5 shadow-sm bg-white">
+        {{ form_start(form) }}
+        <div class="row g-4">
+            <div class="col-md-6">
+                <h2 class="fs-6 fw-bold text-dark text-uppercase tracking-wider small mb-3">Identité</h2>
+                {{ form_row(form.name, {'attr': {'class': 'form-control rounded-3 py-2 px-3 small', 'placeholder': 'Ex: Domicile, Bureau'}}) }}
+                {{ form_row(form.firstname, {'attr': {'class': 'form-control rounded-3 py-2 px-3 small'}}) }}
+                {{ form_row(form.lastname, {'attr': {'class': 'form-control rounded-3 py-2 px-3 small'}}) }}
+                {{ form_row(form.phone, {'attr': {'class': 'form-control rounded-3 py-2 px-3 small'}}) }}
+                {{ form_row(form.company, {'attr': {'class': 'form-control rounded-3 py-2 px-3 small', 'placeholder': 'Optionnel'}}) }}
             </div>
 
-            <div class="text-center mt-4">
-                <button type="submit" class="btn btn-primary">
-                    Enregistrer l’adresse
-                </button>
+            <div class="col-md-6">
+                <h2 class="fs-6 fw-bold text-dark text-uppercase tracking-wider small mb-3">Destination</h2>
+                {{ form_row(form.country, {'attr': {'class': 'form-select rounded-3 py-2 px-3 small'}}) }}
+                {{ form_row(form.address, {'attr': {'class': 'form-control rounded-3 py-2 px-3 small', 'placeholder': 'N° et nom de voie'}}) }}
+                {{ form_row(form.postal, {'attr': {'class': 'form-control rounded-3 py-2 px-3 small'}}) }}
+                {{ form_row(form.city, {'attr': {'class': 'form-control rounded-3 py-2 px-3 small'}}) }}
             </div>
         </div>
+
+        <div class="mt-4 pt-3 border-top border-light-subtle text-end">
+            <button type="submit" class="btn btn-dark rounded-pill px-5 py-2 fw-semibold">
+                Enregistrer l'adresse
+            </button>
+        </div>
+        {{ form_end(form, { render_rest: false }) }}
     </div>
-    {{ form_end(form, { render_rest: false }) }}
 </div>
 {% endblock %}

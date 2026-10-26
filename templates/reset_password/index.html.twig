@@ -1,72 +1,48 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Mot de place oublié : Zone-Frais{% endblock %}
+{% block title %}Mot de passe oublié — MHvolt{% endblock %}
 
-{% block stylesheets %}
+{% block content %}
+<div class="container py-5" style="max-width: 520px;">
+    <div class="text-center mb-4">
+        <span class="text-uppercase tracking-wider small fw-semibold text-muted">Sécurité</span>
+        <h1 class="display-6 fw-bold text-dark mt-1">Mot de passe oublié</h1>
+        <p class="text-secondary small mb-0">
+            Saisissez votre adresse e-mail pour recevoir un lien de réinitialisation sécurisé.
+        </p>
+    </div>
 
-    <link href="https://fonts.googleapis.com/css?family=Nunito:400,600,700,800&display=swap" rel="stylesheet">
-
-    <link rel="stylesheet" href="https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css" />   
-    {# fas fa-xxx #}
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" /> 
-    <!-- Bootstrap core CSS -->
-    <link rel="stylesheet" href="{{ asset('assets/css/bootstrap.min.css') }}" >
-    <!-- Font Awesome -->
-    <!-- Footer -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PV1GOfQNHSoD2xbE+QkPxCAF1NEevoEH3S10sibvcOQVnN" crossorigin="anonymous">
-    <!-- Home-section -->
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
-    <!-- Glidejs | Show product slider-->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Glide.js/3.4.1/css/glide.core.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Glide.js/3.4.1/css/glide.theme.css" />
-
-    <!-- CSS PERSONNALISEES -->
-    <link rel="stylesheet" href="{{ asset('assets/css/login-register.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/nav.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/section.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/cart.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/lightslider.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/footer.css') }}">
-{% endblock %}
-{% block content %} <br><br><br><br><br><br><br>
-    <div class="block-small">
     {% for message in app.flashes('notice') %}
-        <div class="alert alert-info">{{ message }}</div>
-    {% endfor %}
-     <div class="container">
-        <div class="cont">
-            <form method="post">
-                <div class="form sign-in">
-                    <h2>Réinitialiser mon mot de passe</h2>
-
-                    <label>
-                    <label for="inputEmail">Votre Email</label>
-                    <input type="email" name="email" id="inputEmail" class="form-control" placeholder="email" required autofocus>
-                    </label>
-                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-                    <button class="submit btn btn-lg btn-info btn-block mt-3" type="submit">
-                        Validé
-                    </button>
-                    <p class="forgot-pass"><a href="{{ path('reset_password') }} "style="color:black;">Mot de passe oublié</a>
-                    <p class="text-center">Ou souhaitez-vous <a href="{{ path('app_login') }} "style="color:black;">Vous connecter</a> ?</p>
-
-                    <div class="social-media">
-                        <ul>
-                        <img src="{{ asset('assets/img/facebook.png') }}" alt="" />
-                        <img src="{{ asset('assets/img/twitter.png') }}" alt="" />
-                        <img src="{{ asset('assets/img/linkedin.png') }}" alt="" />
-                        <img src="{{ asset('assets/img/instagram.png') }}" alt="" />
-                        </ul>
-                    </div>
-                </div>
-            </form>
-            <div class="sub-cont">
-                <div class="img">
-                    <div class="img-text m-up">
-                    <h2>MDP Oublié ??</h2>
-                    <p>Rentre ton adresse E-mail renseigné lors de l'enregistrement et tu recevras un lien pour le réinitialisé.</p>
-                </div>
-            </div><br><br><br>
+        <div class="alert alert-dark border shadow-sm small text-center mb-4">
+            {{ message }}
         </div>
-    </div> <br><br><br><br><br>
+    {% endfor %}
+
+    <div class="card border border-light-subtle rounded-4 p-4 p-md-5 shadow-sm bg-white">
+        <form method="post">
+            <div class="mb-3">
+                <label for="inputEmail" class="form-label small fw-semibold text-dark">Adresse E-mail</label>
+                <input type="email"
+                       name="email"
+                       id="inputEmail"
+                       class="form-control rounded-3 py-2 px-3 small"
+                       placeholder="nom@exemple.com"
+                       required
+                       autofocus>
+            </div>
+
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+            <button class="btn btn-dark rounded-pill py-2 w-100 fw-semibold mt-2 mb-3" type="submit">
+                Envoyer le lien de réinitialisation
+            </button>
+
+            <div class="text-center pt-3 border-top border-light-subtle">
+                <a href="{{ path('app_home') }}" class="text-secondary text-decoration-none small">
+                    <i class="fas fa-arrow-left me-1"></i>Retourner à l'accueil
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
 {% endblock %}

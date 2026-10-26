@@ -1,6 +1,56 @@
-<div class="container-product-list product-list-center">
-        <div class="product-list-box" data-aos="fade" data-aos-duration="2000">
-            <a href="{{ path('trottinette_show', { 'slug' : trottinette.slug } ) }}"> <img src="/uploads/{{ trottinette.image }}" alt="" /></a>
-            <p>Titre : {{ trottinette.name }}</p>
+{% set imgObj = trottinette.illustrations is defined and trottinette.illustrations|length > 0
+    ? trottinette.illustrations|first
+    : null %}
+{% set rawImg = imgObj ? imgObj.image : (trottinette.image ?? 'default.jpg') %}
+{% set imgPath = rawImg starts with 'http' ? rawImg : '/uploads/trottinettes/' ~ rawImg %}
+{% set tvaRate = trottinette.tva ? (trottinette.tva.value / 100) : 0.2 %}
+{% set priceTTC = trottinette.price * (1 + tvaRate) %}
+{% set promoTTC = (trottinette.promoPrice is defined and trottinette.promoPrice is not null and trottinette.promoPrice > 0) ? (trottinette.promoPrice * (1 + tvaRate)) : null %}
+
+<div class="card h-100 border border-light-subtle rounded-4 p-3 bg-white product-card shadow-sm" data-aos="fade-up" data-aos-duration="600">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <div class="d-flex align-items-center gap-1">
+            <span class="badge bg-light text-dark fw-normal border">Trottinette</span>
+            {% if promoTTC %}
+                <span class="badge bg-danger rounded-pill px-2 py-1 fw-semibold" style="font-size: 0.65rem;">Promo</span>
+            {% endif %}
         </div>
+        {% if trottinette.stock is defined and trottinette.stock < 1 %}
+            <span class="badge bg-danger-subtle text-danger border border-danger-subtle fw-normal">Rupture</span>
+        {% else %}
+            <span class="badge bg-success-subtle text-success border border-success-subtle fw-normal">En stock</span>
+        {% endif %}
+    </div>
+
+    {# Image #}
+    <a href="{{ path('trottinette_show', {'slug': trottinette.slug}) }}" class="d-flex align-items-center justify-content-center my-3 text-decoration-none" style="height: 200px;">
+        <img src="{{ imgPath }}"
+             alt="{{ trottinette.name }}"
+             class="img-fluid object-fit-contain h-100 w-100 product-img-zoom">
+    </a>
+
+    {# Titre & Bouton #}
+    <div class="card-body p-0 pt-2 d-flex flex-column justify-content-end">
+        <h3 class="fs-6 fw-semibold text-dark mb-1 text-truncate">
+            <a href="{{ path('trottinette_show', {'slug': trottinette.slug}) }}" class="text-dark text-decoration-none">
+                {{ trottinette.name }}
+            </a>
+        </h3>
+
+        <div class="d-flex justify-content-between align-items-baseline mb-3">
+            <div>
+                {% if promoTTC %}
+                    <span class="fs-5 fw-bold text-danger">{{ promoTTC|number_format(2, ',', ' ') }} €</span>
+                    <span class="text-muted text-decoration-line-through small ms-1">{{ priceTTC|number_format(2, ',', ' ') }} €</span>
+                {% else %}
+                    <span class="fs-5 fw-bold text-dark">{{ priceTTC|number_format(2, ',', ' ') }} €</span>
+                {% endif %}
+            </div>
+            <span class="text-secondary small">TTC</span>
+        </div>
+
+        <a href="{{ path('trottinette_show', {'slug': trottinette.slug}) }}" class="btn btn-outline-dark rounded-pill w-100 btn-sm py-2 fw-medium">
+            Découvrir le modèle
+        </a>
+    </div>
 </div>

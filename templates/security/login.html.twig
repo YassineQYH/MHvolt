@@ -1,139 +1,116 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Connection à Pergolazur{% endblock %}
-
-{% block stylesheets %}
-  <link href="https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css" rel="stylesheet"/>   {# Icone réseaux Sociaux #}
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" /> {# fas fa-xxx #}
-
-  <link rel="stylesheet" href="{{ asset('assets/css/nav.css') }}">
-  <link rel="stylesheet" href="{{ asset('assets/css/login.css') }}">
-
-{% endblock %}
+{% block title %}Connexion — MHvolt{% endblock %}
 
 {% block content %}
-  <form method="post">
-    <!-- Container -->
-    <div class="container container-login" id="container">
-      <!-- Row -->
-      <div class="row">
-        <!-- Sign Up -->
-        <div class="col align-center flex-col sign-up">
-          {# <div class="form-wrapper">
-            <div class="social-list align-center sign-up">
-              <div class="align-center facebook-bg">
-                <i class="bx bxl-facebook"></i>
-              </div>
-              <div class="align-center google-bg">
-                <i class="bx bxl-google"></i>
-              </div>
-              <div class="align-center twitter-bg">
-                <i class="bx bxl-twitter"></i>
-              </div>
-              <div class="align-center insta-bg">
-                <i class="bx bxl-instagram-alt"></i>
-              </div>
-            </div>
-          </div> #}
-        </div>
-        <!-- End Sign Up -->
-        <!-- Sign In -->
-        {% if app.user %}
-        <div class="col align-center flex-col sign-in sign-in-connecter">
-          <div class="form-wrapper align-center">
-            <div class="form sign-in">
-              <button> <a href="{{ path('admin') }}">Accéder au back-Office</a> </button>
-            </div>
-          </div> <br>
-          <div class="form-wrapper align-center">
-            <div class="form sign-in">
-              <button> <a href="{{ path('app_logout') }}">Se Déconnecter</a> </button>
-            </div>
-          </div>
-        {% else %}
-        <div class="col align-center flex-col sign-in">
-          <div class="form-wrapper align-center">
-            <div class="form sign-in">
-              <div class="input-group">
-                <i class="bx bxs-user"></i>
-                <input type="email" placeholder="E-mail" value="{{ last_username }}" name="email" id="inputEmail" class="form-control" autocomplete="email" required autofocus>
-              </div>
-              <div class="input-group">
-                <i class="bx bxs-lock-alt"></i>
-                <input type="password" placeholder="Mot de passe" name="password" id="inputPassword" class="form-control" autocomplete="current-password" required />
-              </div>
-                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-              <button type="submit">Se connecter</button>
-            </div>
-          </div>
-        {% endif %}
-
-          <div class="form-wrapper">
-            <div class="social-list align-center sign-in">
-
-              <div class="align-center facebook-bg">
-                  <a href="https://www.facebook.com/" target="blank" class="bx bxl-facebook"></a>
-              </div>
-
-              <div class="align-center google-bg">
-                <a href="https://www.google.com/" target="blank" class="bx bxl-google"></a>
-              </div>
-
-              <div class="align-center twitter-bg">
-                <a href="https://www.twitter.com/" target="blank" class="bx bxl-twitter"></a>
-              </div>
-
-              <div class="align-center insta-bg">
-                <a href="https://www.instagram.com/" target="blank" class="bx bxl-instagram-alt"></a>
-              </div>
-
-            </div>
-
-          </div>
-        </div>
-        <!-- End Sign In -->
-      </div>
-      <!-- End Row -->
-      <!-- Content Section -->
-      <div class="row content-row">
-        <!-- Sign In Content -->
-        <div class="col align-items flex-col">
-
-
-        {% if app.user %}
-
-
-          <div class="text sign-in">
-          {# <p class="bouton-acces-admin-deco"><b><a href="{{ path('app_logout') }}">Déconnexion</a></b></p> #}
-            <h2>Bon retour {{ app.user.lastname }} {{ app.user.firstname }}</h2>
-            {# <p class="bouton-acces-admin-deco">Tu peux Accéder au <b><a href="{{ path('admin') }}">BackOffice</a></b></p> #}
-          </div>
-
-        {% else %}
-
-          <div class="text sign-in login-text-bureau">
-            <h2>Veuillez vous connecter</h2>
-            <div class="separateur"></div>
-          </div>
-
-          <div class="text sign-in login-text-mobile">
-            <h2>Veuillez vous connecter</h2>
-            <div class="separateur"></div>
-          </div>
-
-        {% endif %}
-
-          <div class="img sign-in">
-            <img src="{{ asset('assets/img-login/bg1.svg') }}" alt="" />
-          </div>
-        </div>
-      </div>
-
+<div class="container py-5" style="max-width: 480px;">
+    {# En-tête #}
+    <div class="text-center mb-4">
+        <span class="text-uppercase tracking-wider small fw-semibold text-muted">Espace Membre</span>
+        <h1 class="display-6 fw-bold text-dark mt-1">Connexion</h1>
+        <p class="text-secondary small mb-0">Accédez à votre compte MHvolt et à vos commandes.</p>
     </div>
-    <!-- End Container -->
-  </form>
 
-    <!-- Script -->
-    <script type="text/javascript" src="{{ asset('assets/js/login.js') }}"></script>
+    {# Erreur de connexion Symfony Security #}
+    {% if error is defined and error %}
+        <div class="alert alert-dark border shadow-sm small text-center mb-4">
+            {{ error.messageKey|trans(error.messageData, 'security') }}
+        </div>
+    {% endif %}
+
+    <div class="card border border-light-subtle rounded-4 p-4 p-md-5 shadow-sm bg-white">
+        {% if app.user %}
+            <div class="text-center py-3">
+                <div class="d-inline-flex align-items-center justify-content-center bg-body-tertiary border rounded-circle mb-3" style="width: 64px; height: 64px;">
+                    <i class="fas fa-user-check fs-3 text-dark"></i>
+                </div>
+                <h2 class="fs-5 fw-bold text-dark mb-1">Vous êtes déjà connecté</h2>
+                <p class="text-secondary small mb-4">Session active pour <strong>{{ app.user.userIdentifier }}</strong></p>
+
+                <div class="d-grid gap-2">
+                    {% if is_granted('ROLE_ADMIN') %}
+                        <a href="/admin" class="btn btn-outline-dark btn-sm rounded-pill py-2">
+                            <i class="fas fa-cog me-2"></i>Administration
+                        </a>
+                    {% endif %}
+                    <a href="{{ path('account') }}" class="btn btn-dark btn-sm rounded-pill py-2">
+                        <i class="fas fa-user me-2"></i>Accéder à mon compte
+                    </a>
+                    <a href="{{ path('app_logout') }}" class="btn btn-link text-danger text-decoration-none small mt-2">
+                        Se déconnecter
+                    </a>
+                </div>
+            </div>
+        {% else %}
+            <form method="post" action="{{ path('app_login') }}">
+                <div class="mb-3">
+                    <label for="inputEmail" class="form-label small fw-semibold text-dark">Adresse E-mail</label>
+                    <input type="email"
+                           name="email"
+                           id="inputEmail"
+                           class="form-control rounded-3 py-2 px-3 small"
+                           placeholder="nom@exemple.com"
+                           value="{{ last_username|default('') }}"
+                           autocomplete="email"
+                           required
+                           autofocus>
+                </div>
+
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <label for="inputPassword" class="form-label small fw-semibold text-dark mb-0">Mot de passe</label>
+                        <button type="button" class="btn btn-link text-secondary text-decoration-none p-0 small" onclick="toggleLoginPagePassword(this)" style="font-size: 0.75rem;">
+                            Afficher
+                        </button>
+                    </div>
+                    <input type="password"
+                           name="password"
+                           id="inputPassword"
+                           class="form-control rounded-3 py-2 px-3 small"
+                           placeholder="••••••••"
+                           autocomplete="current-password"
+                           required>
+                </div>
+
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="_remember_me" id="rememberMe">
+                        <label class="form-check-label small text-secondary" for="rememberMe">
+                            Se souvenir de moi
+                        </label>
+                    </div>
+                    <a href="{{ path('reset_password') }}" class="small text-secondary text-decoration-none">
+                        Mot de passe oublié ?
+                    </a>
+                </div>
+
+                <button type="submit" class="btn btn-dark rounded-pill py-2 w-100 fw-semibold mb-3">
+                    Se connecter
+                </button>
+            </form>
+
+            <div class="text-center pt-3 border-top border-light-subtle">
+                <span class="text-secondary small">Vous n'avez pas encore de compte ?</span>
+                <button type="button" class="btn btn-link text-dark fw-bold text-decoration-none small p-0 ms-1" data-bs-toggle="modal" data-bs-target="#authModal">
+                    Créer un compte
+                </button>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    function toggleLoginPagePassword(btn) {
+        const input = document.getElementById('inputPassword');
+        if (input.type === 'password') {
+            input.type = 'text';
+            btn.textContent = 'Masquer';
+        } else {
+            input.type = 'password';
+            btn.textContent = 'Afficher';
+        }
+    }
+</script>
 {% endblock %}
-

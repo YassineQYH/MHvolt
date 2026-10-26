@@ -1,33 +1,48 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Livraison & Retours{% endblock %}
-
-{% block stylesheets %}
-    {{ parent() }}
-    <link rel="stylesheet" href="{{ asset('assets/css/legal-page.css') }}">
-{% endblock %}
+{% block title %}Livraison & Retours — MHvolt{% endblock %}
 
 {% block content %}
-<section class="legal-page">
-    <h1>Livraison & Retours</h1>
+<div class="container py-5" style="max-width: 820px;">
+    <div class="mb-5 pb-3 border-bottom border-light-subtle">
+        <span class="text-uppercase tracking-wider small fw-semibold text-muted">Logistique & SAV</span>
+        <h1 class="display-6 fw-bold text-dark mt-1">Livraison et retours</h1>
+        <p class="text-secondary small mb-0">Modalités d'expédition, délais de transit et procédure de retour.</p>
+    </div>
 
-    <h2>1. Délais de livraison</h2>
-    <p>Les commandes sont expédiées sous 24 à 72h ouvrées (hors week-ends et jours fériés). Les délais peuvent varier selon la disponibilité des produits et le transporteur choisi.</p>
+    <div class="d-flex flex-column gap-4 text-secondary small leading-relaxed">
+        <section>
+            <h2 class="fs-6 fw-bold text-dark text-uppercase tracking-wider mb-2">1. Zones et transporteurs</h2>
+            <p class="mb-0">Les livraisons sont assurées en France métropolitaine et en Belgique. Chaque colis est préparé dans nos ateliers logistiques et remis à des transporteurs spécialisés dans le fret de mobilité électrique et de batteries lithium.</p>
+        </section>
 
-    <h2>2. Modes de livraison</h2>
-    <p>Nous livrons dans toute la France métropolitaine et la Belgique via nos partenaires de transport (Colissimo, Mondial Relay, Chronopost...). Les frais de livraison sont calculés automatiquement selon le poids et la destination.</p>
+        <section>
+            <h2 class="fs-6 fw-bold text-dark text-uppercase tracking-wider mb-2">2. Délais indicatifs d'acheminement</h2>
+            <ul class="list-unstyled d-flex flex-column gap-2 mb-0 ps-3 border-start border-light-subtle">
+                <li><strong>Trottinettes électriques :</strong> 48 à 72 heures ouvrées (remise contre signature avec suivi sécurisé).</li>
+                <li><strong>Accessoires et pièces détachées :</strong> 24 à 48 heures ouvrées.</li>
+            </ul>
+        </section>
 
-    <h2>3. Suivi de commande</h2>
-    <p>Dès l’expédition, vous recevrez un e-mail contenant un lien de suivi vous permettant de suivre l’acheminement de votre colis.</p>
+        <section>
+            <h2 class="fs-6 fw-bold text-dark text-uppercase tracking-wider mb-2">3. Frais de port</h2>
+            <p class="mb-0">Les frais de transport sont automatiquement indexés sur le barème de poids total (`Weight`) de votre commande. Le montant exact est affiché en toute transparence avant la validation du panier.</p>
+        </section>
 
-    <h2>4. Retours</h2>
-    <p>Vous disposez de <strong>14 jours</strong> après réception de votre commande pour retourner tout article ne vous convenant pas. Les produits doivent être retournés dans leur emballage d’origine, non utilisés et accompagnés de la facture d’achat.</p>
+        <section>
+            <h2 class="fs-6 fw-bold text-dark text-uppercase tracking-wider mb-2">4. Contrôle lors de la réception</h2>
+            <p class="mb-0">Le destinataire est tenu de vérifier l'état du carton et la conformité du matériel en présence du livreur. En cas de dommage apparent, émettez des réserves précises et motivées sur le bon de livraison et signalez-le à notre support sous 48 heures.</p>
+        </section>
 
-    <h2>5. Remboursements</h2>
-    <p>Après réception et vérification du produit retourné, nous procédons au remboursement sous 14 jours via le même mode de paiement que celui utilisé lors de la commande.</p>
-
-    <h2>6. Contact pour un retour</h2>
-    <p>Pour toute demande de retour, contactez-nous à :
-    <a href="mailto:admin@hictrott.com">admin@hictrott.com</a></p>
-</section>
+        <section>
+            <h2 class="fs-6 fw-bold text-dark text-uppercase tracking-wider mb-2">5. Procédure de retour (14 jours)</h2>
+            <p class="mb-2">Pour effectuer un retour au titre du droit de rétractation :</p>
+            <ol class="ps-3 mb-0">
+                <li class="mb-1">Contactez le support client pour obtenir une référence d'autorisation de retour.</li>
+                <li class="mb-1">Replacez l'équipement nettoyé dans son carton d'origine avec l'ensemble des câbles, chargeurs et manuels.</li>
+                <li>Le remboursement est exécuté dans un délai de 7 jours ouvrés suivant la réception et la vérification technique du matériel en atelier.</li>
+            </ol>
+        </section>
+    </div>
+</div>
 {% endblock %}
