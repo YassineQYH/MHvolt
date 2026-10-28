@@ -4,10 +4,8 @@ namespace App\Controller;
 
 use App\Classe\Cart;
 use App\Entity\Accessory;
-use App\Entity\Illustration;
 use App\Service\PromotionService;
 use App\Service\PromotionFinderService;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -15,25 +13,19 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class AccessoryController extends BaseController
 {
-    protected EntityManagerInterface $entityManager;
-
-    public function __construct(EntityManagerInterface $entityManager)
-    {
-        $this->entityManager = $entityManager;
-    }
-
     #[Route('/accessoires', name: 'accessoires')]
-        public function index(Request $request, UserPasswordHasherInterface $encoder): Response
-        {
-            $accessories = $this->entityManager->getRepository(Accessory::class)->findAll();
+    public function index(Request $request, UserPasswordHasherInterface $encoder): Response
+    {
+        $accessories = $this->entityManager->getRepository(Accessory::class)
+            ->findBy([], ['id' => 'DESC']);
 
-            $formregister = $this->createRegisterForm($request, $encoder);
+        $formregister = $this->createRegisterForm($request, $encoder);
 
-            return $this->render('accessoires/index.html.twig', [ // <--- Correction ici (index.html.twig au lieu de show.html.twig)
-                'accessories' => $accessories,
-                'formregister' => $formregister->createView(),
-            ]);
-        }
+        return $this->render('accessoires/index.html.twig', [
+            'accessories' => $accessories,
+            'formregister' => $formregister->createView(),
+        ]);
+    }
 
     #[Route('/accessoire/{slug}', name: 'accessory_show')]
     public function show(
@@ -43,8 +35,7 @@ class AccessoryController extends BaseController
         Cart $cartService,
         PromotionFinderService $promoFinder,
         PromotionService $promotionService
-    ): Response
-    {
+    ): Response {
         $accessory = $this->entityManager->getRepository(Accessory::class)
             ->findOneBy(['slug' => $slug]);
 
@@ -52,24 +43,12 @@ class AccessoryController extends BaseController
             throw $this->createNotFoundException('Cet accessoire n’existe pas.');
         }
 
-        // 🔹 Récupère toutes les illustrations liées à cet accessoire via Product
-        $illustrations = $this->entityManager->getRepository(Illustration::class)
-            ->findBy(['product' => $accessory]);
-
+        $illustrations = $accessory->getIllustrations();
         $formregister = $this->createRegisterForm($request, $encoder);
 
-        // -------------------------------------
-        // 🔥 gestion promotion auto
-        // -------------------------------------
         $promotion = $promoFinder->FindBestForProduct($accessory);
-
-        // 💰 Prix original
         $originalPrice = $accessory->getPrice();
-
-        // 💸 Prix réduit si promo dispo
         $promoPrice = $promotion ? $promoFinder->calculateDiscountedPrice($accessory, $promotion) : null;
-
-        // Trouver la promo à afficher sur la home (auto ou non)
         $homepagePromo = $promoFinder->findHomepagePromo();
 
         return $this->render('accessoires/show.html.twig', [
@@ -77,7 +56,6 @@ class AccessoryController extends BaseController
             'illustrations' => $illustrations,
             'formregister' => $formregister->createView(),
             'cart' => $cartService,
-            // 🔥 On envoie les infos au template
             'promotion' => $promotion,
             'originalPrice' => $originalPrice,
             'promoPrice' => $promoPrice,
@@ -96,10 +74,8 @@ class AccessoryController extends BaseController
             throw $this->createNotFoundException('Cet accessoire n’existe pas.');
         }
 
-        $trottinettes = [];
-        foreach ($accessory->getTrottinetteAccessories() as $pivot) {
-            $trottinettes[] = $pivot->getTrottinette();
-        }
+        // 🔥 Direct via la collection ManyToMany inverse
+        $trottinettes = $accessory->getTrottinettes();
 
         $formregister = $this->createRegisterForm($request, $encoder);
 

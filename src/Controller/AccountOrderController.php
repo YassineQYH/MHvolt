@@ -2,83 +2,64 @@
 
 namespace App\Controller;
 
-use App\Entity\Order;
 use App\Classe\Cart;
+use App\Entity\Order;
 use App\Repository\WeightRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
 
 class AccountOrderController extends AbstractController
 {
-    private EntityManagerInterface $entityManager;
-
-    public function __construct(EntityManagerInterface $entityManager)
-    {
-        $this->entityManager = $entityManager;
-    }
+    public function __construct(
+        private readonly EntityManagerInterface $entityManager
+    ) {}
 
     #[Route('/compte/mes-commandes', name: 'account_order')]
-    public function index(Cart $cart, WeightRepository $weightRepository): \Symfony\Component\HttpFoundation\Response
+    public function index(Cart $cart, WeightRepository $weightRepository): Response
     {
-        $cartItems = $cart->getFull();
-
-        $orders = $this->entityManager->getRepository(Order::class)->findSuccessOrders($this->getUser());
-
-        $poid = 0.0;
-        $quantityProduct = 0;
-
-        foreach ($cartItems as $element) {
-            $poidAndQuantity = $element['product']->getWeight() ?? 0.0; // float direct
-            $quantityProduct += $element['quantity'];
-            $poid += $poidAndQuantity * $element['quantity'];
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->redirectToRoute('app_home', ['login' => 1]);
         }
 
-        // Récupération du prix livraison selon poids
-        $weightEntity = $weightRepository->findPriceByWeight($poid);
-        $prix = $weightEntity ? $weightEntity->getPrice() : 0.0;
+        $cartItems = $cart->getFull();
+        $orders = $this->entityManager->getRepository(Order::class)->findBy(
+            ['user' => $user, 'paymentState' => Order::PAYMENT_PAID],
+            ['id' => 'DESC']
+        );
 
+        $poidsTotal = $cart->getTotalWeight();
+        $weightEntity = $weightRepository->findPriceByWeight($poidsTotal);
+        $prixLivraison = $weightEntity ? $weightEntity->getPrice() : 0.0;
 
         return $this->render('account/order.html.twig', [
             'orders' => $orders,
-            'poid' => $poid,
-            'price' => $prix,
-            'quantity_product' => $quantityProduct,
+            'poid' => $poidsTotal,
+            'price' => $prixLivraison,
+            'quantity_product' => $cart->getTotalQuantity(),
             'panier' => $cartItems,
         ]);
     }
 
     #[Route('/compte/mes-commandes/{reference}', name: 'account_order_show')]
-    public function show(string $reference): \Symfony\Component\HttpFoundation\Response
+    public function show(string $reference): Response
     {
-        $order = $this->entityManager->getRepository(Order::class)->findOneByReference($reference);
-
-        if (!$order || $order->getUser() !== $this->getUser()) {
-            return $this->redirectToRoute('account_order');
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->redirectToRoute('app_home', ['login' => 1]);
         }
 
-        // Calcul du poids total de la commande
-        $totalWeight = 0;
-        foreach ($order->getOrderDetails() as $item) {
-            $totalWeight += $item->getWeight() * $item->getQuantity();
+        $order = $this->entityManager->getRepository(Order::class)->findOneBy(['reference' => $reference]);
+
+        if (!$order || $order->getUser() !== $user) {
+            return $this->redirectToRoute('account_order');
         }
 
         return $this->render('account/order_show.html.twig', [
             'order' => $order,
-            'totalWeight' => $totalWeight,
+            'totalWeight' => $order->getWeightTotal(),
         ]);
-    }
-
-
-    public function fillPriceList(WeightRepository $weightRepository): array
-    {
-        $priceList = [];
-        $weights = $weightRepository->findAll();
-
-        foreach ($weights as $item) {
-            $priceList[(string)$item->getKg()] = $item->getPrice();
-        }
-
-        return $priceList;
     }
 }

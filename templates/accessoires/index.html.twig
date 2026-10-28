@@ -1,26 +1,27 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Nos Accessoires — MHvolt{% endblock %}
+{% block title %}Nos Accessoires & Équipements — MHvolt{% endblock %}
 
 {% block content %}
     <section class="py-5 bg-white">
         <div class="container py-3">
             <div class="text-center mb-5" data-aos="fade-up">
-                <span class="text-uppercase tracking-wider small fw-semibold text-muted">Équipements</span>
+                <span class="text-uppercase tracking-wider small fw-semibold text-muted">Boutique</span>
                 <h1 class="display-5 fw-bold text-dark mt-1">Nos Accessoires</h1>
                 <p class="text-secondary mx-auto mt-2" style="max-width: 600px;">
-                    Casques, antivols, guidons et pièces certifiées pour entretenir et sécuriser votre trottinette électrique.
+                    Optimisez la sécurité, le confort et les performances de votre trottinette avec notre sélection d'équipements certifiés.
                 </p>
             </div>
 
+            {% set items = accessories|default(accessoires|default([])) %}
+
             <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
-                {% for item in accessories %}
+                {% for item in items %}
                     {% set imgObj = item.illustrations|first %}
                     {% set rawImg = imgObj ? imgObj.image : (item.image ?? 'default.jpg') %}
                     {% set imgPath = rawImg starts with 'http' ? rawImg : '/uploads/accessoires/' ~ rawImg %}
-                    {% set tvaRate = item.tva ? (item.tva.value / 100) : 0.2 %}
-                    {% set priceTTC = item.price * (1 + tvaRate) %}
-                    {% set promoTTC = (item.promoPrice is defined and item.promoPrice is not null and item.promoPrice > 0) ? (item.promoPrice * (1 + tvaRate)) : null %}
+                    {% set priceTTC = item.price %}
+                    {% set promoTTC = (item.promoPrice is defined and item.promoPrice is not null and item.promoPrice > 0 and item.promoPrice < item.price) ? item.promoPrice : null %}
 
                     <div class="col" data-aos="fade-up" data-aos-duration="600">
                         <div class="card h-100 border border-light-subtle rounded-4 p-3 bg-white product-card shadow-sm">
@@ -31,7 +32,7 @@
                                         <span class="badge bg-danger rounded-pill px-2 py-1 fw-semibold" style="font-size: 0.65rem;">Promo</span>
                                     {% endif %}
                                 </div>
-                                {% if item.stock < 1 %}
+                                {% if item.stock is defined and item.stock < 1 %}
                                     <span class="badge bg-danger-subtle text-danger border border-danger-subtle">Rupture</span>
                                 {% else %}
                                     <span class="badge bg-success-subtle text-success border border-success-subtle">En stock</span>
@@ -45,26 +46,26 @@
                             </a>
 
                             <div class="card-body p-0 pt-2 d-flex flex-column justify-content-end">
-                                <h3 class="fs-6 fw-semibold text-dark mb-1 text-truncate">
+                                <h3 class="fs-6 fw-bold text-dark mb-1 text-truncate" title="{{ item.name }}">
                                     <a href="{{ path('accessory_show', { 'slug': item.slug }) }}" class="text-dark text-decoration-none">
                                         {{ item.name }}
                                     </a>
                                 </h3>
 
                                 <div class="d-flex justify-content-between align-items-baseline mb-3">
-                                    <div>
+                                    <div class="d-flex align-items-baseline gap-2">
                                         {% if promoTTC %}
-                                            <span class="fs-5 fw-bold text-danger">{{ promoTTC|number_format(2, ',', ' ') }} €</span>
-                                            <span class="text-muted text-decoration-line-through small ms-1">{{ priceTTC|number_format(2, ',', ' ') }} €</span>
+                                            <span class="fs-5 fw-bold text-dark">{{ promoTTC|number_format(2, ',', ' ') }}&nbsp;€</span>
+                                            <del class="small text-danger fw-semibold" style="text-decoration: line-through !important;">{{ priceTTC|number_format(2, ',', ' ') }}&nbsp;€</del>
                                         {% else %}
-                                            <span class="fs-5 fw-bold text-dark">{{ priceTTC|number_format(2, ',', ' ') }} €</span>
+                                            <span class="fs-5 fw-bold text-dark">{{ priceTTC|number_format(2, ',', ' ') }}&nbsp;€</span>
                                         {% endif %}
                                     </div>
-                                    <span class="text-secondary small">TTC</span>
+                                    <span class="text-secondary small fw-medium">TTC</span>
                                 </div>
 
                                 <a href="{{ path('accessory_show', { 'slug': item.slug }) }}" class="btn btn-outline-dark rounded-pill w-100 btn-sm py-2 fw-medium">
-                                    Voir l'accessoire
+                                    Découvrir l'accessoire
                                 </a>
                             </div>
                         </div>
@@ -76,9 +77,9 @@
                 {% endfor %}
             </div>
 
-            {% if accessories is iterable and accessories|length > 0 and knp_pagination_render is defined %}
+            {% if items is iterable and items|length > 0 and knp_pagination_render is defined %}
                 <div class="d-flex justify-content-center mt-5">
-                    {{ knp_pagination_render(accessories) }}
+                    {{ knp_pagination_render(items) }}
                 </div>
             {% endif %}
         </div>

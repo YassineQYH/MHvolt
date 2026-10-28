@@ -14,14 +14,12 @@
     <div class="d-flex flex-column gap-3 overflow-y-auto pe-1" style="max-height: 320px;">
         {% if items is not empty %}
             {% for item in items %}
-                {% set priceHT = item.product.price %}
-                {% set tvaRate = (item.product.tva.value ?? 20) / 100 %}
-                {% set priceTTC = priceHT * (1 + tvaRate) %}
+                {% set priceTTC = item.product.price %}
                 {% set totalItemTTC = priceTTC * item.quantity %}
                 {% set illustration = item.product.illustrations is defined and item.product.illustrations|length > 0
                     ? item.product.illustrations|first
                     : null %}
-                {% set itemType = item.type|default('trottinette') %}
+                {% set itemType = item.type|default(item.product.type|default('trottinette')) %}
 
                 <div class="p-2 border border-light-subtle rounded-3 bg-white">
                     <div class="d-flex gap-2">
@@ -45,7 +43,7 @@
                         {# Détails & Contrôles #}
                         <div class="flex-grow-1 min-w-0">
                             <span class="fw-semibold text-dark small text-truncate d-block mb-1">
-                                {{ item.product.name }}
+                                {{ item.product.nameShort|default(item.product.name) }}
                             </span>
 
                             <div class="d-flex justify-content-between align-items-center">
@@ -70,7 +68,7 @@
 
                                 {# Total Ligne #}
                                 <span class="fw-bold text-dark small">
-                                    {{ totalItemTTC|number_format(2, ',', ' ') }} €
+                                    {{ totalItemTTC|number_format(2, ',', ' ') }}&nbsp;€
                                 </span>
 
                                 {# Supprimer #}
@@ -99,7 +97,7 @@
         <div class="pt-2 border-top border-light-subtle">
             <div class="d-flex justify-content-between align-items-baseline mb-3">
                 <span class="text-secondary small">Total TTC estimé</span>
-                <span class="fs-5 fw-bold text-dark">{{ totalTTC|number_format(2, ',', ' ') }} €</span>
+                <span class="fs-5 fw-bold text-dark">{{ totalTTC|number_format(2, ',', ' ') }}&nbsp;€</span>
             </div>
 
             <div class="d-grid gap-2">

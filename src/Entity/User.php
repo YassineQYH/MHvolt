@@ -2,11 +2,10 @@
 
 namespace App\Entity;
 
-use App\Entity\Address;
 use App\Repository\UserRepository;
-use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -14,9 +13,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
+    #[ORM\Id, ORM\GeneratedValue, ORM\Column]
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
@@ -37,30 +34,25 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 16)]
     private ?string $tel = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $passwordResetToken = null;
-
-    #[ORM\Column(type: 'datetime', nullable: true)]
-    private ?\DateTimeInterface $passwordResetTokenExpiresAt = null;
-
-
-    // ------------------- RELATION ADDRESSES -------------------
-    #[ORM\OneToMany(mappedBy: "user", targetEntity: Address::class, cascade: ["persist"], orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: "user", targetEntity: Address::class, cascade: ["persist", "remove"], orphanRemoval: true)]
     private Collection $addresses;
+
+    #[ORM\OneToMany(mappedBy: "user", targetEntity: Order::class)]
+    private Collection $orders;
 
     public function __construct()
     {
         $this->addresses = new ArrayCollection();
+        $this->orders = new ArrayCollection();
     }
 
-        public function __toString(): string
+    public function __toString(): string
     {
-        return $this->firstName . ' ' . $this->lastName;
+        return trim(($this->firstName ?? '') . ' ' . ($this->lastName ?? '')) ?: ($this->email ?? 'Utilisateur');
     }
 
-
-    // ------------------- GETTERS / SETTERS -------------------
     public function getId(): ?int { return $this->id; }
+
     public function getEmail(): ?string { return $this->email; }
     public function setEmail(string $email): static { $this->email = $email; return $this; }
 
@@ -72,7 +64,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getPassword(): ?string { return $this->password; }
     public function setPassword(string $password): static { $this->password = $password; return $this; }
 
-    #[\Deprecated]
     public function eraseCredentials(): void {}
 
     public function getFirstName(): ?string { return $this->firstName; }
@@ -84,23 +75,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getTel(): ?string { return $this->tel; }
     public function setTel(string $tel): static { $this->tel = $tel; return $this; }
 
-    public function getPasswordResetToken(): ?string { return $this->passwordResetToken; }
-    public function setPasswordResetToken(?string $token): static { $this->passwordResetToken = $token; return $this; }
-
-    public function getPasswordResetTokenExpiresAt(): ?\DateTimeInterface { return $this->passwordResetTokenExpiresAt; }
-    public function setPasswordResetTokenExpiresAt(?\DateTimeInterface $expiresAt): static { $this->passwordResetTokenExpiresAt = $expiresAt; return $this; }
-
-// ------------------- ADDRESSES -------------------
-    /**
-     * @return Collection<int, Address>
-     */
+    /** @return Collection<int, Address> */
     public function getAddresses(): Collection { return $this->addresses; }
 
     public function addAddress(Address $address): static
     {
         if (!$this->addresses->contains($address)) {
             $this->addresses->add($address);
-            $address->setUser($this); // lie automatiquement l'adresse au User
+            $address->setUser($this);
         }
         return $this;
     }
@@ -114,4 +96,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         }
         return $this;
     }
+
+    /** @return Collection<int, Order> */
+    public function getOrders(): Collection { return $this->orders; }
 }

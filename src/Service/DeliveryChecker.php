@@ -2,63 +2,51 @@
 
 namespace App\Service;
 
+use App\Classe\Mail;
+use App\Entity\Order;
 use App\Repository\OrderRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Mailer\MailerInterface;
-use App\Classe\Mail;
 
 class DeliveryChecker
 {
-    private OrderRepository $orderRepository;
-    private EntityManagerInterface $em;
-    private MailerInterface $mailer;
-
-    public function __construct(OrderRepository $orderRepository, EntityManagerInterface $em, MailerInterface $mailer)
-    {
-        $this->orderRepository = $orderRepository;
-        $this->em = $em;
-        $this->mailer = $mailer;
-    }
+    public function __construct(
+        private readonly OrderRepository $orderRepository,
+        private readonly EntityManagerInterface $em
+    ) {}
 
     public function checkDeliveries(): void
     {
-        // Récupère toutes les commandes en cours de livraison (deliveryState = 2)
-        $orders = $this->orderRepository->findBy(['deliveryState' => 2]);
+        $orders = $this->orderRepository->findBy(['deliveryState' => Order::STATE_SHIPPING]);
 
         foreach ($orders as $order) {
             $primaryTracking = $order->getTrackingNumber();
             $primaryCarrier = $order->getCarrier();
 
-            $secondaryTracking = $order->getSecondaryCarrierTrackingNumber();
-            $secondaryCarrier = $order->getSecondaryCarrier(); // Optionnel pour l’instant, null si non utilisé
-
-            // Skip si pas de tracking principal ou carrier
             if (!$primaryTracking || !$primaryCarrier) {
                 continue;
             }
 
             $delivered = $this->isDelivered($primaryTracking, $primaryCarrier);
 
-            // Vérifie le second tracking si existant et non livré
-            if (!$delivered && $secondaryTracking && $secondaryCarrier) {
-                $delivered = $this->isDelivered($secondaryTracking, $secondaryCarrier);
-            }
-
             if ($delivered) {
-                $order->setDeliveryState(3);
-                $this->em->persist($order);
+                $order->setDeliveryState(Order::STATE_DELIVERED);
 
-                // Envoi d'un mail via Mailjet
-                $mail = new Mail();
-                $content = "Bonjour " . $order->getUser()->getFirstName() . ",<br>"
-                    . "Votre commande #" . $order->getReference() . " a été livrée avec succès.<br>"
-                    . "Merci pour votre confiance !";
-                $mail->send(
-                    $order->getUser()->getEmail(),
-                    $order->getUser()->getFirstName(),
-                    "Votre commande est livrée !",
-                    $content
-                );
+                $user = $order->getUser();
+                if ($user && $user->getEmail()) {
+                    $mail = new Mail();
+                    $content = sprintf(
+                        "Bonjour %s,<br><br>Votre commande #<strong>%s</strong> a été livrée avec succès.<br>Merci pour votre confiance !",
+                        htmlspecialchars($user->getFirstName() ?? 'Client'),
+                        htmlspecialchars($order->getReference())
+                    );
+
+                    $mail->send(
+                        $user->getEmail(),
+                        $user->getFirstName() ?? 'Client',
+                        "Votre commande MHvolt a été livrée !",
+                        $content
+                    );
+                }
             }
         }
 
@@ -67,41 +55,32 @@ class DeliveryChecker
 
     private function isDelivered(string $trackingNumber, string $carrier): bool
     {
-        // 🔧 MODE DEV : on simule que le colis est livré
-        /* return true; */ // Décommenter pour test avec cette cmd : php bin/console app:check-deliveries
+        $apiKey = $_ENV['TRACK123_API_KEY'] ?? null;
+        if (!$apiKey) {
+            return false;
+        }
 
-        // -- TEST LOCAL : numéro précis simulé livré --
-        /* if ($trackingNumber === '6G61398207501' && $carrier === 'colissimo') {
-            // ⚠️ Simulation pour ce numéro de suivi précis
-            return true;
-        } */
-
-        // -- Partie réelle avec l'API Track123 --
-        $apiKey = '76b446ff2aa94c6f9622c0b4acd4dab3';
-        $url = "https://api.track123.com/v1/trackings/{$trackingNumber}?carrier={$carrier}";
+        $url = sprintf("https://api.track123.com/v1/trackings/%s?carrier=%s", urlencode($trackingNumber), urlencode($carrier));
 
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, ["Authorization: Bearer {$apiKey}"]);
-
-        // ⚠️ OPTIONS POUR TEST LOCAL : ignorer les erreurs SSL
-        //curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false); // à enlever une fois en PROD
-        //curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // à enlever une fois en PROD
+        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            "Authorization: Bearer {$apiKey}",
+            "Accept: application/json"
+        ]);
 
         $response = curl_exec($ch);
-
-        if ($response === false) {
-            // Affiche l'erreur curl si besoin
-            var_dump(curl_error($ch));
-        }
-
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
+
+        if (!$response || $httpCode !== 200) {
+            return false;
+        }
 
         $data = json_decode($response, true);
 
-        // Retourne true si le colis est livré
-        return isset($data['status']) && $data['status'] === 'delivered';
+        return isset($data['status']) && strtolower($data['status']) === 'delivered';
     }
-
 }

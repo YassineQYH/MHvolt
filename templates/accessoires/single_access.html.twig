@@ -1,9 +1,8 @@
 {% set imgObj = accessory.illustrations|first %}
 {% set rawImg = imgObj ? imgObj.image : (accessory.image ?? 'default.jpg') %}
 {% set imgPath = rawImg starts with 'http' ? rawImg : '/uploads/accessoires/' ~ rawImg %}
-{% set tvaRate = accessory.tva ? (accessory.tva.value / 100) : 0.2 %}
-{% set priceTTC = accessory.price * (1 + tvaRate) %}
-{% set promoTTC = (accessory.promoPrice is defined and accessory.promoPrice is not null and accessory.promoPrice > 0) ? (accessory.promoPrice * (1 + tvaRate)) : null %}
+{% set priceTTC = accessory.price %}
+{% set promoTTC = (accessory.promoPrice is defined and accessory.promoPrice is not null and accessory.promoPrice > 0 and accessory.promoPrice < accessory.price) ? accessory.promoPrice : null %}
 
 <div class="card h-100 border border-light-subtle rounded-4 p-3 bg-white product-card shadow-sm">
     <div class="d-flex justify-content-between align-items-center mb-2">
@@ -27,22 +26,22 @@
     </a>
 
     <div class="card-body p-0 pt-2 d-flex flex-column justify-content-end">
-        <h3 class="fs-6 fw-semibold text-dark mb-1 text-truncate">
+        <h3 class="fs-6 fw-bold text-dark mb-1 text-truncate" title="{{ accessory.name }}">
             <a href="{{ path('accessory_show', { 'slug': accessory.slug }) }}" class="text-dark text-decoration-none">
                 {{ accessory.name }}
             </a>
         </h3>
 
         <div class="d-flex justify-content-between align-items-baseline mb-3">
-            <div>
+            <div class="d-flex align-items-baseline gap-2">
                 {% if promoTTC %}
-                    <span class="fs-5 fw-bold text-danger">{{ promoTTC|number_format(2, ',', ' ') }} €</span>
-                    <span class="text-muted text-decoration-line-through small ms-1">{{ priceTTC|number_format(2, ',', ' ') }} €</span>
+                    <span class="fs-5 fw-bold text-dark">{{ promoTTC|number_format(2, ',', ' ') }}&nbsp;€</span>
+                    <del class="small text-danger fw-semibold" style="text-decoration: line-through !important;">{{ priceTTC|number_format(2, ',', ' ') }}&nbsp;€</del>
                 {% else %}
-                    <span class="fs-5 fw-bold text-dark">{{ priceTTC|number_format(2, ',', ' ') }} €</span>
+                    <span class="fs-5 fw-bold text-dark">{{ priceTTC|number_format(2, ',', ' ') }}&nbsp;€</span>
                 {% endif %}
             </div>
-            <span class="text-secondary small">TTC</span>
+            <span class="text-secondary small fw-medium">TTC</span>
         </div>
 
         <a href="{{ path('accessory_show', { 'slug': accessory.slug }) }}" class="btn btn-outline-dark rounded-pill w-100 btn-sm py-2 fw-medium">

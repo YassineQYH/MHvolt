@@ -9,13 +9,11 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: AddressRepository::class)]
 class Address
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column(type: "integer")]
+    #[ORM\Id, ORM\GeneratedValue, ORM\Column(type: "integer")]
     private ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "addresses")]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, onDelete: "CASCADE")]
     private ?User $user = null;
 
     #[ORM\Column(type: "string", length: 255)]
@@ -55,18 +53,11 @@ class Address
 
     public function __toString(): string
     {
-        return sprintf(
-            "%s - %s, %s, %s",
-            $this->name,
-            $this->address,
-            $this->city,
-            $this->country
-        );
+        return sprintf("%s - %s, %s, %s", $this->name, $this->address, $this->city, $this->country);
     }
 
-    // ---------------- Getters / Setters ----------------
-
     public function getId(): ?int { return $this->id; }
+
     public function getUser(): ?User { return $this->user; }
     public function setUser(?User $user): self { $this->user = $user; return $this; }
 
@@ -96,5 +87,4 @@ class Address
 
     public function getPhone(): ?string { return $this->phone; }
     public function setPhone(string $phone): self { $this->phone = $phone; return $this; }
-
 }

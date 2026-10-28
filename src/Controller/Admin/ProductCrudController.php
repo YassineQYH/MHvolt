@@ -3,22 +3,23 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Product;
-use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
-use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\{
-    IdField,
-    TextField,
-    TextEditorField,
-    NumberField,
-    IntegerField,
-    BooleanField,
     AssociationField,
-    DateTimeField,
+    BooleanField,
     CollectionField,
+    DateTimeField,
     FormField,
+    IdField,
     ImageField,
+    IntegerField,
+    MoneyField,
+    NumberField,
+    TextEditorField,
+    TextField
 };
 
 class ProductCrudController extends AbstractCrudController
@@ -31,102 +32,66 @@ class ProductCrudController extends AbstractCrudController
     public function configureActions(Actions $actions): Actions
     {
         return $actions
-            ->disable(Action::NEW, Action::EDIT, Action::DELETE) // interdit création, modification, suppression
-            ->add(Crud::PAGE_INDEX, Action::DETAIL) // ajoute l'action "Voir"
-            ->update(Crud::PAGE_INDEX, Action::DETAIL, function (Action $action) {
-                return $action
-                    ->setIcon('fa fa-eye')   // icône œil
-                    ->setCssClass('btn btn-info'); // style bouton visible
-            });
+            ->disable(Action::NEW, Action::EDIT, Action::DELETE)
+            ->add(Crud::PAGE_INDEX, Action::DETAIL);
     }
 
     public function configureCrud(Crud $crud): Crud
     {
         return $crud
             ->setEntityLabelInSingular('Produit')
-            ->setEntityLabelInPlural('Produits')
+            ->setEntityLabelInPlural('Tous les produits')
             ->setDefaultSort(['id' => 'DESC'])
-            ->showEntityActionsInlined(true); //
+            ->showEntityActionsInlined(true);
     }
 
     public function configureFields(string $pageName): iterable
     {
         return [
+            IdField::new('id')->onlyOnIndex(),
 
-            // ----------- IDENTIFIANT -----------
-            IdField::new('id')->hideOnForm(),
-
-            // ----------- TYPE DE PRODUIT -----------
-
-            ImageField::new('firstIllustrationPath', 'Image')
+            ImageField::new('firstIllustration', 'Image')
                 ->onlyOnIndex()
-                ->setBasePath(''), // EasyAdmin va utiliser le getter
+                ->setBasePath('/'),
 
-            // ----------- INFO PRODUIT -----------
             FormField::addPanel('Informations générales'),
-
             TextField::new('name', 'Nom du produit'),
             TextField::new('slug')->hideOnIndex(),
-
             TextEditorField::new('description', 'Description'),
 
-            // ----------- PRIX / STOCK -----------
             FormField::addPanel('Prix & Stock'),
-            NumberField::new('promoPrice', 'Prix promo HT')
-                ->setNumDecimals(2)
-                ->setRequired(false)
-                ->setHelp('Laisse vide s\'il n\'y a pas de promotion sur ce produit'),
+            MoneyField::new('price', 'Prix de vente TTC')
+                ->setCurrency('EUR')
+                ->setStoredAsCents(false),
 
-            // Index : affichage avec €
-            NumberField::new('price', 'Prix HT')
-                ->setNumDecimals(2)
-                ->formatValue(fn ($value) => number_format($value, 2, ',', ' ') . ' €')
-                ->onlyOnIndex(),
+            MoneyField::new('promoPrice', 'Prix promo TTC')
+                ->setCurrency('EUR')
+                ->setStoredAsCents(false)
+                ->formatValue(fn ($value) => $value > 0 ? number_format((float)$value, 2, ',', ' ') . ' €' : '-'),
 
-            // Formulaire : édition propre
-            NumberField::new('price', 'Prix HT')
-                ->setNumDecimals(2)
-                ->hideOnIndex(),
+            IntegerField::new('stock', 'Stock disponible'),
+            BooleanField::new('isBest', 'En avant sur l’accueil'),
 
-            IntegerField::new('stock', 'Stock'),
-
-            BooleanField::new('isBest', 'Accueil'),
-
-            // ----------- RELATIONS -----------
-            FormField::addPanel('Données liées'),
-
+            FormField::addPanel('Données techniques & fiscales'),
             NumberField::new('weight', 'Poids (kg)')
-                ->formatValue(function ($value) {
-                    if (floor($value) == $value) {
-                        return $value . 'kg';
-                    }
-                    return number_format($value, 2, ',', '') . 'kg';
-                }),
+                ->formatValue(fn ($value) => $value !== null ? number_format((float)$value, 2, ',', ' ') . ' kg' : '-'),
 
-            AssociationField::new('tva', 'TVA'),
+            AssociationField::new('tva', 'TVA')
+                ->onlyOnDetail()
+                ->formatValue(fn ($value) =>$value ? $value->getName() . ' (' .$value->getValue() . ' %)' : '-'),
 
-            TextField::new('type', 'Type')
-                ->onlyOnIndex() // optionnel : visible seulement dans la liste
-                ->formatValue(function ($value, $entity) {
-                    /** @var \App\Entity\Product $entity */
-                    return ucfirst($entity->getType()); // Trottinette / Accessoire / Product
-                }),
+            TextField::new('type', 'Type de produit')
+                ->onlyOnIndex()
+                ->formatValue(fn ($value, $entity) => ucfirst($entity->getType())),
 
-            // ----------- ILLUSTRATIONS : affichées mais non modifiées ici -----------
             FormField::addPanel('Illustrations'),
-
             CollectionField::new('illustrations', 'Images')
-                ->onlyOnDetail() // visible seulement sur la page détail
+                ->onlyOnDetail()
                 ->setTemplatePath('admin/fields/illustrations.html.twig'),
 
-            // ----------- DATES -----------
             FormField::addPanel('Métadonnées'),
-
-            DateTimeField::new('createdAt', 'Créé le')
-                ->hideOnForm(),
-
-            DateTimeField::new('updatedAt', 'Mis à jour le')
-                ->hideOnForm(),
+            DateTimeField::new('createdAt', 'Créé le')->onlyOnDetail(),
+            DateTimeField::new('updatedAt', 'Mis à jour le')->onlyOnDetail(),
         ];
     }
 }

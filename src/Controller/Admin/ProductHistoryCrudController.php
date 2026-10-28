@@ -6,14 +6,14 @@ use App\Entity\ProductHistory;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Config\{Crud, Action, Actions};
 use EasyCorp\Bundle\EasyAdminBundle\Field\{
-    IdField,
-    TextField,
-    TextEditorField,
-    IntegerField,
-    NumberField,
-    ImageField,
+    AssociationField,
     DateTimeField,
-    AssociationField
+    IdField,
+    ImageField,
+    IntegerField,
+    MoneyField,
+    TextEditorField,
+    TextField
 };
 
 class ProductHistoryCrudController extends AbstractCrudController
@@ -28,53 +28,43 @@ class ProductHistoryCrudController extends AbstractCrudController
         return $crud
             ->setEntityLabelInSingular("Historique produit")
             ->setEntityLabelInPlural("Historiques produits")
-            ->showEntityActionsInlined()
+            ->showEntityActionsInlined(true)
             ->setSearchFields(['name', 'slug', 'product.name'])
             ->setDefaultSort(['modifiedAt' => 'DESC']);
     }
 
     public function configureActions(Actions $actions): Actions
     {
-        // On désactive la création, édition et suppression : historique = lecture seule
         return $actions
-            ->disable(Action::NEW, Action::EDIT, Action::DELETE);
+            ->disable(Action::NEW, Action::EDIT, Action::DELETE)
+            ->add(Crud::PAGE_INDEX, Action::DETAIL);
     }
 
     public function configureFields(string $pageName): iterable
     {
         return [
+            IdField::new('id')->onlyOnIndex(),
 
-            IdField::new('id')->hideOnForm(),
+            AssociationField::new('product', 'Produit d’origine'),
 
-            // Produit lié
-            AssociationField::new('product', 'Produit d’origine')
-                ->setFormTypeOption('disabled', true),
+            TextField::new('name', 'Nom enregistré'),
 
-            // Snapshot du nom à la date du changement
-            TextField::new('name', 'Nom enregistré')
-                ->setFormTypeOption('disabled', true),
-
-            TextField::new('slug', 'Slug')
-                ->setFormTypeOption('disabled', true),
+            TextField::new('slug', 'Slug')->hideOnIndex(),
 
             TextEditorField::new('description', 'Description')
-                ->hideOnIndex()
-                ->setFormTypeOption('disabled', true),
+                ->onlyOnDetail(),
 
-            IntegerField::new('stock', 'Stock')
-                ->setFormTypeOption('disabled', true),
+            IntegerField::new('stock', 'Stock'),
 
-            NumberField::new('price', 'Prix (€)')
-                ->formatValue(fn($v) => number_format($v, 2, ',', ' ') . ' €')
-                ->setFormTypeOption('disabled', true),
+            MoneyField::new('price', 'Prix enregistré')
+                ->setCurrency('EUR')
+                ->setStoredAsCents(false),
 
-            // Image à l'instant T
             ImageField::new('mainImage', 'Image principale')
-                ->setBasePath('/uploads/illustrations')
-                ->hideOnForm(),
+                ->setBasePath('/')
+                ->onlyOnIndex(),
 
-            DateTimeField::new('modifiedAt', 'Date de modification')
-                ->setFormTypeOption('disabled', true),
+            DateTimeField::new('modifiedAt', 'Date de modification'),
         ];
     }
 }

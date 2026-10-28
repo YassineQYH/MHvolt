@@ -6,35 +6,32 @@ use App\Repository\TvaRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use App\Entity\Product;
 
 #[ORM\Entity(repositoryClass: TvaRepository::class)]
 class Tva
 {
-    #[ORM\Id, ORM\GeneratedValue]
-    #[ORM\Column(type: "integer")]
+    #[ORM\Id, ORM\GeneratedValue, ORM\Column(type: "integer")]
     private ?int $id = null;
 
     #[ORM\Column(length: 100)]
-    private string $name;
+    private string $name; // Ex: "Taux normal", "Taux réduit"
 
     #[ORM\Column(type: "float")]
-    private float $value;
+    private float $value; // Ex: 20.0 ou 5.5
 
     #[ORM\OneToMany(mappedBy: "tva", targetEntity: Product::class)]
     private Collection $products;
 
-    public function __construct(string $name = '', float $value = 0.0)
+    public function __construct(string $name = 'Taux normal', float $value = 20.0)
     {
         $this->name = $name;
         $this->value = $value;
         $this->products = new ArrayCollection();
     }
 
-
     public function __toString(): string
     {
-        return $this->getName() . ' - ' . $this->getValue() . ' %';
+        return $this->name . ' (' . $this->value . ' %)';
     }
 
     public function getId(): ?int { return $this->id; }
@@ -47,20 +44,4 @@ class Tva
 
     /** @return Collection<int, Product> */
     public function getProducts(): Collection { return $this->products; }
-
-    public function addProduct(Product $product): self
-    {
-        if (!$this->products->contains($product)) {
-            $this->products[] = $product;
-            $product->setTva($this);
-        }
-        return $this;
-    }
-
-    public function removeProduct(Product $product): self
-    {
-        // On supprime la relation côté collection, mais on ne passe jamais null
-        $this->products->removeElement($product);
-        return $this;
-    }
 }

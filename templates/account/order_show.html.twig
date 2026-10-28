@@ -58,18 +58,24 @@
                         <th class="ps-4 py-3">Produit</th>
                         <th class="py-3 text-center">Quantité</th>
                         <th class="py-3">Poids</th>
-                        <th class="py-3 text-end">Prix Unit. HT</th>
-                        <th class="py-3 text-end">Total HT</th>
+                        <th class="py-3 text-end">Prix Unit. TTC</th>
                         <th class="pe-4 py-3 text-end">Total TTC</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% set totalHT = 0 %}
-                    {% set totalTTC = 0 %}
+                    {% set totalLignesTTC = 0 %}
+                    {% set promo = order.promoReduction ?? 0 %}
 
                     {% for item in order.orderDetails %}
-                        {% set totalItemHT = item.price * item.quantity %}
-                        {% set totalItemTTC = totalItemHT * (1 + (item.tva / 100)) %}
+                        {# Prix TTC unitaire payé et total de la ligne stockés en base #}
+                        {% set unitTTC = item.priceTtc > 0 ? item.priceTtc : item.price %}
+                        {% set totalItemTTC = item.totalTtc > 0 ? item.totalTtc : (unitTTC * item.quantity) %}
+                        {% set totalLignesTTC = totalLignesTTC + totalItemTTC %}
+
+                        {# Prix de base catalogue pour affichage barré si promo #}
+                        {% set basePriceTTC = item.productEntity ? item.productEntity.price : (item.price * (1 + (item.tva / 100))) %}
+                        {% set hasRemise = (basePriceTTC - unitTTC) > 0.05 %}
+
                         {% set illustration = (item.productEntity is defined and item.productEntity and item.productEntity.illustrations|length > 0)
                             ? item.productEntity.illustrations|first
                             : null %}
@@ -77,21 +83,29 @@
                             <td class="ps-4 py-3">
                                 <div class="d-flex align-items-center gap-3">
                                     <div class="bg-body-tertiary border rounded-3 p-1 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; flex-shrink: 0;">
-                                        <img src="/uploads/{{ item.productEntity.uploadDirectory }}/{{ illustration ? illustration.image : 'default.jpg' }}"
-                                             alt="{{ item.product }}"
-                                             class="img-fluid object-fit-contain" style="max-height: 40px;">
+                                        {% if item.productEntity %}
+                                            <img src="/uploads/{{ item.productEntity.uploadDirectory }}/{{ illustration ? illustration.image : 'default.jpg' }}"
+                                                 alt="{{ item.product }}"
+                                                 class="img-fluid object-fit-contain" style="max-height: 40px;">
+                                        {% else %}
+                                            <i class="bx bx-package fs-4 text-secondary"></i>
+                                        {% endif %}
                                     </div>
                                     <span class="fw-semibold text-dark small">{{ item.product }}</span>
                                 </div>
                             </td>
                             <td class="py-3 text-center small">x{{ item.quantity }}</td>
                             <td class="py-3 text-secondary small">{{ (item.productEntity.weight ?? item.weight) * item.quantity }} kg</td>
-                            <td class="py-3 text-end text-secondary small">{{ item.price|number_format(2, ',', ' ') }} €</td>
-                            <td class="py-3 text-end text-secondary small">{{ totalItemHT|number_format(2, ',', ' ') }} €</td>
-                            <td class="pe-4 py-3 text-end fw-bold text-dark small">{{ totalItemTTC|number_format(2, ',', ' ') }} €</td>
+                            <td class="py-3 text-end text-secondary small">
+                                {% if hasRemise %}
+                                    <del class="text-danger small me-1">{{ basePriceTTC|number_format(2, ',', ' ') }}&nbsp;€</del>
+                                    <span class="fw-semibold text-dark">{{ unitTTC|number_format(2, ',', ' ') }}&nbsp;€</span>
+                                {% else %}
+                                    {{ unitTTC|number_format(2, ',', ' ') }}&nbsp;€
+                                {% endif %}
+                            </td>
+                            <td class="pe-4 py-3 text-end fw-bold text-dark small">{{ totalItemTTC|number_format(2, ',', ' ') }}&nbsp;€</td>
                         </tr>
-                        {% set totalHT = totalHT + totalItemHT %}
-                        {% set totalTTC = totalTTC + totalItemTTC %}
                     {% endfor %}
                 </tbody>
             </table>
@@ -99,40 +113,40 @@
     </div>
 
     {# Totaux & Transport #}
-    {% set promo = order.promoReduction ?? 0 %}
-    {% set totalCommande = totalTTC - promo + order.carrierPrice %}
+    {% set totalBrutTTC = totalLignesTTC + promo %}
+    {% set totalCommande = totalLignesTTC + order.carrierPrice %}
 
     <div class="row justify-content-end">
         <div class="col-md-5 col-lg-4">
             <div class="card border border-light-subtle rounded-4 p-4 shadow-sm bg-body-tertiary">
-                <div class="d-flex justify-content-between small text-secondary mb-2">
-                    <span>Total articles HT</span>
-                    <span class="text-dark">{{ totalHT|number_format(2, ',', ' ') }} €</span>
-                </div>
-                <div class="d-flex justify-content-between small text-secondary mb-2">
-                    <span>TVA</span>
-                    <span class="text-dark">{{ (totalTTC - totalHT)|number_format(2, ',', ' ') }} €</span>
-                </div>
-                <div class="d-flex justify-content-between small text-secondary mb-2">
-                    <span>Total articles TTC</span>
-                    <span class="text-dark">{{ totalTTC|number_format(2, ',', ' ') }} €</span>
-                </div>
-
                 {% if promo > 0 %}
+                    <div class="d-flex justify-content-between small text-secondary mb-2">
+                        <span>Sous-total articles TTC</span>
+                        <span class="text-dark">{{ totalBrutTTC|number_format(2, ',', ' ') }}&nbsp;€</span>
+                    </div>
                     <div class="d-flex justify-content-between small text-success mb-2">
                         <span>Réduction ({{ order.promoTitre ?? order.promoCode }})</span>
-                        <span>-{{ promo|number_format(2, ',', ' ') }} €</span>
+                        <span>-{{ promo|number_format(2, ',', ' ') }}&nbsp;€</span>
+                    </div>
+                    <div class="d-flex justify-content-between small text-secondary mb-2">
+                        <span>Sous-total remisé TTC</span>
+                        <span class="text-dark">{{ totalLignesTTC|number_format(2, ',', ' ') }}&nbsp;€</span>
+                    </div>
+                {% else %}
+                    <div class="d-flex justify-content-between small text-secondary mb-2">
+                        <span>Sous-total articles TTC</span>
+                        <span class="text-dark">{{ totalLignesTTC|number_format(2, ',', ' ') }}&nbsp;€</span>
                     </div>
                 {% endif %}
 
                 <div class="d-flex justify-content-between small text-secondary mb-3 pb-3 border-bottom border-light-subtle">
                     <span>Frais de port ({{ order.carrier ?? 'Standard' }})</span>
-                    <span class="text-dark">{{ order.carrierPrice|number_format(2, ',', ' ') }} €</span>
+                    <span class="text-dark">{{ order.carrierPrice|number_format(2, ',', ' ') }}&nbsp;€</span>
                 </div>
 
                 <div class="d-flex justify-content-between align-items-baseline">
-                    <span class="fw-bold text-dark">Total réglé</span>
-                    <span class="fs-5 fw-bold text-dark">{{ totalCommande|number_format(2, ',', ' ') }} €</span>
+                    <span class="fw-bold text-dark">Total réglé TTC</span>
+                    <span class="fs-5 fw-bold text-dark">{{ totalCommande|number_format(2, ',', ' ') }}&nbsp;€</span>
                 </div>
             </div>
         </div>

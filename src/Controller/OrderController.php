@@ -3,26 +3,23 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use DateTime;
-use Dompdf\Dompdf;
-use chillerlan\QRCode\{QRCode, QROptions};
 use App\Classe\Cart;
-use App\Entity\User;
 use App\Entity\Order;
-use App\Form\OrderType;
-use App\Service\PdfService;
 use App\Entity\OrderDetails;
-use App\Service\PromotionService;
-use App\Repository\WeightRepository;
+use App\Form\OrderType;
+use App\Repository\CategoryAccessoryRepository;
 use App\Repository\PromotionRepository;
+use App\Repository\WeightRepository;
+use App\Service\PdfService;
+use App\Service\PromotionService;
+use chillerlan\QRCode\QRCode;
+use chillerlan\QRCode\QROptions;
 use Doctrine\ORM\EntityManagerInterface;
+use Dompdf\Dompdf;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use App\Repository\CategoryAccessoryRepository;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-
-
 
 class OrderController extends AbstractController
 {
@@ -31,7 +28,7 @@ class OrderController extends AbstractController
         private readonly PdfService $pdfService
     ) {}
 
-#[Route('/recapitulatif-commande', name: 'order_recap', methods: ['GET', 'POST'])]
+    #[Route('/recapitulatif-commande', name: 'order_recap', methods: ['GET', 'POST'])]
     public function index(
         Cart $cart,
         Request $request,
@@ -47,126 +44,107 @@ class OrderController extends AbstractController
             return $this->redirectToRoute('cart');
         }
 
-        // récupération de toutes les promos
         $allPromotions = $promoRepo->findAll();
         $promoTitre = $cart->getDiscountName($promotionService, $allPromotions);
 
         $form = $this->createForm(OrderType::class, null, ['user' => $user]);
         $form->handleRequest($request);
 
-        // 🔹 DUMP pour debug
-        /* dump($request->request->all()); // toutes les données POST
-        dump($form->get('addresses')->getData()); // l'adresse sélectionnée
-        die('DEBUG'); */
-
         if (!$form->isSubmitted() || !$form->isValid()) {
             $this->addFlash('error', 'Le formulaire est invalide.');
             return $this->redirectToRoute('cart');
         }
 
-        // récupération de l'adresse sélectionnée
         $delivery = $form->get('addresses')->getData();
-
         if (!$delivery) {
             $this->addFlash('error', 'Veuillez sélectionner une adresse de livraison.');
             return $this->redirectToRoute('cart');
         }
 
-        // ✅ TOUT EST OK => ON PASSE AU RECAP
-        /* return $this->redirectToRoute('order_recap'); */
-
-        // Calcul du poids total et du prix de livraison
-        $poidsTotal = 0.0;
-        $quantiteTotale = 0;
-        foreach ($cart->getFull() as $element) {
-            $produit = $element['product'];
-            $quantite = (int) $element['quantity'];
-            $poids = (float) $produit->getWeight(); // plus besoin de ->getKg()
-            $poidsTotal += $poids * $quantite;
-            $quantiteTotale += $quantite;
-        }
-
+        // 1. Calcul des frais de port par poids
+        $poidsTotal = (float) $cart->getTotalWeight();
         $poidsTarif = $weightRepository->findPriceByWeight($poidsTotal);
-        $prixLivraison = $poidsTarif ? $poidsTarif->getPrice() : 0;
+        $prixLivraison = $poidsTarif ? (float) $poidsTarif->getPrice() : 0.0;
 
-        // Contenu de l'adresse de livraison
         $deliveryContent = sprintf(
-            '%s %s<br>%s<br>%s%s%s<br>%s',
-            $delivery->getFirstname(),
-            $delivery->getLastname(),
-            $delivery->getPhone(),
-            $delivery->getCompany() ? $delivery->getCompany() . '<br>' : '',
-            $delivery->getAddress(),
-            '<br>' . $delivery->getPostal() . ' ' . $delivery->getCity(),
-            $delivery->getCountry()
+            '%s %s<br>%s<br>%s%s<br>%s %s<br>%s',
+            htmlspecialchars($delivery->getFirstname()),
+            htmlspecialchars($delivery->getLastname()),
+            htmlspecialchars($delivery->getPhone() ?? ''),
+            $delivery->getCompany() ? htmlspecialchars($delivery->getCompany()) . '<br>' : '',
+            htmlspecialchars($delivery->getAddress()),
+            htmlspecialchars($delivery->getPostal()),
+            htmlspecialchars($delivery->getCity()),
+            htmlspecialchars($delivery->getCountry())
         );
 
-        // Création de la commande
+        // 2. Détection du pays de livraison pour la ventilation fiscale
+        $countryCode = strtoupper(trim($delivery->getCountry() ?? 'BE'));
+        $defaultTvaRate = ($countryCode === 'FR') ? 20.0 : 21.0;
+
+        $reductionTTC = (float) $cart->getDiscountTTC($promotionService, $allPromotions);
+
+        // 3. Création de la commande
         $order = new Order();
-        $order->setCarrier('bpost');
-        $order->setReference((new \DateTime())->format('dmY') . '-' . uniqid());
+        $order->setReference((new \DateTimeImmutable())->format('dmY') . '-' . strtoupper(substr(uniqid(), -6)));
         $order->setUser($user);
-        $order->setCreatedAt(new \DateTime());
+        $order->setCarrier('bpost');
         $order->setCarrierPrice($prixLivraison);
         $order->setDelivery($deliveryContent);
-        $order->setPaymentState(0);
-        $order->setDeliveryState(0);
-
-        // Code promo
-        if (method_exists($cart, 'getPromoCode')) {
-            $order->setPromoCode($cart->getPromoCode());
-        }
-
-        // 🎁 AJOUT - hydratation du titre de la promo (corrige la colonne vide en BDD)
-        if (method_exists($cart, 'getDiscountName')) {
-            $order->setPromoTitre($cart->getDiscountName($promotionService, $allPromotions));
-        }
-
-        // Réduction TTC
-        $order->setPromoReduction(
-            $cart->getDiscountTTC($promotionService, $allPromotions)
-        );
+        $order->setDeliveryCountry($countryCode);
+        $order->setPaymentState(Order::PAYMENT_UNPAID);
+        $order->setDeliveryState(Order::STATE_WAITING);
+        $order->setPromoCode($cart->getPromoCode());
+        $order->setPromoTitre($promoTitre);
+        $order->setPromoReduction($reductionTTC);
 
         $this->entityManager->persist($order);
 
-        // 🔹 Calcul pour la répartition de la réduction sur les produits
-        $reductionTTC = $cart->getDiscountTTC($promotionService, $allPromotions);
-        $totalTTCPanier = array_reduce($cart->getFull(), fn($carry, $item) =>
-            $carry + $item['product']->getPrice() * (1 + ($item['product']->getTva()?->getValue() / 100 ?? 0)) * $item['quantity'],
-        0);
+        // 4. Calcul du total brut basé sur le prix TTC public saisi en admin
+        $totalBrutTTC = array_reduce(
+            $cart->getFull(),
+            fn($carry, $item) => $carry + ((float)$item['product']->getPrice() * (int)$item['quantity']),
+            0.0
+        );
 
-        // Détails des produits
+        // 5. Enregistrement des lignes OrderDetails sans surtaxe
         foreach ($cart->getFull() as $element) {
             $produit = $element['product'];
             $quantite = (int) $element['quantity'];
 
-            $tvaValue = $produit->getTva() ? $produit->getTva()->getValue() : 0;
-            $priceTTC = $produit->getPrice() * (1 + ($tvaValue / 100));
+            // Taux de TVA applicable
+            $tvaRate = (float) ($produit->getTva() ? $produit->getTva()->getValue() : $defaultTvaRate);
 
-            // 🔹 proportion de réduction pour ce produit
-            $productTTC = $priceTTC * $quantite;
-            $reductionProportion = $totalTTCPanier > 0 ? $productTTC / $totalTTCPanier : 0;
-            $reductionProduitTTC = $reductionTTC * $reductionProportion;
+            // Le prix en base de données EST le prix public TTC
+            $priceTTC = (float) $produit->getPrice();
+            $priceHT = $priceTTC / (1 + ($tvaRate / 100));
+
+            // Répartition équitable de la réduction promo globale sur chaque article
+            $partTTC = ($totalBrutTTC > 0)
+                ? (($priceTTC * $quantite) / $totalBrutTTC) * $reductionTTC
+                : 0.0;
+            $reducUnitaireTTC = $quantite > 0 ? ($partTTC / $quantite) : 0.0;
+
+            $priceTtcAfterReduc = max(0.0, $priceTTC - $reducUnitaireTTC);
+            $priceHtAfterReduc = $priceTtcAfterReduc / (1 + ($tvaRate / 100));
 
             $orderDetails = new OrderDetails();
             $orderDetails->setMyOrder($order);
             $orderDetails->setProduct($produit->getName());
             $orderDetails->setProductEntity($produit);
-            $orderDetails->setWeight((string) $produit->getWeight());
             $orderDetails->setQuantity($quantite);
-            $orderDetails->setPrice($produit->getPrice());
-            $orderDetails->setTotal($produit->getPrice() * $quantite);
-            $orderDetails->setTva($tvaValue);
-            $orderDetails->setPriceTTC($priceTTC);
 
-            // 🔹 NOUVELLES COLONNES
-            $priceAfterReducHT = $produit->getPrice() - ($reductionProduitTTC / (1 + ($tvaValue / 100)) / $quantite);
-            $priceAfterReducTTC = $priceTTC - ($reductionProduitTTC / $quantite);
-            $totalAfterReduc = $priceAfterReducHT * $quantite;
+            // Prix unitaire HT et remisé HT
+            $orderDetails->setPrice(round($priceHT, 2));
+            $orderDetails->setPriceAfterReduc(round($priceHtAfterReduc, 2));
 
-            $orderDetails->setPriceAfterReduc($priceAfterReducHT);
-            $orderDetails->setPriceTTCAfterReduc($priceAfterReducTTC);
-            $orderDetails->setTotalAfterReduc($totalAfterReduc);
+            // Taux TVA
+            $orderDetails->setTva($tvaRate);
+
+            // Prix unitaire TTC et Total TTC réels payés
+            $orderDetails->setPriceTtc(round($priceTtcAfterReduc, 2));
+            $orderDetails->setTotalTtc(round($priceTtcAfterReduc * $quantite, 2));
+            $orderDetails->setWeight((float)$produit->getWeight());
 
             $this->entityManager->persist($orderDetails);
         }
@@ -176,20 +154,18 @@ class OrderController extends AbstractController
         return $this->render('order/index.html.twig', [
             'cart' => $cart->getFull(),
             'cartObject' => $cart,
+            'order' => $order,
             'delivery' => $deliveryContent,
             'reference' => $order->getReference(),
             'price' => $prixLivraison,
-            'totalLivraison' => null,
             'categories' => $categoryAccessoryRepository->findAll(),
-            'promoDiscount' => $cart->getDiscountTTC($promotionService, $allPromotions),
+            'promoDiscount' => $reductionTTC,
             'promoCode' => $cart->getPromoCode(),
             'promoTitre' => $promoTitre,
             'promoService' => $promotionService,
             'allPromotions' => $allPromotions,
         ]);
     }
-
-
 
     #[Route('/account/order/{reference}/facture', name: 'account_order_invoice', methods: ['GET'])]
     public function generateInvoice(string $reference, Request $request): Response
@@ -227,33 +203,32 @@ class OrderController extends AbstractController
     {
         $trackingNumber = $order->getTrackingNumber() ?: 'N/A';
 
-        // Configuration du QR code
         $options = new QROptions([
             'outputType' => QRCode::OUTPUT_IMAGE_PNG,
             'eccLevel' => QRCode::ECC_L,
-            'imageBase64' => true, // Générer directement base64
+            'imageBase64' => true,
             'scale' => 5
         ]);
 
-        // Générer le QR code
         $qrcode = new QRCode($options);
-        $qrCodeDataUri = $qrcode->render($trackingNumber); // base64 PNG
+        $qrCodeDataUri = $qrcode->render($trackingNumber);
 
-        // Rendre le template twig en HTML
         $html = $this->renderView('pdf/bordereau.html.twig', [
             'order' => $order,
             'qrCodePath' => $qrCodeDataUri
         ]);
 
-        // Générer le PDF
         $dompdf = new Dompdf();
         $dompdf->loadHtml($html);
         $dompdf->setPaper('A6', 'portrait');
         $dompdf->render();
 
-        // Envoyer le PDF en téléchargement
-        return new Response($dompdf->stream("bordereau_{$order->getReference()}.pdf", [
-            "Attachment" => true
-        ]));
+        $pdfContent = $dompdf->output();
+        $filename = sprintf('bordereau_%s.pdf', $order->getReference());
+
+        return new Response($pdfContent, 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => sprintf('attachment; filename="%s"', $filename),
+        ]);
     }
 }

@@ -75,7 +75,7 @@
             border-bottom: 1px solid #f3f4f6;
         }
         .totals-table {
-            width: 45%;
+            width: 48%;
             margin-left: auto;
             border-collapse: collapse;
             margin-bottom: 40px;
@@ -145,51 +145,64 @@
             <tr>
                 <th>Désignation</th>
                 <th class="text-center">Qté</th>
-                <th class="text-right">Prix unit. HT</th>
+                <th class="text-right">Prix unit. TTC</th>
                 <th class="text-right">TVA</th>
                 <th class="text-right">Total TTC</th>
             </tr>
         </thead>
         <tbody>
-            {% set totalProduitsHT = 0 %}
-            {% set totalTVA = 0 %}
+            {% set totalProduitsTTC = 0 %}
+            {% set totalHT = 0 %}
+
             {% for item in order.orderDetails %}
-                {% set totalItemHT = item.price * item.quantity %}
-                {% set tvaItem = totalItemHT * (item.tva / 100) %}
-                {% set totalItemTTC = totalItemHT + tvaItem %}
-                {% set totalProduitsHT = totalProduitsHT + totalItemHT %}
-                {% set totalTVA = totalTVA + tvaItem %}
+                {% set unitTTC = item.priceTtc > 0 ? item.priceTtc : (item.price * (1 + item.tva / 100)) %}
+                {% set lineTotalTTC = item.totalTtc > 0 ? item.totalTtc : (unitTTC * item.quantity) %}
+                {% set tvaRate = item.tva|default(21) %}
+                {% set lineHT = lineTotalTTC / (1 + (tvaRate / 100)) %}
+
+                {% set totalProduitsTTC = totalProduitsTTC + lineTotalTTC %}
+                {% set totalHT = totalHT + lineHT %}
+
                 <tr>
                     <td><strong>{{ item.product }}</strong></td>
                     <td class="text-center">{{ item.quantity }}</td>
-                    <td class="text-right">{{ item.price|number_format(2, ',', ' ') }} €</td>
-                    <td class="text-right">{{ item.tva }}%</td>
-                    <td class="text-right">{{ totalItemTTC|number_format(2, ',', ' ') }} €</td>
+                    <td class="text-right">{{ unitTTC|number_format(2, ',', ' ') }} €</td>
+                    <td class="text-right">{{ tvaRate }}%</td>
+                    <td class="text-right">{{ lineTotalTTC|number_format(2, ',', ' ') }} €</td>
                 </tr>
             {% endfor %}
         </tbody>
     </table>
 
     {# Totaux #}
-    {% set totalProduitsTTC = totalProduitsHT + totalTVA %}
     {% set promo = order.promoReduction ?? 0 %}
-    {% set totalCommande = totalProduitsTTC - promo + order.carrierPrice %}
+    {% set totalBrutTTC = totalProduitsTTC + promo %}
+    {% set totalTVA = totalProduitsTTC - totalHT %}
+    {% set totalCommande = totalProduitsTTC + order.carrierPrice %}
 
     <table class="totals-table">
-        <tr>
-            <td>Sous-total HT :</td>
-            <td class="text-right">{{ totalProduitsHT|number_format(2, ',', ' ') }} €</td>
-        </tr>
-        <tr>
-            <td>TVA :</td>
-            <td class="text-right">{{ totalTVA|number_format(2, ',', ' ') }} €</td>
-        </tr>
         {% if promo > 0 %}
         <tr>
-            <td style="color:#047857;">Remise :</td>
+            <td>Sous-total articles :</td>
+            <td class="text-right">{{ totalBrutTTC|number_format(2, ',', ' ') }} €</td>
+        </tr>
+        <tr>
+            <td style="color:#047857;">Réduction ({{ order.promoTitre ?? order.promoCode }}) :</td>
             <td class="text-right" style="color:#047857;">-{{ promo|number_format(2, ',', ' ') }} €</td>
         </tr>
         {% endif %}
+        <tr>
+            <td>Sous-total articles TTC :</td>
+            <td class="text-right">{{ totalProduitsTTC|number_format(2, ',', ' ') }} €</td>
+        </tr>
+        <tr>
+            <td>Dont montant HT :</td>
+            <td class="text-right">{{ totalHT|number_format(2, ',', ' ') }} €</td>
+        </tr>
+        <tr>
+            <td>Dont TVA incluse :</td>
+            <td class="text-right">{{ totalTVA|number_format(2, ',', ' ') }} €</td>
+        </tr>
         <tr>
             <td>Frais d'expédition :</td>
             <td class="text-right">{{ order.carrierPrice|number_format(2, ',', ' ') }} €</td>

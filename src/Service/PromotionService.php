@@ -8,110 +8,84 @@ use App\Entity\Product;
 class PromotionService
 {
     /**
-     * Calcule la réduction totale applicable sur un panier complet
-     *
-     * @param array $cartFull Tableau du panier complet (comme retourné par Cart::getFull())
-     * @param Promotion|null $promo La promotion à appliquer
-     * @return float Montant total de la réduction
+     * Calcule la réduction totale TTC applicable sur le panier
      */
     public function calculateReduction(array $cartFull, ?Promotion $promo = null): float
     {
-        if (!$promo || !$promo->canBeUsed() || !$promo->isDiscountValid()) {
-            return 0;
+        if (!$promo || !$promo->canBeUsed() || !$promo->isDiscountValid() || empty($cartFull)) {
+            return 0.0;
         }
 
-        $totalReduction = 0;
+        // Cas 1 : Réduction globale sur tout le panier
+        if ($promo->getTargetType() === Promotion::TARGET_ALL) {
+            $total = 0.0;
+            foreach ($cartFull as $item) {
+                $total += (float)$item['product']->getPrice() * (int)$item['quantity'];
+            }
+
+            if ($promo->getDiscountAmount() !== null) {
+                return min($total, (float)$promo->getDiscountAmount());
+            }
+
+            if ($promo->getDiscountPercent() !== null) {
+                return round($total * ((float)$promo->getDiscountPercent() / 100), 2);
+            }
+
+            return 0.0;
+        }
+
+        // Cas 2 : Réduction ciblée par produit ou catégorie
+        $totalReduction = 0.0;
 
         foreach ($cartFull as $item) {
+            /** @var Product $product */
             $product = $item['product'];
-            $quantity = $item['quantity'];
-            $unitPriceHT = $product->getPrice(); // toujours HT
+            $quantity = (int)$item['quantity'];
+            $unitPrice = (float)$product->getPrice();
 
-            switch ($promo->getTargetType()) {
-                case Promotion::TARGET_ALL:
-                    // Réduction sur le total HT du panier
-                    $totalHT = 0;
-                    foreach ($cartFull as $p) {
-                        $totalHT += $p['product']->getPrice() * $p['quantity'];
-                    }
+            $isEligible = match ($promo->getTargetType()) {
+                Promotion::TARGET_CATEGORY_ACCESS =>
+                    $product->getType() === 'accessoire'
+                    && method_exists($product, 'getCategory')
+                    && $product->getCategory() === $promo->getCategoryAccess(),
+                Promotion::TARGET_PRODUCT =>
+                    $product === $promo->getProduct(),
+                Promotion::TARGET_PRODUCT_LIST =>
+                    $promo->getProducts()->contains($product),
+                default => false,
+            };
 
-                    $totalReduction = $promo->getDiscountAmount() ?? ($totalHT * ($promo->getDiscountPercent() / 100));
-                    break;
-
-                case Promotion::TARGET_CATEGORY_ACCESS:
-                    if ($product->getType() === 'accessoire' && $product->getCategory() === $promo->getCategoryAccess()) {
-                        if ($promo->getDiscountAmount() !== null) {
-                            // Promo en € (montant fixe)
-                            $totalReduction += $promo->getDiscountAmount() * $quantity;
-                        } elseif ($promo->getDiscountPercent() !== null) {
-                            // Promo en % sur HT
-                            $totalReduction += ($unitPriceHT * ($promo->getDiscountPercent() / 100)) * $quantity;
-                        }
-                    }
-                    break;
-
-                case Promotion::TARGET_PRODUCT:
-                    if ($product === $promo->getProduct()) {
-                        if ($promo->getDiscountAmount() !== null) {
-                            $totalReduction += $promo->getDiscountAmount() * $quantity;
-                        } elseif ($promo->getDiscountPercent() !== null) {
-                            $totalReduction += ($unitPriceHT * ($promo->getDiscountPercent() / 100)) * $quantity;
-                        }
-                    }
-                    break;
-
-                case Promotion::TARGET_PRODUCT_LIST:
-                    if ($promo->getProducts()->contains($product)) {
-                        if ($promo->getDiscountAmount() !== null) {
-                            $totalReduction += $promo->getDiscountAmount() * $quantity;
-                        } elseif ($promo->getDiscountPercent() !== null) {
-                            $totalReduction += ($unitPriceHT * ($promo->getDiscountPercent() / 100)) * $quantity;
-                        }
-                    }
-                    break;
+            if ($isEligible) {
+                if ($promo->getDiscountAmount() !== null) {
+                    $discountPerUnit = min($unitPrice, (float)$promo->getDiscountAmount());
+                    $totalReduction += $discountPerUnit * $quantity;
+                } elseif ($promo->getDiscountPercent() !== null) {
+                    $totalReduction += round(($unitPrice * ((float)$promo->getDiscountPercent() / 100)) * $quantity, 2);
+                }
             }
         }
 
-        return max(0, $totalReduction);
+        return max(0.0, $totalReduction);
     }
 
-
-    /**
-     * Applique une promotion sur un prix unitaire d'un produit
-     * (utile pour recalculer le prix affiché d'une ligne)
-     */
     public function applyPromotion(Promotion $promo, float $price, Product $product): float
     {
-        return max(0, $price - $this->calculateReduction([['product' => $product, 'quantity' => 1]], $promo));
+        $reduction = $this->calculateReduction([['product' => $product, 'quantity' => 1]], $promo);
+        return max(0.0, $price - $reduction);
     }
 
-    /**
-     * Retourne une promotion automatique applicable au panier (ou null)
-     */
     public function getAutomaticPromotion(array $cartFull, iterable $allPromos = []): ?Promotion
     {
-        // On filtre uniquement les promotions autoApply
         foreach ($allPromos as $promo) {
-
-            // On ignore les promos non automatiques
-            if (!$promo->isAutoApply()) {
+            if (!$promo->isAutoApply() || !$promo->canBeUsed() || !$promo->isDiscountValid()) {
                 continue;
             }
 
-            // On ignore celles qui ne peuvent pas être utilisées
-            if (!$promo->canBeUsed() || !$promo->isDiscountValid()) {
-                continue;
-            }
-
-            // Test : est-ce que cette promo donne réellement une réduction ?
-            $reduction = $this->calculateReduction($cartFull, $promo);
-
-            if ($reduction > 0) {
-                return $promo; // ✅ Promo auto applicable trouvée
+            if ($this->calculateReduction($cartFull, $promo) > 0) {
+                return $promo;
             }
         }
 
-        return null; // ❌ Aucune promo auto applicable
+        return null;
     }
-
 }

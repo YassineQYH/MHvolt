@@ -7,29 +7,27 @@ use Twig\Environment;
 
 class ContactMailer
 {
-    private Mail $mail;
-    private Environment $twig;
-
-    public function __construct(Mail $mail, Environment $twig)
-    {
-        $this->mail = $mail;
-        $this->twig = $twig;
-    }
+    public function __construct(
+        private readonly Mail $mail,
+        private readonly Environment $twig
+    ) {}
 
     public function sendAdminMail(array $data): void
     {
         $content = $this->twig->render('emails/contact_admin.html.twig', [
-            'name' => $data['name'],
-            'company' => $data['company'],
-            'tel' => $data['tel'],
-            'email' => $data['email'],
-            'message' => $data['message'],
+            'name' => $data['name'] ?? '',
+            'company' => $data['company'] ?? '',
+            'tel' => $data['tel'] ?? '',
+            'email' => $data['email'] ?? '',
+            'message' => $data['message'] ?? '',
         ]);
 
+        $adminEmail = $_ENV['ADMIN_EMAIL'] ?? 'admin@mhvolt.com';
+
         $this->mail->send(
-            'yassine.qyh@gmail.com', // admin
-            'HichTrott',
-            'Vous avez reçu une nouvelle demande de contact',
+            $adminEmail,
+            'MHvolt Administration',
+            'Nouvelle demande de contact reçue',
             $content
         );
     }
@@ -37,17 +35,17 @@ class ContactMailer
     public function sendUserMail(array $data): void
     {
         $content = $this->twig->render('emails/contact_user.html.twig', [
-            'name' => $data['name'],
-            'company' => $data['company'],
-            'tel' => $data['tel'],
-            'email' => $data['email'],
-            'message' => $data['message'],
+            'name' => $data['name'] ?? '',
+            'company' => $data['company'] ?? '',
+            'tel' => $data['tel'] ?? '',
+            'email' => $data['email'] ?? '',
+            'message' => $data['message'] ?? '',
         ]);
 
         $this->mail->send(
-            $data['email'], // utilisateur
-            'HichTrott',
-            'Confirmation de votre message à HichTrott',
+            $data['email'],
+            $data['name'] ?? 'Client',
+            'Confirmation de votre message à MHvolt',
             $content
         );
     }

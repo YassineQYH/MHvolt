@@ -44,19 +44,17 @@
             <div class="card border border-light-subtle rounded-4 p-4 shadow-sm bg-body-tertiary">
                 <h2 class="fs-6 fw-bold text-dark mb-3">Détail des articles</h2>
 
-                {# Calcul du total TTC #}
+                {# Calcul du total TTC direct #}
                 {% set totalTTC = 0 %}
                 {% for item in cart %}
-                    {% set tvaRate = item.product.tva ? (item.product.tva.value / 100) : 0 %}
-                    {% set priceTTC = item.product.price * (1 + tvaRate) %}
+                    {% set priceTTC = item.product.price %}
                     {% set totalItemTTC = priceTTC * item.quantity %}
                     {% set totalTTC = totalTTC + totalItemTTC %}
                 {% endfor %}
 
                 <div class="d-flex flex-column gap-3 mb-4">
                     {% for key, item in cart %}
-                        {% set tvaRate = item.product.tva ? (item.product.tva.value / 100) : 0 %}
-                        {% set priceTTC = item.product.price * (1 + tvaRate) %}
+                        {% set priceTTC = item.product.price %}
                         {% set totalItemTTC = priceTTC * item.quantity %}
                         {% set totalItemRemise = promoDiscount > 0 ? totalItemTTC - (totalItemTTC / (totalTTC ?: 1) * promoDiscount) : totalItemTTC %}
                         {% set illustration = item.product.illustrations|first %}
@@ -69,7 +67,7 @@
                                          class="img-fluid object-fit-contain" style="max-height: 40px;">
                                 </div>
                                 <div>
-                                    <span class="fw-semibold text-dark small d-block">{{ item.product.name }}</span>
+                                    <span class="fw-semibold text-dark small d-block">{{ item.product.nameShort|default(item.product.name) }}</span>
                                     <span class="text-secondary small">Qté : {{ item.quantity }}</span>
                                 </div>
                             </div>
@@ -77,13 +75,13 @@
                             <div class="text-end">
                                 {% if promoDiscount > 0 %}
                                     <span class="text-muted text-decoration-line-through small" style="font-size: 0.75rem;">
-                                        {{ totalItemTTC|number_format(2, ',', ' ') }} €
+                                        {{ totalItemTTC|number_format(2, ',', ' ') }}&nbsp;€
                                     </span><br>
                                     <span class="fw-bold text-dark small">
-                                        {{ totalItemRemise|number_format(2, ',', ' ') }} €
+                                        {{ totalItemRemise|number_format(2, ',', ' ') }}&nbsp;€
                                     </span>
                                 {% else %}
-                                    <span class="fw-semibold text-dark small">{{ totalItemTTC|number_format(2, ',', ' ') }} €</span>
+                                    <span class="fw-semibold text-dark small">{{ totalItemTTC|number_format(2, ',', ' ') }}&nbsp;€</span>
                                 {% endif %}
                             </div>
                         </div>
@@ -92,27 +90,27 @@
 
                 {# Totaux financiers #}
                 {% set subtotalRemise = promoDiscount > 0 ? (totalTTC - promoDiscount) : totalTTC %}
-                {% set grandTotal = subtotalRemise + price %}
+                {% set grandTotal = subtotalRemise + price|default(0) %}
 
                 <div class="d-flex justify-content-between small text-secondary mb-2">
-                    <span>Total produits TTC</span>
-                    <span class="text-dark">{{ totalTTC|number_format(2, ',', ' ') }} €</span>
+                    <span>Total articles TTC</span>
+                    <span class="text-dark">{{ totalTTC|number_format(2, ',', ' ') }}&nbsp;€</span>
                 </div>
 
                 {% if promoDiscount > 0 %}
                     <div class="d-flex justify-content-between small text-success mb-2">
                         <span>Réduction ({% if promoTitreAffiche %}{{ promoTitreAffiche }}{% else %}Appliquée{% endif %})</span>
-                        <span>-{{ promoDiscount|number_format(2, ',', ' ') }} €</span>
+                        <span>-{{ promoDiscount|number_format(2, ',', ' ') }}&nbsp;€</span>
                     </div>
                     <div class="d-flex justify-content-between small text-secondary mb-2">
-                        <span>Sous-total remisé</span>
-                        <span class="text-dark">{{ subtotalRemise|number_format(2, ',', ' ') }} €</span>
+                        <span>Sous-total remisé TTC</span>
+                        <span class="text-dark">{{ subtotalRemise|number_format(2, ',', ' ') }}&nbsp;€</span>
                     </div>
                 {% endif %}
 
                 <div class="d-flex justify-content-between small text-secondary mb-3 pb-3 border-bottom border-light-subtle">
                     <span>Frais de livraison</span>
-                    <span class="text-dark">{{ price|number_format(2, ',', ' ') }} €</span>
+                    <span class="text-dark">{{ price|default(0)|number_format(2, ',', ' ') }}&nbsp;€</span>
                 </div>
 
                 <div class="d-flex justify-content-between align-items-baseline mb-4">
@@ -120,14 +118,13 @@
                         <span class="fs-6 fw-bold text-dark d-block">Montant total</span>
                         <span class="text-secondary small" style="font-size: 0.75rem;">TVA incluse</span>
                     </div>
-                    <span class="fs-4 fw-bold text-dark">{{ grandTotal|number_format(2, ',', ' ') }} €</span>
+                    <span class="fs-4 fw-bold text-dark">{{ grandTotal|number_format(2, ',', ' ') }}&nbsp;€</span>
                 </div>
 
                 {% if delivery is defined and delivery is not empty %}
-                    {# Lien pur, zéro JS bloquant, zéro onclick #}
                     <a href="{{ path('stripe_create_session', {'reference': reference}) }}"
                        class="btn btn-dark rounded-pill py-3 fw-semibold w-100 text-center shadow-sm">
-                        <i class="fas fa-lock me-2"></i>Payer | {{ grandTotal|number_format(2, ',', ' ') }} €
+                        <i class="fas fa-lock me-2"></i>Payer | {{ grandTotal|number_format(2, ',', ' ') }}&nbsp;€
                     </a>
                 {% else %}
                     <button class="btn btn-secondary rounded-pill py-3 fw-semibold w-100 text-center" disabled>

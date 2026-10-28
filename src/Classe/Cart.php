@@ -16,19 +16,14 @@ class Cart
     private EntityManagerInterface $entityManager;
     private WeightRepository $weightRepository;
     private ?SessionInterface $session;
-    private float $reduction = 0.0;
 
-    public function __construct(EntityManagerInterface $entityManager, RequestStack $requestStack, WeightRepository $weightRepository)
+    public function __construct(EntityManagerInterface $entityManager, RequestStack $requestStack, WeightRepository$weightRepository)
     {
-        $this->entityManager = $entityManager;
-        $this->weightRepository = $weightRepository;
+        $this->entityManager =$entityManager;
+        $this->weightRepository =$weightRepository;
+        $this->session =$requestStack->getSession();
 
-        // Récupère la session si elle existe
-        $this->session = $requestStack->getSession();
-
-        // Démarre la session si elle existe mais n'est pas encore active
-        if ($this->session && !$this->session->isStarted()) {
-            $this->session->start();
+        if ($this->session && !$this->session->isStarted()) {$this->session->start();
         }
     }
 
@@ -36,7 +31,7 @@ class Cart
     public function setPromoCode(?string $code): void
     {
         if ($this->session) {
-            $this->session->set('promo_code', $code);
+            $this->session->set('promo_code',$code);
         }
     }
 
@@ -45,68 +40,67 @@ class Cart
         return $this->session ? $this->session->get('promo_code') : null;
     }
 
-    // ------------------- Ajout au panier -------------------
-    public function add(int $id, string $type = 'trottinette'): void
+    public function clearPromos(): void
+    {
+        if ($this->session) {$this->session->remove('promo_code');
+        }
+    }
+
+    // ------------------- Gestion des articles -------------------
+    public function add(int $id, string$type = 'trottinette'): void
     {
         if (!$this->session) return;
 
-        $cart = $this->session->get('cart', []);
+        $cart =$this->session->get('cart', []);
         $cart[$type][$id] = ($cart[$type][$id] ?? 0) + 1;
-        $this->session->set('cart', $cart);
+        $this->session->set('cart',$cart);
     }
 
-    // ------------------- Récupère le panier -------------------
     public function get(): array
     {
         return $this->session ? $this->session->get('cart', []) : [];
     }
 
-    // ------------------- Supprime tout le panier -------------------
     public function remove(): void
     {
-        if ($this->session) {
-            $this->session->remove('cart');
+        if ($this->session) {$this->session->remove('cart');
         }
     }
 
-    // ------------------- Supprime un élément -------------------
-    public function delete(int $id, string $type = 'trottinette'): void
+    public function delete(int $id, string$type = 'trottinette'): void
     {
         if (!$this->session) return;
 
-        $cart = $this->session->get('cart', []);
+        $cart =$this->session->get('cart', []);
         unset($cart[$type][$id]);
-        $this->session->set('cart', $cart);
+        $this->session->set('cart',$cart);
     }
 
-    // ------------------- Diminue la quantité -------------------
-    public function decrease(int $id, string $type = 'trottinette'): void
+    public function decrease(int $id, string$type = 'trottinette'): void
     {
         if (!$this->session) return;
 
-        $cart = $this->session->get('cart', []);
+        $cart =$this->session->get('cart', []);
         if (!empty($cart[$type][$id])) {
-            if ($cart[$type][$id] > 1) {
-                $cart[$type][$id]--;
+            if ($cart[$type][$id] > 1) {$cart[$type][$id]--;
             } else {
                 unset($cart[$type][$id]);
             }
-            $this->session->set('cart', $cart);
+            $this->session->set('cart',$cart);
         }
     }
 
-    // ------------------- Récupère le panier complet -------------------
+    // ------------------- Panier complet avec entités -------------------
     public function getFull(): array
     {
         $cartComplete = [];
-        if (!$this->session) return $cartComplete;
+        if (!$this->session) return$cartComplete;
 
-        $cart = $this->get();
+        $cart =$this->get();
 
-        // ---- Trottinettes ----
+        // Trottinettes
         if (!empty($cart['trottinette'])) {
-            foreach ($cart['trottinette'] as $id => $quantity) {
-                $product = $this->entityManager->getRepository(Trottinette::class)->find($id);
+            foreach ($cart['trottinette'] as$id => $quantity) {$product = $this->entityManager->getRepository(Trottinette::class)->find($id);
                 if (!$product) {
                     $this->delete($id, 'trottinette');
                     continue;
@@ -119,10 +113,9 @@ class Cart
             }
         }
 
-        // ---- Accessoires ----
+        // Accessoires
         if (!empty($cart['accessory'])) {
-            foreach ($cart['accessory'] as $id => $quantity) {
-                $product = $this->entityManager->getRepository(Accessory::class)->find($id);
+            foreach ($cart['accessory'] as$id => $quantity) {$product = $this->entityManager->getRepository(Accessory::class)->find($id);
                 if (!$product) {
                     $this->delete($id, 'accessory');
                     continue;
@@ -138,150 +131,102 @@ class Cart
         return $cartComplete;
     }
 
-    // ------------------- Poids total du panier -------------------
+    // ------------------- Poids & Frais de port -------------------
     public function getTotalWeight(): float
     {
         $totalWeight = 0.0;
-        foreach ($this->getFull() as $element) {
-            $weight = $element['product']->getWeight();
-            if (is_object($weight)) {
-                $totalWeight += $weight->getKg() * $element['quantity'];
-            } elseif (is_float($weight) || is_int($weight)) {
-                $totalWeight += $weight * $element['quantity'];
-            }
+        foreach ($this->getFull() as $element) {$weight = (float)($element['product']->getWeight() ?? 0.0);$totalWeight += $weight * (int)$element['quantity'];
         }
         return $totalWeight;
     }
 
     public function getShippingPrice(): float
     {
-        $totalWeight = $this->getTotalWeight();
-        $weightEntity = $this->weightRepository->findPriceByWeight($totalWeight);
+        $totalWeight = $this->getTotalWeight();$weightEntity = $this->weightRepository->findPriceByWeight($totalWeight);
 
-        return $weightEntity ? $weightEntity->getPrice() : 0.0;
+        return $weightEntity ? (float)$weightEntity->getPrice() : 0.0;
     }
 
-
-
-    // ------------------- Réduction ------------------- Plus besoin de setReduction(), la valeur est toujours recalculée
-    /* public function setReduction(float $montant): void
+    public function getLivraisonPrice(WeightRepository $weightRepository): float
     {
-        $this->reduction = $montant;
-
-        // 👉 On stocke aussi en session pour ne pas perdre la valeur
-        if ($this->session) {
-            $this->session->set('promo_reduction', $montant);
-        }
-    } */
-
-    // Calcule la réduction actuelle selon le panier et la promo en session
-    public function getReduction(PromotionService $promoService, ?Promotion $promo = null): float
-    {
-        $cartFull = $this->getFull();
-
-        // Si aucun promo fourni, on regarde le code en session
-        if (!$promo) {
-            $promoCode = $this->getPromoCode();
-            if (!$promoCode) return 0;
-
-            $promo = $this->entityManager->getRepository(Promotion::class)
-                ->findOneBy(['code' => $promoCode]);
-
-            if (!$promo) return 0;
-        }
-
-        return $promoService->calculateReduction($cartFull, $promo);
+        $weightEntity = $weightRepository->findPriceByWeight($this->getTotalWeight());
+        return $weightEntity ? (float)$weightEntity->getPrice() : 0.0;
     }
 
-    // ------------------- Réinitialiser code promo et réduction -------------------
-    public function clearPromos(): void
-    {
-        if ($this->session) {
-            $this->session->remove('promo_code');
-        }
-    }
-
-    // ------------------- Quantité totale -------------------
     public function getTotalQuantity(): int
     {
         $total = 0;
-        foreach ($this->getFull() as $element) {
-            $total += $element['quantity'];
+        foreach ($this->getFull() as$element) {
+            $total += (int)$element['quantity'];
         }
         return $total;
     }
 
-    // ------------------- Prix livraison -------------------
-    public function getLivraisonPrice(\App\Repository\WeightRepository $weightRepository): float
+    // ------------------- Sous-total TTC catalogue brut -------------------
+    public function getSubtotalTtc(): float
     {
-        $poids = $this->getTotalWeight();
-        $weightEntity = $weightRepository->findPriceByWeight($poids);
-        return $weightEntity ? $weightEntity->getPrice() : 0;
-    }
-
-    // ------------------- Réduction TTC (pour affichage) -------------------
-    public function getDiscountTTC(PromotionService $promoService, array $allPromotions): float
-    {
-        $cartFull = $this->getFull();
-        if (empty($cartFull)) return 0;
-
-        $promo = $this->getBestPromotion($promoService, $allPromotions);
-        if (!$promo) return 0;
-
-        $discountTTC = 0;
-        foreach ($cartFull as $item) {
-            $product  = $item['product'];
-            $quantity = $item['quantity'];
-
-            if ($promo->getDiscountAmount() !== null) {
-                $unitDiscountHT = $promo->getDiscountAmount();
-            } elseif ($promo->getDiscountPercent() !== null) {
-                $unitDiscountHT = $product->getPrice() * ($promo->getDiscountPercent() / 100);
-            } else {
-                $unitDiscountHT = 0;
-            }
-
-            $tvaRate = $product->getTva()?->getValue() / 100 ?? 0;
-            $unitDiscountTTC = $unitDiscountHT * (1 + $tvaRate);
-            $discountTTC += $unitDiscountTTC * $quantity;
+        $total = 0.0;
+        foreach ($this->getFull() as$element) {
+            $product =$element['product'];
+            $price = (float)($product->getPromoPrice() ?? $product->getPrice());$total += $price * (int)$element['quantity'];
         }
-
-        return $discountTTC;
+        return $total;
     }
 
-
-    // ------------------- Récupère la meilleure promotion applicable -------------------
-    public function getBestPromotion(PromotionService $promoService, array $allPromotions): ?Promotion
+    // ------------------- Promotions & Réductions -------------------
+    public function getReduction(PromotionService $promoService, ?Promotion $promo = null): float
     {
-        $cartFull = $this->getFull();
-        if (empty($cartFull)) return null;
+        $cartFull =$this->getFull();
 
-        // 1️⃣ Promo manuelle via code promo
-        $promoCode = $this->getPromoCode();
-        if ($promoCode) {
-            $manualPromo = $this->entityManager->getRepository(Promotion::class)
+        if (!$promo) {
+            $promoCode =$this->getPromoCode();
+            if (!$promoCode) return 0.0;
+
+            $promo =$this->entityManager->getRepository(Promotion::class)
                 ->findOneBy(['code' => $promoCode]);
 
-            if ($manualPromo && $promoService->calculateReduction($cartFull, $manualPromo) > 0) {
-                // Si code promo valide, on l'applique directement
+            if (!$promo) return 0.0;
+        }
+
+        return $promoService->calculateReduction($cartFull,$promo);
+    }
+
+    public function getDiscountTTC(PromotionService $promoService, array$allPromotions): float
+    {
+        $cartFull =$this->getFull();
+        if (empty($cartFull)) return 0.0;
+
+        $promo =$this->getBestPromotion($promoService,$allPromotions);
+        if (!$promo) return 0.0;
+
+        // Le prix du produit étant déjà en TTC, calculateReduction renvoie directement le montant TTC exact
+        return $promoService->calculateReduction($cartFull,$promo);
+    }
+
+    public function getBestPromotion(PromotionService $promoService, array$allPromotions): ?Promotion
+    {
+        $cartFull =$this->getFull();
+        if (empty($cartFull)) return null;
+
+        $promoCode =$this->getPromoCode();
+        if ($promoCode) {
+            $manualPromo =$this->entityManager->getRepository(Promotion::class)
+                ->findOneBy(['code' => $promoCode]);
+
+            if ($manualPromo &&$promoService->calculateReduction($cartFull,$manualPromo) > 0) {
                 return $manualPromo;
             }
 
-            // Si le code promo est invalide, on peut le nettoyer
             $this->clearPromos();
             return null;
         }
 
-        // 2️⃣ Sinon, promo automatique
-        return $promoService->getAutomaticPromotion($cartFull, $allPromotions);
+        return $promoService->getAutomaticPromotion($cartFull,$allPromotions);
     }
 
-    // ------------------- Nom de la promotion -------------------
-    public function getDiscountName(PromotionService $promoService, array $allPromotions): ?string
+    public function getDiscountName(PromotionService $promoService, array$allPromotions): ?string
     {
-        $promo = $this->getBestPromotion($promoService, $allPromotions);
+        $promo =$this->getBestPromotion($promoService,$allPromotions);
         return $promo ? $promo->getTitre() : null;
     }
-
-
 }

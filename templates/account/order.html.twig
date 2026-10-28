@@ -37,14 +37,15 @@
                     </thead>
                     <tbody>
                         {% for order in orders %}
-                            {% set productsTTC = 0 %}
+                            {# Somme exacte des lignes TTC réelles stockées en base #}
+                            {% set totalLignesTTC = 0 %}
                             {% for item in order.orderDetails %}
-                                {% set lineHT = item.price * item.quantity %}
-                                {% set tvaRate = (item.tva is not empty ? (item.tva / 100) : 0) %}
-                                {% set lineTTC = lineHT * (1 + tvaRate) %}
-                                {% set productsTTC = productsTTC + lineTTC %}
+                                {% set lineTotal = item.totalTtc > 0 ? item.totalTtc : (item.priceTtc * item.quantity) %}
+                                {% set totalLignesTTC = totalLignesTTC + lineTotal %}
                             {% endfor %}
+
                             {% set promo = order.promoReduction ?? 0 %}
+                            {% set totalRegle = totalLignesTTC + order.carrierPrice %}
 
                             <tr>
                                 <td class="ps-4 py-3">
@@ -68,16 +69,16 @@
                                     {% endif %}
                                 </td>
                                 <td class="py-3 text-secondary small">{{ order.createdAt|date('d/m/Y') }}</td>
-                                <td class="py-3 text-secondary small">{{ order.carrierPrice|number_format(2, ',', ' ') }} €</td>
+                                <td class="py-3 text-secondary small">{{ order.carrierPrice|number_format(2, ',', ' ') }}&nbsp;€</td>
                                 <td class="py-3 text-secondary small">
                                     {% if promo > 0 %}
-                                        <span class="text-success">-{{ promo|number_format(2, ',', ' ') }} €</span>
+                                        <span class="text-success">-{{ promo|number_format(2, ',', ' ') }}&nbsp;€</span>
                                     {% else %}
                                         —
                                     {% endif %}
                                 </td>
                                 <td class="py-3 fw-bold text-dark small">
-                                    {{ (productsTTC - promo + order.carrierPrice)|number_format(2, ',', ' ') }} €
+                                    {{ totalRegle|number_format(2, ',', ' ') }}&nbsp;€
                                 </td>
                                 <td class="pe-4 py-3 text-end">
                                     <a href="{{ path('account_order_show', { 'reference': order.reference }) }}"

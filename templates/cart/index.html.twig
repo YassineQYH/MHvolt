@@ -16,16 +16,15 @@
     </div>
 
     {% if cart|length > 0 %}
-        {# === Calculs totaux et poids === #}
+        {# === Calculs totaux et poids directs en TTC === #}
         {% set totalTTC = 0 %}
         {% set totalWeight = 0 %}
         {% set promoDiscount = cartObject.getDiscountTTC(promoService, allPromotions) %}
 
         {% for item in cart %}
-            {% set tvaRate = item.product.tva ? (item.product.tva.value / 100) : 0 %}
-            {% set priceTTC = item.product.price * (1 + tvaRate) %}
+            {% set priceTTC = item.product.price %}
             {% set totalItemTTC = priceTTC * item.quantity %}
-            {% set itemWeight = item.product.weight %}
+            {% set itemWeight = item.product.weight|default(0) %}
             {% set totalWeight = totalWeight + (itemWeight * item.quantity) %}
             {% set totalTTC = totalTTC + totalItemTTC %}
         {% endfor %}
@@ -45,28 +44,30 @@
                     </thead>
                     <tbody>
                         {% for item in cart %}
-                            {% set tvaRate = item.product.tva ? (item.product.tva.value / 100) : 0 %}
-                            {% set priceTTC = item.product.price * (1 + tvaRate) %}
+                            {% set priceTTC = item.product.price %}
                             {% set totalItemTTC = priceTTC * item.quantity %}
                             {% set totalItemRemise = promoDiscount > 0 ? totalItemTTC - (totalItemTTC / (totalTTC ?: 1) * promoDiscount) : totalItemTTC %}
                             {% set illustration = item.product.illustrations|first %}
-                            {% set itemWeight = item.product.weight %}
+                            {% set itemWeight = item.product.weight|default(0) %}
+                            {% set itemType = item.type|default(item.product.type|default('trottinette')) %}
+                            {% set showRoute = (itemType == 'accessory' or itemType == 'accessoire') ? 'accessory_show' : 'trottinette_show' %}
+
                             <tr>
                                 <td class="ps-4 py-3">
                                     <div class="d-flex align-items-center gap-3">
                                         <div class="bg-body-tertiary border rounded-3 p-1 d-flex align-items-center justify-content-center" style="width: 56px; height: 56px; flex-shrink: 0;">
-                                            <a href="{{ path(item.type == 'accessory' ? 'accessory_show' : 'trottinette_show', { slug: item.product.slug }) }}">
+                                            <a href="{{ path(showRoute, { slug: item.product.slug }) }}">
                                                 <img src="/uploads/{{ item.product.uploadDirectory }}/{{ illustration ? illustration.image : 'default.jpg' }}"
                                                      alt="{{ item.product.name }}"
                                                      class="img-fluid object-fit-contain" style="max-height: 48px;">
                                             </a>
                                         </div>
                                         <div>
-                                            <a href="{{ path(item.type == 'accessory' ? 'accessory_show' : 'trottinette_show', { slug: item.product.slug }) }}"
+                                            <a href="{{ path(showRoute, { slug: item.product.slug }) }}"
                                                class="fw-semibold text-dark text-decoration-none small d-block">
-                                                {{ item.product.name }}
+                                                {{ item.product.nameShort|default(item.product.name) }}
                                             </a>
-                                            <span class="text-secondary small">{{ priceTTC|number_format(2, ',', ' ') }} € / unité</span>
+                                            <span class="text-secondary small">{{ priceTTC|number_format(2, ',', ' ') }}&nbsp;€ / unité</span>
                                         </div>
                                     </div>
                                 </td>
@@ -81,15 +82,15 @@
 
                                 <td class="py-3 text-end">
                                     {% if promoDiscount > 0 %}
-                                        <span class="text-muted text-decoration-line-through small">{{ totalItemTTC|number_format(2, ',', ' ') }} €</span><br>
-                                        <span class="fw-bold text-dark">{{ totalItemRemise|number_format(2, ',', ' ') }} €</span>
+                                        <span class="text-muted text-decoration-line-through small">{{ totalItemTTC|number_format(2, ',', ' ') }}&nbsp;€</span><br>
+                                        <span class="fw-bold text-dark">{{ totalItemRemise|number_format(2, ',', ' ') }}&nbsp;€</span>
                                     {% else %}
-                                        <span class="fw-bold text-dark">{{ totalItemTTC|number_format(2, ',', ' ') }} €</span>
+                                        <span class="fw-bold text-dark">{{ totalItemTTC|number_format(2, ',', ' ') }}&nbsp;€</span>
                                     {% endif %}
                                 </td>
 
                                 <td class="pe-4 py-3 text-end">
-                                    <a href="{{ path('delete_to_cart', {'id': item.product.id, 'type': item.type|default('trottinette')}) }}"
+                                    <a href="{{ path('delete_to_cart', {'id': item.product.id, 'type': itemType}) }}"
                                        class="btn btn-outline-danger btn-sm border-0 rounded-circle"
                                        title="Supprimer">
                                         <i class="bx bx-trash fs-5"></i>
@@ -103,7 +104,7 @@
         </div>
 
         {# ========================================================
-           1. FORMULAIRE CODE PROMO (TOTALEMENT INDÉPENDANT)
+           1. FORMULAIRE CODE PROMO
            ======================================================== #}
         {% set promoCode = cartObject.getPromoCode() %}
         <div class="row justify-content-end mb-4">
@@ -171,7 +172,7 @@
 
             {# Colonne Droite : Synthèse & Validation #}
             <div class="col-lg-5">
-                {% set totalLivraison = price %}
+                {% set totalLivraison = price|default(0) %}
                 {% set subtotalRemise = totalTTC - promoDiscount %}
                 {% set grandTotal = subtotalRemise + totalLivraison %}
 
@@ -179,29 +180,29 @@
                     <h2 class="fs-6 fw-bold text-dark mb-3">Récapitulatif financier</h2>
 
                     <div class="d-flex justify-content-between small text-secondary mb-2">
-                        <span>Sous-total articles</span>
-                        <span class="text-dark">{{ totalTTC|number_format(2, ',', ' ') }} €</span>
+                        <span>Sous-total articles TTC</span>
+                        <span class="text-dark">{{ totalTTC|number_format(2, ',', ' ') }}&nbsp;€</span>
                     </div>
 
                     {% if promoDiscount > 0 %}
                         <div class="d-flex justify-content-between small text-success mb-2">
                             <span>Remise appliquée</span>
-                            <span>- {{ promoDiscount|number_format(2, ',', ' ') }} €</span>
+                            <span>-{{ promoDiscount|number_format(2, ',', ' ') }}&nbsp;€</span>
                         </div>
                         <div class="d-flex justify-content-between small text-secondary mb-2">
-                            <span>Sous-total remisé</span>
-                            <span class="text-dark">{{ subtotalRemise|number_format(2, ',', ' ') }} €</span>
+                            <span>Sous-total remisé TTC</span>
+                            <span class="text-dark">{{ subtotalRemise|number_format(2, ',', ' ') }}&nbsp;€</span>
                         </div>
                     {% endif %}
 
                     <div class="d-flex justify-content-between small text-secondary mb-3 pb-3 border-bottom border-light-subtle">
                         <span>Frais d'expédition estimés</span>
-                        <span class="text-dark">{{ totalLivraison|number_format(2, ',', ' ') }} €</span>
+                        <span class="text-dark">{{ totalLivraison|number_format(2, ',', ' ') }}&nbsp;€</span>
                     </div>
 
                     <div class="d-flex justify-content-between align-items-baseline mb-4">
-                        <span class="fs-6 fw-bold text-dark">Total estimé</span>
-                        <span class="fs-4 fw-bold text-dark">{{ grandTotal|number_format(2, ',', ' ') }} €</span>
+                        <span class="fs-6 fw-bold text-dark">Total estimé TTC</span>
+                        <span class="fs-4 fw-bold text-dark">{{ grandTotal|number_format(2, ',', ' ') }}&nbsp;€</span>
                     </div>
 
                     {{ form_widget(form_order.submit, {

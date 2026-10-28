@@ -3,17 +3,25 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Accessory;
-use App\Entity\Illustrationaccess;
-use App\Entity\TrottinetteAccessory;
-use Doctrine\Common\Collections\Collection;
-use EasyCorp\Bundle\EasyAdminBundle\Config\{Crud, Actions, Action};
+use App\Entity\Product;
+use App\Entity\Tva;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\{
-    IdField, TextField, TextEditorField, BooleanField, ImageField,
-    NumberField, AssociationField, CollectionField, DateTimeField
+    AssociationField,
+    BooleanField,
+    CollectionField,
+    IdField,
+    ImageField,
+    MoneyField,
+    NumberField,
+    TextEditorField,
+    TextField
 };
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class AccessoryCrudController extends AbstractCrudController
 {
@@ -36,110 +44,45 @@ class AccessoryCrudController extends AbstractCrudController
             ->setDefaultSort(['id' => 'DESC']);
     }
 
-    public function configureFields(string $pageName): iterable
-    {
-        return [
-            CollectionField::new('illustrations', 'Images')
-                ->onlyOnDetail()
-                ->setTemplatePath('admin/fields/illustrations.html.twig'),
-
-            IdField::new('id')->hideOnForm(),
-
-            ImageField::new('firstIllustration', 'Image')
-                ->onlyOnIndex()
-                ->setBasePath(''),
-
-            TextField::new('name', 'Nom'),
-            TextField::new('slug')->setFormTypeOption('disabled', true)->hideOnIndex(),
-
-            TextEditorField::new('description', 'Description'),
-
-            NumberField::new('price', 'Prix de base (€)')->setNumDecimals(2),
-
-            NumberField::new('promoPrice', 'Prix promo (€)')
-                ->setNumDecimals(2)
-                ->setRequired(false)
-                ->setHelp('Laisser vide si aucune promotion directe.'),
-
-            AssociationField::new('tva', 'TVA')
-                ->formatValue(function ($value, $entity) {
-                    if (!$value) return '';
-                    return $value->getName() . ' - ' . $value->getValue() . ' %';
-                }),
-
-            NumberField::new('weight', 'Poids (kg)')
-                ->setHelp('Entrez le poids exact du produit')
-                ->formatValue(function ($value, $entity) {
-                    if (floor($value) == $value) {
-                        return $value . 'kg';
-                    }
-                    return number_format($value, 2, ',', '') . 'kg';
-                }),
-
-            NumberField::new('stock', 'Stock'),
-
-            BooleanField::new('isBest', 'Accueil'),
-
-            // ---------------------- Relations ----------------------
-
-            AssociationField::new('category', 'Catégorie'),
-
-            CollectionField::new('illustrations', 'Illustrations')
-                ->allowAdd()
-                ->allowDelete()
-                ->setEntryType(\App\Form\IllustrationType::class)
-                ->setFormTypeOption('by_reference', false)
-                ->onlyOnForms(),
-
-            AssociationField::new('trottinetteAccessories', 'Trottinettes associées')
-                ->onlyOnDetail()
-                ->formatValue(function ($v, $entity) {
-                    $html = '<ul>';
-                    foreach ($entity->getTrottinetteAccessories() as $ta) {
-                        $html .= '<li>' . $ta->getTrottinette()?->getName() . '</li>';
-                    }
-                    $html .= '</ul>';
-                    return $html;
-                })
-                ->renderAsHtml(),
-        ];
-    }
-
     public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
-        if (!$entityInstance instanceof Accessory) {
-            parent::persistEntity($entityManager, $entityInstance);
-            return;
-        }
+        if ($entityInstance instanceof Product) {
+            // 1. TVA standard par défaut si non renseignée
+            if ($entityInstance->getTva() === null) {
+                $defaultTva = $entityManager->getRepository(Tva::class)->findOneBy([])
+                    ?? (new Tva())->setName('Taux standard')->setValue(21.0);
+                $entityInstance->setTva($defaultTva);
+            }
 
-        $this->handleIllustrationsUpload($entityInstance);
+            // 2. Traitement des photos avant enregistrement en base
+            if ($entityInstance instanceof Accessory) {
+                $this->handleIllustrationsUpload($entityInstance);
+            }
+        }
 
         parent::persistEntity($entityManager, $entityInstance);
     }
 
     public function updateEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
-        if (!$entityInstance instanceof Accessory) {
-            parent::updateEntity($entityManager, $entityInstance);
-            return;
+        if ($entityInstance instanceof Accessory) {
+            $this->handleIllustrationsUpload($entityInstance);
         }
-
-        $this->handleIllustrationsUpload($entityInstance);
 
         parent::updateEntity($entityManager, $entityInstance);
     }
 
     private function handleIllustrationsUpload(Accessory $accessory): void
     {
-        $request = $this->getContext()->getRequest();
-
+        $request = $this->getContext()?->getRequest();
         if (!$request) {
             return;
         }
 
         $files = $request->files->all();
+        $formKey = 'Accessory';
 
-        if (!isset($files['Accessory']['illustrations'])) {
+        if (!isset($files[$formKey]['illustrations'])) {
             return;
         }
 
@@ -151,21 +94,92 @@ class AccessoryCrudController extends AbstractCrudController
         }
 
         foreach ($accessory->getIllustrations() as $index => $illustration) {
-            if (
-                !isset($files['Accessory']['illustrations'][$index]['image']) ||
-                !$files['Accessory']['illustrations'][$index]['image'] instanceof UploadedFile
-            ) {
+            if (!isset($files[$formKey]['illustrations'][$index]['image'])) {
                 continue;
             }
 
-            /** @var UploadedFile $file */
-            $file = $files['Accessory']['illustrations'][$index]['image'];
+            $file = $files[$formKey]['illustrations'][$index]['image'];
 
-            $filename = uniqid('acc_', true) . '.' . $file->guessExtension();
-            $file->move($uploadDir, $filename);
+            if ($file instanceof UploadedFile) {
+                $filename = uniqid('acc_', true) . '.' . $file->guessExtension();
+                $file->move($uploadDir, $filename);
 
-            $illustration->setImage($filename);
-            $illustration->setProduct($accessory);
+                $illustration->setImage($filename);
+                $illustration->setProduct($accessory);
+            }
         }
+    }
+
+    public function configureFields(string $pageName): iterable
+    {
+        return [
+            IdField::new('id')->hideOnForm(),
+
+            ImageField::new('firstIllustration', 'Image')
+                ->onlyOnIndex()
+                ->setBasePath('/'),
+
+            TextField::new('name', 'Nom'),
+            TextField::new('slug')->setFormTypeOption('disabled', true)->hideOnIndex(),
+
+            TextEditorField::new('description', 'Description')
+                ->hideOnIndex(),
+
+            MoneyField::new('price', 'Prix de vente TTC')
+                ->setCurrency('EUR')
+                ->setStoredAsCents(false)
+                ->setHelp('Prix public TTC affiché sur la boutique.'),
+
+            MoneyField::new('promoPrice', 'Prix promo TTC')
+                ->setCurrency('EUR')
+                ->setStoredAsCents(false)
+                ->setRequired(false)
+                ->setHelp('Laisser vide si aucune promotion directe.'),
+
+            // TVA masquée de l'index pour alléger le tableau, visible uniquement au détail
+            AssociationField::new('tva', 'TVA')
+                ->onlyOnDetail()
+                ->formatValue(fn ($value) => $value ? $value->getName() . ' (' . $value->getValue() . ' %)' : '-'),
+
+            NumberField::new('weight', 'Poids (kg)')
+                ->setNumDecimals(2)
+                ->setHelp('Entrez le poids en kg')
+                ->formatValue(fn($value) => $value !== null ? number_format($value, 2, ',', ' ') . ' kg' : '-'),
+
+            NumberField::new('stock', 'Stock'),
+
+            BooleanField::new('isBest', 'En avant sur l’accueil'),
+
+            AssociationField::new('category', 'Catégorie'),
+
+            // Galerie d'illustrations
+            CollectionField::new('illustrations', 'Illustrations')
+                ->allowAdd()
+                ->allowDelete()
+                ->setEntryType(\App\Form\IllustrationType::class)
+                ->setFormTypeOption('by_reference', false)
+                ->onlyOnForms(),
+
+            CollectionField::new('illustrations', 'Images')
+                ->onlyOnDetail()
+                ->setTemplatePath('admin/fields/illustrations.html.twig'),
+
+            // Association avec Trottinette : modifiable sur formulaire et lisible au détail
+            AssociationField::new('trottinettes', 'Trottinettes compatibles')
+                ->onlyOnForms()
+                ->setFormTypeOption('by_reference', false)
+                ->setHelp('Sélectionnez les modèles de trottinettes compatibles avec cet accessoire.'),
+
+            AssociationField::new('trottinettes', 'Trottinettes compatibles')
+                ->onlyOnDetail()
+                ->formatValue(function ($v, $entity) {
+                    $html = '<ul class="mb-0">';
+                    foreach ($entity->getTrottinettes() as $trott) {
+                        $html .= '<li>' . htmlspecialchars($trott->getName()) . '</li>';
+                    }
+                    return $html . '</ul>';
+                })
+                ->renderAsHtml(),
+        ];
     }
 }

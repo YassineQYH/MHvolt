@@ -2,61 +2,56 @@
 
 namespace App\Entity;
 
-use App\Entity\Product;
-use Doctrine\ORM\Mapping as ORM;
 use App\Repository\OrderDetailsRepository;
+use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: OrderDetailsRepository::class)]
 class OrderDetails
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
+    #[ORM\Id, ORM\GeneratedValue, ORM\Column(type: 'integer')]
     private ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: Order::class, inversedBy: 'orderDetails')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?Order $myOrder = null;
 
+    // Snapshot du nom du produit au moment de l'achat
     #[ORM\Column(type: 'string', length: 255)]
     private ?string $product = null;
 
     #[ORM\ManyToOne(targetEntity: Product::class)]
-    #[ORM\JoinColumn(nullable: true)]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     private ?Product $productEntity = null;
 
     #[ORM\Column(type: 'integer')]
-    private ?int $quantity = null;
+    private ?int $quantity = 1;
 
+    // Prix unitaire HT avant réduction
     #[ORM\Column(type: 'float')]
     private ?float $price = null;
 
-    #[ORM\Column(type: 'float', nullable: true)]
+    // Prix unitaire HT effectif après réduction
+    #[ORM\Column(type: 'float')]
     private ?float $priceAfterReduc = null;
 
+    // Taux de TVA (ex: 21.0 ou 20.0)
     #[ORM\Column(type: 'float')]
-    private ?float $total = null;
+    private ?float $tva = 20.0;
 
-    #[ORM\Column(type: 'float', nullable: true)]
-    private ?float $totalAfterReduc = null;
+    // Prix unitaire TTC effectif
+    #[ORM\Column(type: 'float')]
+    private ?float $priceTtc = null;
 
-    #[ORM\Column(type: 'string', length: 64)]
-    private ?string $weight = null;
-
-    #[ORM\Column(type: 'float', nullable: true)]
-    private ?float $tva = null;
+    // Total de la ligne TTC (quantité * priceTtc)
+    #[ORM\Column(type: 'float')]
+    private ?float $totalTtc = null;
 
     #[ORM\Column(type: 'float')]
-    private ?float $priceTTC = null;
-
-    #[ORM\Column(type: 'float', nullable: true)]
-    private ?float $priceTtcAfterReduc = null;
-
-
+    private float $weight = 0.0;
 
     public function __toString(): string
     {
-        return $this->getProduct().' x'.$this->getQuantity().' - Taille '.$this->getWeight();
+        return sprintf('%s (x%d)', $this->product, $this->quantity);
     }
 
     public function getId(): ?int { return $this->id; }
@@ -76,27 +71,18 @@ class OrderDetails
     public function getPrice(): ?float { return $this->price; }
     public function setPrice(float $price): self { $this->price = $price; return $this; }
 
-    public function getPriceAfterReduc(): ?float{return $this->priceAfterReduc;}
-    public function setPriceAfterReduc(?float $priceAfterReduc): self{$this->priceAfterReduc = $priceAfterReduc; return $this;}
+    public function getPriceAfterReduc(): ?float { return $this->priceAfterReduc; }
+    public function setPriceAfterReduc(float $priceAfterReduc): self { $this->priceAfterReduc = $priceAfterReduc; return $this; }
 
-    public function getTotal(): ?float { return $this->total; }
-    public function setTotal(float $total): self { $this->total = $total; return $this; }
+    public function getTva(): ?float { return $this->tva; }
+    public function setTva(float $tva): self { $this->tva = $tva; return $this; }
 
-    public function getTotalAfterReduc(): ?float{return $this->totalAfterReduc;}
-    public function setTotalAfterReduc(?float $totalAfterReduc): self{$this->totalAfterReduc = $totalAfterReduc; return $this;}
+    public function getPriceTtc(): ?float { return $this->priceTtc; }
+    public function setPriceTtc(float $priceTtc): self { $this->priceTtc = $priceTtc; return $this; }
 
-    public function getWeight(): ?string { return $this->weight; }
-    public function setWeight(string $weight): self { $this->weight = $weight; return $this; }
+    public function getTotalTtc(): ?float { return $this->totalTtc; }
+    public function setTotalTtc(float $totalTtc): self { $this->totalTtc = $totalTtc; return $this; }
 
-    public function getTva(): ?float{return $this->tva;}
-    public function setTva(?float $tva): self{$this->tva = $tva;return $this;}
-
-    public function getPriceTTC(): ?float{return $this->priceTTC;}
-    public function setPriceTTC(float $priceTTC): self{$this->priceTTC = $priceTTC;return $this;}
-
-    public function getPriceTtcAfterReduc(): ?float{return $this->priceTtcAfterReduc;}
-    public function setPriceTtcAfterReduc(?float $priceTTCAfterReduc): self{$this->priceTtcAfterReduc = $priceTTCAfterReduc; return $this;}
-
-    public function getPromoInfo(): string{$order = $this->getMyOrder();return $order ? ($order->getPromoCode() ?: $order->getPromoTitre() ?: '-') : '-';}
-
+    public function getWeight(): float { return $this->weight; }
+    public function setWeight(float $weight): self { $this->weight = $weight; return $this; }
 }

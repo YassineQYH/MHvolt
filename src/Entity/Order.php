@@ -11,29 +11,50 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Table(name: '`order`')]
 class Order
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
+    public const PAYMENT_UNPAID = 0;
+    public const PAYMENT_PAID = 1;
+
+    public const STATE_WAITING = 0;
+    public const STATE_PREPARATION = 1;
+    public const STATE_SHIPPING = 2;
+    public const STATE_DELIVERED = 3;
+    public const STATE_CANCELED = 4;
+
+    public const DELIVERY_STATES = [
+        self::STATE_WAITING      => 'Commande en attente',
+        self::STATE_PREPARATION  => 'Préparation en cours',
+        self::STATE_SHIPPING     => 'Livraison en cours',
+        self::STATE_DELIVERED    => 'Livraison terminée',
+        self::STATE_CANCELED     => 'Annulée',
+    ];
+
+    #[ORM\Id, ORM\GeneratedValue, ORM\Column(type: 'integer')]
     private ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'orders')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 
-    #[ORM\Column(type: 'datetime')]
-    private ?\DateTimeInterface $createdAt = null;
+    #[ORM\Column(type: 'datetime_immutable')]
+    private \DateTimeImmutable $createdAt;
+
+    #[ORM\Column(type: 'string', length: 255)]
+    private ?string $reference = null;
 
     #[ORM\Column(type: 'float')]
-    private ?float $carrierPrice = null;
+    private float $carrierPrice = 0.0;
+
+    #[ORM\Column(type: 'string', length: 100, nullable: true)]
+    private ?string $carrier = 'bpost';
+
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $trackingNumber = null;
 
     #[ORM\Column(type: 'text')]
     private ?string $delivery = null;
 
-    #[ORM\OneToMany(mappedBy: 'myOrder', targetEntity: OrderDetails::class)]
-    private Collection $orderDetails;
-
-    #[ORM\Column(type: 'string', length: 255)]
-    private ?string $reference = null;
+    #[ORM\Column(type: 'string', length: 10, nullable: true)]
+    private ?string $deliveryCountry = 'BE';
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $stripeSessionId = null;
@@ -41,34 +62,25 @@ class Order
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
     private ?string $promoCode = null;
 
-    #[ORM\Column(type: 'float', nullable: true)]
-    private ?float $promoReduction = null;
-
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $promoTitre = null;
 
-    #[ORM\Column(type: 'integer')]
-    private ?int $paymentState = 0;
+    #[ORM\Column(type: 'float', nullable: true)]
+    private ?float $promoReduction = 0.0;
 
     #[ORM\Column(type: 'integer')]
-    private ?int $deliveryState = 0;
+    private int $paymentState = self::PAYMENT_UNPAID;
 
-    #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private ?string $trackingNumber = null;
+    #[ORM\Column(type: 'integer')]
+    private int $deliveryState = self::STATE_WAITING;
 
-    #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private ?string $carrier = null;
-
-    // 🟢 --- SECONDARY TRANSPORT ---
-    #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private ?string $secondaryCarrierTrackingNumber = null;
-
-    #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private ?string $secondaryCarrier = null;
+    #[ORM\OneToMany(mappedBy: 'myOrder', targetEntity: OrderDetails::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
+    private Collection $orderDetails;
 
     public function __construct()
     {
         $this->orderDetails = new ArrayCollection();
+        $this->createdAt = new \DateTimeImmutable();
     }
 
     public function __toString(): string
@@ -76,33 +88,97 @@ class Order
         return $this->reference ?? 'Commande n°' . $this->id;
     }
 
+    /** Total TTC des produits seuls (après réductions) */
+    public function getSubtotalTtc(): float
+    {
+        $subtotal = 0.0;
+        foreach ($this->orderDetails as $detail) {
+            $subtotal += $detail->getTotalTtc();
+        }
+        return $subtotal;
+    }
+
+    /** Total TTC global final (produits après promo + frais de port) */
+    public function getTotalTtc(): float
+    {
+        return $this->getSubtotalTtc() + $this->carrierPrice;
+    }
+
+    /** Pour rétrocompatibilité avec tes anciens templates */
     public function getTotal(): float
     {
-        $total = 0.0;
-        /** @var OrderDetails $product */
-        foreach ($this->getOrderDetails() as $product) {
-            $total += $product->getPrice() * $product->getQuantity();
-        }
-        return $total;
+        return $this->getTotalTtc();
     }
+
+    public function getWeightTotal(): float
+    {
+        $totalWeight = 0.0;
+        foreach ($this->orderDetails as $detail) {
+            $totalWeight += $detail->getWeight() * $detail->getQuantity();
+        }
+        return $totalWeight;
+    }
+
+    public function getDeliveryStateLabel(): string
+    {
+        return self::DELIVERY_STATES[$this->deliveryState] ?? 'Statut inconnu';
+    }
+
+    public function getOrderStatusLabel(): string
+    {
+        if ($this->paymentState === self::PAYMENT_UNPAID) {
+            return 'Non payée';
+        }
+        return 'Payée - ' . $this->getDeliveryStateLabel();
+    }
+
+    // ------------------- GETTERS & SETTERS -------------------
 
     public function getId(): ?int { return $this->id; }
 
     public function getUser(): ?User { return $this->user; }
     public function setUser(?User $user): self { $this->user = $user; return $this; }
 
-    public function getCreatedAt(): ?\DateTimeInterface { return $this->createdAt; }
-    public function setCreatedAt(\DateTimeInterface $createdAt): self { $this->createdAt = $createdAt; return $this; }
+    public function getCreatedAt(): \DateTimeImmutable { return $this->createdAt; }
+    public function setCreatedAt(\DateTimeImmutable $createdAt): self { $this->createdAt = $createdAt; return $this; }
 
-    public function getCarrierPrice(): ?float { return $this->carrierPrice; }
+    public function getReference(): ?string { return $this->reference; }
+    public function setReference(string $reference): self { $this->reference = $reference; return $this; }
+
+    public function getCarrierPrice(): float { return $this->carrierPrice; }
     public function setCarrierPrice(float $carrierPrice): self { $this->carrierPrice = $carrierPrice; return $this; }
+
+    public function getCarrier(): ?string { return $this->carrier; }
+    public function setCarrier(?string $carrier): self { $this->carrier = $carrier; return $this; }
+
+    public function getTrackingNumber(): ?string { return $this->trackingNumber; }
+    public function setTrackingNumber(?string $trackingNumber): self { $this->trackingNumber = $trackingNumber; return $this; }
 
     public function getDelivery(): ?string { return $this->delivery; }
     public function setDelivery(string $delivery): self { $this->delivery = $delivery; return $this; }
 
-    /**
-     * @return Collection|OrderDetails[]
-     */
+    public function getDeliveryCountry(): ?string { return $this->deliveryCountry; }
+    public function setDeliveryCountry(?string $country): self { $this->deliveryCountry = $country; return $this; }
+
+    public function getStripeSessionId(): ?string { return $this->stripeSessionId; }
+    public function setStripeSessionId(?string $stripeSessionId): self { $this->stripeSessionId = $stripeSessionId; return $this; }
+
+    public function getPromoCode(): ?string { return $this->promoCode; }
+    public function setPromoCode(?string $promoCode): self { $this->promoCode = $promoCode; return $this; }
+
+    public function getPromoTitre(): ?string { return $this->promoTitre; }
+    public function setPromoTitre(?string $promoTitre): self { $this->promoTitre = $promoTitre; return $this; }
+
+    public function getPromoReduction(): ?float { return $this->promoReduction; }
+    public function setPromoReduction(?float $promoReduction): self { $this->promoReduction = $promoReduction; return $this; }
+
+    public function getPaymentState(): int { return $this->paymentState; }
+    public function setPaymentState(int $paymentState): self { $this->paymentState = $paymentState; return $this; }
+
+    public function getDeliveryState(): int { return $this->deliveryState; }
+    public function setDeliveryState(int $deliveryState): self { $this->deliveryState = $deliveryState; return $this; }
+
+    /** @return Collection<int, OrderDetails> */
     public function getOrderDetails(): Collection { return $this->orderDetails; }
 
     public function addOrderDetail(OrderDetails $orderDetail): self
@@ -123,144 +199,4 @@ class Order
         }
         return $this;
     }
-
-    // 🟢 --- GETTERS & SETTERS ---
-
-    public function getReference(): ?string { return $this->reference; }
-    public function setReference(string $reference): self { $this->reference = $reference; return $this; }
-
-    public function getStripeSessionId(): ?string { return $this->stripeSessionId; }
-    public function setStripeSessionId(?string $stripeSessionId): self { $this->stripeSessionId = $stripeSessionId; return $this; }
-
-    // ✅ Paiement (0 = Non payée, 1 = Payée)
-    public function getPaymentState(): ?int { return $this->paymentState; }
-    public function setPaymentState(int $paymentState): self { $this->paymentState = $paymentState; return $this; }
-
-    // ✅ Livraison
-    public function getDeliveryState(): ?int { return $this->deliveryState; }
-    public function setDeliveryState(int $deliveryState): self { $this->deliveryState = $deliveryState; return $this; }
-
-    public function getTrackingNumber(): ?string { return $this->trackingNumber; }
-    public function setTrackingNumber(?string $trackingNumber): self { $this->trackingNumber = $trackingNumber; return $this; }
-
-    public function getCarrier(): ?string { return $this->carrier; }
-    public function setCarrier(?string $carrier): self { $this->carrier = $carrier; return $this; }
-
-    public function getSecondaryCarrierTrackingNumber(): ?string { return $this->secondaryCarrierTrackingNumber; }
-    public function setSecondaryCarrierTrackingNumber(?string $trackingNumber): self { $this->secondaryCarrierTrackingNumber = $trackingNumber; return $this; }
-
-    public function getSecondaryCarrier(): ?string { return $this->secondaryCarrier; }
-    public function setSecondaryCarrier(?string $carrier): self { $this->secondaryCarrier = $carrier; return $this; }
-
-    public function getPromoCode(): ?string { return $this->promoCode; }
-    public function setPromoCode(?string $promoCode): self { $this->promoCode = $promoCode; return $this; }
-
-    public function getPromoReduction(): ?float { return $this->promoReduction; }
-    public function setPromoReduction(?float $promoReduction): self { $this->promoReduction = $promoReduction; return $this; }
-
-    public function getPromoTitre(): ?string{return $this->promoTitre;}
-    public function setPromoTitre(?string $promoTitre): self{$this->promoTitre = $promoTitre;return $this;}
-
-    public function getTotalAfterReduction(): float{$total = $this->getTotal();if ($this->getPromoReduction()) {return $total - $this->getPromoReduction();}return $total;}
-
-    public function getTotalTtc(): float
-    {
-        $totalTtc = 0;
-
-        foreach ($this->getOrderDetails() as $detail) {
-            if (method_exists($detail, 'getPriceTtc')) {
-                $totalTtc += $detail->getPriceTtc() * $detail->getQuantity();
-            }
-        }
-
-        return $totalTtc;
-    }
-
-    public function getCartTotalTtc(): float
-    {
-        $total = $this->getTotalTtc();
-
-        if ($this->getPromoReduction()) {
-            $total -= $this->getPromoReduction();
-        }
-
-        $total += $this->getCarrierPrice();
-
-        return $total;
-    }
-
-    public function getTotalTtcAfterReduction(): float
-    {
-        $totalTtc = 0;
-
-        foreach ($this->orderDetails as $detail) {
-            $product = $detail->getProductEntity();
-            if ($product instanceof \App\Entity\Product) {
-                // prix après réduction du produit
-                $priceAfterReduc = $detail->getPriceAfterReduc() ?? $product->getPrice();
-
-                // récupérer la TVA du produit
-                $tvaValue = $product->getTva() ? $product->getTva()->getValue() : 0;
-
-                // calcul TTC pour cette ligne : prix * (1 + TVA/100) * quantité
-                $totalTtc += $priceAfterReduc * (1 + $tvaValue / 100) * $detail->getQuantity();
-            } else {
-                // fallback si pas de productEntity
-                $priceAfterReduc = $detail->getPriceAfterReduc() ?? $detail->getPrice() ?? 0;
-                $tvaValue = $detail->getTva() ?? 0;
-                $totalTtc += $priceAfterReduc * (1 + $tvaValue / 100) * $detail->getQuantity();
-            }
-        }
-
-        return $totalTtc;
-    }
-
-    public function getPromoInfo(): ?string{return $this->promoCode ?: $this->promoTitre ?: '-';}
-
-
-    public function getWeightTotal(): float
-    {
-        return array_reduce(
-            $this->orderDetails->toArray(),
-            fn($carry, $item) => $carry + ($item->getWeight() * $item->getQuantity()),
-            0
-        );
-    }
-
-    public function getDeliveryStateLabel(): string
-    {
-        return self::DELIVERY_STATES[$this->deliveryState] ?? 'Statut inconnu';
-    }
-
-    public function getOrderStatusLabel(): string
-    {
-        if ($this->paymentState === 0) {
-            return 'Non payée';
-        }
-
-        return 'Payée - ' . ($this->getDeliveryStateLabel());
-    }
-
-    public function isInPreparation(): bool
-    {
-        return $this->deliveryState === self::STATE_PREPARATION;
-    }
-
-    public const PAYMENT_UNPAID = 0;
-    public const PAYMENT_PAID = 1;
-
-    public const STATE_WAITING = 0;
-    public const STATE_PREPARATION = 1;
-    public const STATE_SHIPPING = 2;
-    public const STATE_DELIVERED = 3;
-    public const STATE_CANCELED = 4;
-
-    public const DELIVERY_STATES = [
-        self::STATE_WAITING      => 'Commande en attente',
-        self::STATE_PREPARATION  => 'Préparation en cours',
-        self::STATE_SHIPPING     => 'Livraison en cours',
-        self::STATE_DELIVERED    => 'Livraison terminée',
-        self::STATE_CANCELED     => 'Annulée',
-    ];
-
 }

@@ -61,61 +61,77 @@
                     <tr>
                         <th class="ps-3 py-2">Désignation</th>
                         <th class="py-2 text-center">Qté</th>
-                        <th class="py-2 text-end">Prix unit. HT</th>
+                        <th class="py-2 text-end">Prix unit. TTC</th>
                         <th class="py-2 text-end">Taux TVA</th>
                         <th class="pe-3 py-2 text-end">Total TTC</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% set totalProduitsHT = 0 %}
-                    {% set totalTVA = 0 %}
+                    {% set totalProduitsTTC = 0 %}
+                    {% set totalHT = 0 %}
+
                     {% for item in order.orderDetails %}
-                        {% set totalItemHT = item.price * item.quantity %}
-                        {% set tvaItem = totalItemHT * (item.tva / 100) %}
-                        {% set totalItemTTC = totalItemHT + tvaItem %}
-                        {% set totalProduitsHT = totalProduitsHT + totalItemHT %}
-                        {% set totalTVA = totalTVA + tvaItem %}
+                        {# Prix TTC unitaire payé et Total TTC de la ligne enregistrés en base #}
+                        {% set unitTTC = item.priceTtc > 0 ? item.priceTtc : (item.price * (1 + item.tva / 100)) %}
+                        {% set lineTotalTTC = item.totalTtc > 0 ? item.totalTtc : (unitTTC * item.quantity) %}
+                        {% set tvaRate = item.tva|default(21) %}
+
+                        {# Ligne HT comptable #}
+                        {% set lineHT = lineTotalTTC / (1 + (tvaRate / 100)) %}
+
+                        {% set totalProduitsTTC = totalProduitsTTC + lineTotalTTC %}
+                        {% set totalHT = totalHT + lineHT %}
+
                         <tr>
                             <td class="ps-3 py-3 fw-semibold text-dark small">{{ item.product }}</td>
                             <td class="py-3 text-center small">x{{ item.quantity }}</td>
-                            <td class="py-3 text-end text-secondary small">{{ item.price|number_format(2, ',', ' ') }} €</td>
-                            <td class="py-3 text-end text-secondary small">{{ item.tva }}%</td>
-                            <td class="pe-3 py-3 text-end fw-semibold text-dark small">{{ totalItemTTC|number_format(2, ',', ' ') }} €</td>
+                            <td class="py-3 text-end text-secondary small">{{ unitTTC|number_format(2, ',', ' ') }}&nbsp;€</td>
+                            <td class="py-3 text-end text-secondary small">{{ tvaRate }}%</td>
+                            <td class="pe-3 py-3 text-end fw-semibold text-dark small">{{ lineTotalTTC|number_format(2, ',', ' ') }}&nbsp;€</td>
                         </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
 
-        {# Totaux #}
-        {% set totalProduitsTTC = totalProduitsHT + totalTVA %}
+        {# Totaux financiers #}
         {% set promo = order.promoReduction ?? 0 %}
-        {% set totalCommande = totalProduitsTTC - promo + order.carrierPrice %}
+        {% set totalBrutTTC = totalProduitsTTC + promo %}
+        {% set totalTVA = totalProduitsTTC - totalHT %}
+        {% set totalCommande = totalProduitsTTC + order.carrierPrice %}
 
         <div class="row justify-content-end">
             <div class="col-md-6 col-lg-5">
                 <div class="d-flex flex-column gap-2 small border-top border-light-subtle pt-3">
-                    <div class="d-flex justify-content-between text-secondary">
-                        <span>Total HT :</span>
-                        <span class="text-dark">{{ totalProduitsHT|number_format(2, ',', ' ') }} €</span>
-                    </div>
-                    <div class="d-flex justify-content-between text-secondary">
-                        <span>Montant TVA :</span>
-                        <span class="text-dark">{{ totalTVA|number_format(2, ',', ' ') }} €</span>
-                    </div>
                     {% if promo > 0 %}
+                        <div class="d-flex justify-content-between text-secondary">
+                            <span>Sous-total articles :</span>
+                            <span class="text-dark">{{ totalBrutTTC|number_format(2, ',', ' ') }}&nbsp;€</span>
+                        </div>
                         <div class="d-flex justify-content-between text-success">
-                            <span>Remise ({{ order.promoTitre ?? order.promoCode }}) :</span>
-                            <span>-{{ promo|number_format(2, ',', ' ') }} €</span>
+                            <span>Réduction ({{ order.promoTitre ?? order.promoCode }}) :</span>
+                            <span>-{{ promo|number_format(2, ',', ' ') }}&nbsp;€</span>
                         </div>
                     {% endif %}
+                    <div class="d-flex justify-content-between text-secondary">
+                        <span>Sous-total articles TTC :</span>
+                        <span class="text-dark">{{ totalProduitsTTC|number_format(2, ',', ' ') }}&nbsp;€</span>
+                    </div>
+                    <div class="d-flex justify-content-between text-secondary">
+                        <span>Dont montant HT :</span>
+                        <span class="text-dark">{{ totalHT|number_format(2, ',', ' ') }}&nbsp;€</span>
+                    </div>
+                    <div class="d-flex justify-content-between text-secondary">
+                        <span>Dont TVA incluse :</span>
+                        <span class="text-dark">{{ totalTVA|number_format(2, ',', ' ') }}&nbsp;€</span>
+                    </div>
                     <div class="d-flex justify-content-between text-secondary pb-2 border-bottom border-light-subtle">
-                        <span>Frais de port :</span>
-                        <span class="text-dark">{{ order.carrierPrice|number_format(2, ',', ' ') }} €</span>
+                        <span>Frais d'expédition :</span>
+                        <span class="text-dark">{{ order.carrierPrice|number_format(2, ',', ' ') }}&nbsp;€</span>
                     </div>
                     <div class="d-flex justify-content-between align-items-baseline fs-6 fw-bold text-dark pt-1">
-                        <span>Total TTC réglé :</span>
-                        <span class="fs-5">{{ totalCommande|number_format(2, ',', ' ') }} €</span>
+                        <span>Total TTC acquitté :</span>
+                        <span class="fs-5">{{ totalCommande|number_format(2, ',', ' ') }}&nbsp;€</span>
                     </div>
                 </div>
             </div>

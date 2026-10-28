@@ -2,38 +2,30 @@
 
 namespace App\Controller\Admin;
 
+use App\Classe\Mail;
+use App\Entity\ResetPassword;
 use App\Entity\User;
-use App\Entity\Address;
 use App\Form\AddressType;
-use App\Form\UserAdminType;
 use Doctrine\ORM\EntityManagerInterface;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\{
-    IdField,
-    TextField,
-    EmailField,
     ChoiceField,
     CollectionField,
-    FormField
+    EmailField,
+    FormField,
+    IdField,
+    TextField
 };
-use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
-use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
-use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
-use Symfony\Component\Uid\Uuid;
-use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class UserCrudController extends AbstractCrudController
 {
-    private MailerInterface $mailer;
-    private UrlGeneratorInterface $router;
-
-    public function __construct(MailerInterface $mailer, UrlGeneratorInterface $router)
-    {
-        $this->mailer = $mailer;
-        $this->router = $router;
-    }
+    public function __construct(
+        private readonly UrlGeneratorInterface $router
+    ) {}
 
     public static function getEntityFqcn(): string
     {
@@ -56,85 +48,38 @@ class UserCrudController extends AbstractCrudController
             ->add(Crud::PAGE_INDEX, Action::DETAIL)
             ->update(Crud::PAGE_INDEX, Action::EDIT, fn(Action $action) => $action->setLabel('Modifier'))
             ->update(Crud::PAGE_INDEX, Action::DELETE, fn(Action $action) => $action->setLabel('Supprimer'))
-            ->update(Crud::PAGE_INDEX, Action::DETAIL, fn(Action $action) => $action->setLabel('Voir'))
-            ->update(Crud::PAGE_DETAIL, Action::EDIT, fn(Action $action) => $action->setLabel('Modifier'))
-            ->update(Crud::PAGE_DETAIL, Action::DELETE, fn(Action $action) => $action->setLabel('Supprimer'));
+            ->update(Crud::PAGE_INDEX, Action::DETAIL, fn(Action $action) => $action->setLabel('Voir'));
     }
 
     public function configureFields(string $pageName): iterable
     {
-        // ==========================
-        // IDENTIFIANT
-        // ==========================
-        yield IdField::new('id')
-            ->hideOnForm(); // Jamais modifiable
+        return [
+            IdField::new('id')->hideOnForm(),
 
+            FormField::addPanel('Informations utilisateur'),
+            EmailField::new('email', 'Adresse e-mail'),
+            TextField::new('firstName', 'Prénom'),
+            TextField::new('lastName', 'Nom'),
+            TextField::new('tel', 'Téléphone'),
 
-        // ==========================
-        // INFORMATIONS UTILISATEUR
-        // ==========================
-        yield FormField::addPanel('Informations utilisateur');
+            FormField::addPanel('Rôles'),
+            ChoiceField::new('roles', 'Droits & Rôles')
+                ->setChoices([
+                    'Client'         => 'ROLE_USER',
+                    'Administrateur' => 'ROLE_ADMIN',
+                ])
+                ->allowMultipleChoices()
+                ->renderExpanded(),
 
-        // Email → visible et éditable
-        yield EmailField::new('email');
-
-        // Prénom / Nom / Téléphone
-        yield TextField::new('firstName')->setLabel('Prénom');
-        yield TextField::new('lastName')->setLabel('Nom');
-        yield TextField::new('tel')->setLabel('Tel');
-
-
-        // ==========================
-        // RÔLES
-        // ==========================
-        yield FormField::addPanel('Rôles');
-
-        yield ChoiceField::new('roles')
-            ->setLabel('Rôles')
-            ->setChoices([
-                'Utilisateur'     => 'ROLE_USER',
-                'Administrateur'  => 'ROLE_ADMIN',
-                'Super Admin'     => 'ROLE_SUPER_ADMIN',
-            ])
-            ->allowMultipleChoices()
-            ->renderExpanded();
-
-
-        // ==========================
-        // ADRESSES
-        // ==========================
-        yield FormField::addPanel('Adresses');
-
-        yield CollectionField::new('addresses', 'Adresses')
-            ->setEntryType(AddressType::class)
-            ->allowAdd()
-            ->allowDelete()
-            ->setFormTypeOption('by_reference', false)
-            ->onlyOnForms();
-
-
-        // ==========================
-        // CHAMPS SENSIBLES / TECHNIQUES
-        // ==========================
-        // ⚠️ Ils existent en base mais NE DOIVENT JAMAIS
-        // être générés dans le formulaire EasyAdmin
-        yield TextField::new('password')
-            ->hideOnForm()
-            ->hideOnIndex()
-            ->hideOnDetail();
-
-        yield TextField::new('passwordResetToken')
-            ->hideOnForm()
-            ->hideOnIndex()
-            ->hideOnDetail();
-
-        yield TextField::new('passwordResetTokenExpiresAt')
-            ->hideOnForm()
-            ->hideOnIndex()
-            ->hideOnDetail();
+            FormField::addPanel('Adresses enregistrées'),
+            CollectionField::new('addresses', 'Adresses')
+                ->setEntryType(AddressType::class)
+                ->allowAdd()
+                ->allowDelete()
+                ->setFormTypeOption('by_reference', false)
+                ->onlyOnForms(),
+        ];
     }
-
-
 
     public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
@@ -142,39 +87,32 @@ class UserCrudController extends AbstractCrudController
             return;
         }
 
-        // Générer un token unique pour création de mot de passe
-        $token = Uuid::v4()->toRfc4122();
-        $entityInstance->setPasswordResetToken($token);
-        $entityInstance->setPasswordResetTokenExpiresAt((new \DateTime())->modify('+1 day'));
-
+        $entityInstance->setPassword(bin2hex(random_bytes(16)));
         $entityManager->persist($entityInstance);
 
-        // Email
+        $token = bin2hex(random_bytes(32));
+        $resetPassword = new ResetPassword();
+        $resetPassword->setUser($entityInstance);
+        $resetPassword->setToken($token);
+        $resetPassword->setCreatedAt(new \DateTime());
+        $entityManager->persist($resetPassword);
+
+        $entityManager->flush();
+
         $url = $this->router->generate(
-            'app_set_password',
-            ['token' => $entityInstance->getPasswordResetToken()],
+            'update_password',
+            ['token' => $token],
             UrlGeneratorInterface::ABSOLUTE_URL
         );
 
-        $email = (new Email())
-            ->from('no-reply@mhvolt.com')
-            ->to($entityInstance->getEmail())
-            ->subject('Création de votre mot de passe')
-            ->html(
-                "Bonjour {$entityInstance->getFirstName()},<br><br>" .
-                "Cliquez sur ce lien pour créer votre mot de passe : <a href='{$url}'>Créer mon mot de passe</a><br>" .
-                "Ce lien expire dans 24h."
-            );
+        $mail = new Mail();
+        $mail->send(
+            $entityInstance->getEmail(),
+            $entityInstance->getFirstName() . ' ' . $entityInstance->getLastName(),
+            'Création de votre compte MHvolt',
+            "Bonjour {$entityInstance->getFirstName()},<br><br>Un compte a été créé pour vous sur MHvolt.<br>Veuillez définir votre mot de passe en cliquant sur le lien suivant : <a href='{$url}'>Créer mon mot de passe</a>."
+        );
 
-        $this->mailer->send($email);
-
-        // Flash
-        $this->addFlash('success', 'Utilisateur créé avec succès. Email de création de mot de passe envoyé.');
-    }
-
-    public function updateEntity(EntityManagerInterface $entityManager, $entityInstance): void
-    {
-        parent::updateEntity($entityManager, $entityInstance);
-        $this->addFlash('success', 'Utilisateur modifié avec succès.');
+        $this->addFlash('success', 'Utilisateur créé. Un e-mail d’invitation a été envoyé.');
     }
 }

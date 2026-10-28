@@ -63,39 +63,59 @@
                             </a>
                         </div>
                         <h1 class="display-6 fw-bold text-dark mb-2">{{ accessory.name }}</h1>
-                        <p class="text-secondary small mb-0">{{ accessory.descriptionShort ?? 'Accessoire conçu pour optimiser l’usage et la durabilité de votre équipement.' }}</p>
+                        {% if accessory.description %}
+                            <div class="text-secondary small mb-0 lh-base">
+                                {{ accessory.description|raw }}
+                            </div>
+                        {% endif %}
                     </div>
 
-                    {# Calculs Prix & TVA (Prend en compte promoPrice direct OU promotion auto) #}
-                    {% set tvaRate = accessory.tva ? (accessory.tva.value / 100) : 0.2 %}
-                    {% set priceTTC = accessory.price * (1 + tvaRate) %}
+                    {# Prix public TTC direct #}
+                    {% set priceTTC = accessory.price %}
+                    {% set hasPromo = false %}
                     {% set promoPrice = priceTTC %}
 
-                    {% if accessory.promoPrice is defined and accessory.promoPrice is not null and accessory.promoPrice > 0 %}
-                        {% set promoPrice = accessory.promoPrice * (1 + tvaRate) %}
+                    {% if accessory.promoPrice is defined and accessory.promoPrice is not null and accessory.promoPrice > 0 and accessory.promoPrice < accessory.price %}
+                        {% set promoPrice = accessory.promoPrice %}
+                        {% set hasPromo = true %}
                     {% elseif promotion and promotion.autoApply %}
                         {% if promotion.targetType == 'all'
                             or (promotion.targetType == 'product' and promotion.product.id == accessory.id)
                             or (promotion.targetType == 'product_list' and accessory in promotion.products) %}
                             {% if promotion.discountAmount is not null %}
-                                {% set promoPrice = (accessory.price - promotion.discountAmount) * (1 + tvaRate) %}
+                                {% set promoPrice = accessory.price - promotion.discountAmount %}
+                                {% set hasPromo = true %}
                             {% elseif promotion.discountPercent is not null %}
-                                {% set promoPrice = accessory.price * (1 - promotion.discountPercent / 100) * (1 + tvaRate) %}
+                                {% set promoPrice = accessory.price * (1 - promotion.discountPercent / 100) %}
+                                {% set hasPromo = true %}
                             {% endif %}
                         {% endif %}
                     {% endif %}
 
-                    {# Bloc Prix #}
+                    {% set hasDirectPromo = accessory.promoPrice is not null and accessory.promoPrice > 0 and accessory.promoPrice < accessory.price %}
+                    {% set activePromoPrice = hasDirectPromo ? accessory.promoPrice : (promoPrice|default(null)) %}
+
+                    {# Bloc Prix avec espacements stricts #}
                     <div class="bg-body-tertiary border border-light-subtle rounded-4 p-4 mb-4">
-                        <div class="d-flex align-items-baseline gap-2 mb-2">
-                            {% if promoPrice < priceTTC %}
-                                <span class="fs-2 fw-bold text-danger">{{ promoPrice|number_format(2, ',', ' ') }} €</span>
-                                <span class="fs-5 text-muted text-decoration-line-through">{{ priceTTC|number_format(2, ',', ' ') }} €</span>
-                                <span class="badge bg-danger rounded-pill ms-2">Offre</span>
+                        <div class="d-flex align-items-center flex-wrap mb-2">
+                            {% if activePromoPrice and activePromoPrice < accessory.price %}
+                                <span class="fs-2 fw-bold text-dark" style="margin-right: 18px; display: inline-block;">
+                                    {{ activePromoPrice|number_format(2, ',', ' ') }}&nbsp;€
+                                </span>
+                                <del class="fs-5 text-danger fw-semibold" style="text-decoration: line-through !important; margin-right: 18px; display: inline-block;">
+                                    {{ accessory.price|number_format(2, ',', ' ') }}&nbsp;€
+                                </del>
+                                <span class="badge bg-danger rounded-pill px-2.5 py-1 small" style="margin-right: 12px; display: inline-block;">
+                                    Promo
+                                </span>
                             {% else %}
-                                <span class="fs-2 fw-bold text-dark">{{ priceTTC|number_format(2, ',', ' ') }} €</span>
+                                <span class="fs-2 fw-bold text-dark" style="margin-right: 12px; display: inline-block;">
+                                    {{ accessory.price|number_format(2, ',', ' ') }}&nbsp;€
+                                </span>
                             {% endif %}
-                            <span class="text-secondary small">TTC</span>
+                            <span class="text-secondary small fw-medium" style="display: inline-block;">
+                                TTC
+                            </span>
                         </div>
 
                         {# Stock & Actions #}
@@ -115,7 +135,7 @@
                             <div class="d-flex flex-column gap-2">
                                 {% if quantity_in_cart == 0 %}
                                     <a href="{{ path('add_to_cart', {'id': product_id, 'type': 'accessory'}) }}"
-                                       class="btn btn-dark rounded-pill py-3 fw-semibold text-center w-100">
+                                       class="btn btn-dark rounded-pill py-3 fw-semibold text-center w-100 shadow-sm">
                                         <i class="bx bx-shopping-bag me-1"></i> Ajouter au panier
                                     </a>
                                 {% else %}
