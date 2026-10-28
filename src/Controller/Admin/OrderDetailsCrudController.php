@@ -45,7 +45,7 @@ class OrderDetailsCrudController extends AbstractCrudController
 
             AssociationField::new('myOrder', 'Commande')
                 ->setCrudController(OrderCrudController::class)
-                ->formatValue(fn($value, $entity) => $entity->getMyOrder()?->getReference() ?? '-'),
+                ->formatValue(fn($value, $entity) =>$entity->getMyOrder()?->getReference() ?? '-'),
 
             TextField::new('product', 'Produit'),
 
@@ -61,10 +61,8 @@ class OrderDetailsCrudController extends AbstractCrudController
             MoneyField::new('priceAfterReduc', 'Prix HT remisé')
                 ->setCurrency('EUR')
                 ->setStoredAsCents(false)
-                ->formatValue(function ($value, $entity) {
-                    $basePrice = (float)($entity->getPrice() ?? 0);
-                    $reducPrice = (float)($entity->getPriceAfterReduc() ?? $basePrice);
-                    return abs($reducPrice - $basePrice) > 0.01
+                ->formatValue(function ($value, $entity) {$basePrice = (float)($entity->getPrice() ?? 0);$reducPrice = (float)($entity->getPriceAfterReduc() ?? $basePrice);
+                    return abs($reducPrice -$basePrice) > 0.01
                         ? number_format($reducPrice, 2, ',', ' ') . ' €'
                         : '-';
                 })
@@ -82,7 +80,7 @@ class OrderDetailsCrudController extends AbstractCrudController
                 ->setStoredAsCents(false),
 
             TextField::new('promoInfo', 'Promo')
-                ->formatValue(fn($value, $entity) => $entity->getMyOrder()?->getPromoCode()
+                ->formatValue(fn($value, $entity) =>$entity->getMyOrder()?->getPromoCode()
                     ?: ($entity->getMyOrder()?->getPromoTitre() ?? '-')
                 ),
         ];

@@ -1,63 +1,68 @@
 {# Détection d'une vraie réduction sur au moins un produit #}
 {% set hasReduc = false %}
 {% for d in field.value %}
-    {% if d.priceAfterReduc is not null and (0 + d.priceAfterReduc) != (0 + d.price) %}
+    {% if d.priceAfterReduc is not null and (0 + d.priceAfterReduc) < (0 + d.price) %}
         {% set hasReduc = true %}
     {% endif %}
 {% endfor %}
 
-<table class="table table-sm">
-    <thead>
-        <tr>
-            <th>Produit</th>
-            <th>Quantité</th>
-            <th>Poids</th>
-            <th>Prix/u HT</th>
-            <th>Total HT</th>
-
-            {% if hasReduc %}
-                <th>Prix/u HT après promo</th>
-                <th>Total HT après promo</th>
-            {% endif %}
-
-            <th>Prix TTC</th>
-
-            {% if hasReduc %}
-                <th>Prix TTC après promo</th>
-            {% endif %}
-        </tr>
-    </thead>
-
-    <tbody>
-        {% for detail in field.value %}
+<div class="table-responsive">
+    <table class="table table-sm table-bordered table-striped align-middle mb-0">
+        <thead class="table-light text-uppercase small text-secondary">
             <tr>
-                <td>{{ detail.product }}</td>
-                <td>{{ detail.quantity }}</td>
-                <td>{{ detail.weight }} kg</td>
-
-                <td>{{ detail.price|number_format(2, ',', ' ') }} €</td>
-                <td>{{ detail.total|number_format(2, ',', ' ') }} €</td>
-
-                {% if hasReduc %}
-                    {% if detail.priceAfterReduc is not null and (0 + detail.priceAfterReduc) != (0 + detail.price) %}
-                        <td>{{ detail.priceAfterReduc|number_format(2, ',', ' ') }} €</td>
-                        <td>{{ detail.totalAfterReduc|number_format(2, ',', ' ') }} €</td>
-                    {% else %}
-                        <td>-</td>
-                        <td>-</td>
-                    {% endif %}
-                {% endif %}
-
-                <td>{{ detail.priceTtc|number_format(2, ',', ' ') }} €</td>
+                <th>Produit</th>
+                <th class="text-center">Quantité</th>
+                <th>Poids</th>
+                <th class="text-end">Prix unit. HT</th>
+                <th class="text-end">Total HT</th>
 
                 {% if hasReduc %}
-                    {% if detail.priceTtcAfterReduc is not null and (0 + detail.priceTtcAfterReduc) != (0 + detail.priceTtc) %}
-                        <td>{{ detail.priceTtcAfterReduc|number_format(2, ',', ' ') }} €</td>
-                    {% else %}
-                        <td>-</td>
-                    {% endif %}
+                    <th class="text-end">Prix unit. HT remisé</th>
+                    <th class="text-end">Total HT remisé</th>
                 {% endif %}
+
+                <th class="text-center">TVA</th>
+                <th class="text-end">Prix unit. TTC</th>
+                <th class="text-end">Total TTC</th>
             </tr>
-        {% endfor %}
-    </tbody>
-</table>
+        </thead>
+
+        <tbody>
+            {% for detail in field.value %}
+                {% set lineHT = (detail.price * detail.quantity) %}
+                {% set lineRemiseHT = (detail.priceAfterReduc ?? detail.price) * detail.quantity %}
+                {% set isItemDiscounted = detail.priceAfterReduc is not null and (0 + detail.priceAfterReduc) < (0 + detail.price) %}
+                {% set lineTotalTTC = detail.totalTtc > 0 ? detail.totalTtc : (detail.priceTtc * detail.quantity) %}
+
+                <tr>
+                    <td><strong>{{ detail.product }}</strong></td>
+                    <td class="text-center font-monospace fw-bold">x{{ detail.quantity }}</td>
+                    <td>{{ (detail.weight * detail.quantity)|number_format(2, ',', ' ') }} kg</td>
+
+                    <td class="text-end">{{ detail.price|number_format(2, ',', ' ') }}&nbsp;€</td>
+                    <td class="text-end">{{ lineHT|number_format(2, ',', ' ') }}&nbsp;€</td>
+
+                    {% if hasReduc %}
+                        {% if isItemDiscounted %}
+                            <td class="text-end text-success fw-semibold">{{ detail.priceAfterReduc|number_format(2, ',', ' ') }}&nbsp;€</td>
+                            <td class="text-end text-success fw-semibold">{{ lineRemiseHT|number_format(2, ',', ' ') }}&nbsp;€</td>
+                        {% else %}
+                            <td class="text-center text-muted">-</td>
+                            <td class="text-center text-muted">-</td>
+                        {% endif %}
+                    {% endif %}
+
+                    <td class="text-center">{{ detail.tva|default(21) }} %</td>
+                    <td class="text-end">{{ detail.priceTtc|number_format(2, ',', ' ') }}&nbsp;€</td>
+                    <td class="text-end fw-bold text-dark">{{ lineTotalTTC|number_format(2, ',', ' ') }}&nbsp;€</td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="{{ hasReduc ? 10 : 8 }}" class="text-center text-muted py-3">
+                        Aucun article associé à cette commande.
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

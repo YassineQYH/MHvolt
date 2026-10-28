@@ -194,7 +194,7 @@ class OrderCrudController extends AbstractCrudController
         return $this->redirectToOrderDetail($order);
     }
 
-private function updateOrderState(Order $order, int $state, string $message): void
+    private function updateOrderState(Order $order, int $state, string $message): void
     {
         $order->setDeliveryState($state);
         $this->entityManager->flush();
@@ -218,7 +218,6 @@ private function updateOrderState(Order $order, int $state, string $message): vo
 
         // Remise en stock sécurisée
         foreach ($order->getOrderDetails() as $item) {
-            // Supporte getProductEntity() ou getProduct() si relation directe
             $product = method_exists($item, 'getProductEntity') ? $item->getProductEntity() : null;
             if ($product) {
                 $product->setStock($product->getStock() + $item->getQuantity());
@@ -298,7 +297,7 @@ private function updateOrderState(Order $order, int $state, string $message): vo
 
             FormField::addPanel('Paiement & Livraison')->collapsible(),
             NumberField::new('weightTotal', 'Poids total')
-                ->formatValue(fn($value) => number_format((float)$value, 2, ',', ' ') . ' kg'),
+                ->formatValue(fn($value, $entity) => number_format((float)($value ?? array_reduce($entity->getOrderDetails()->toArray(), fn($c, $d) => $c + ((float)$d->getWeight() * $d->getQuantity()), 0.0)), 2, ',', ' ') . ' kg'),
 
             MoneyField::new('carrierPrice', 'Frais de port')
                 ->setCurrency('EUR')
@@ -308,12 +307,25 @@ private function updateOrderState(Order $order, int $state, string $message): vo
             MoneyField::new('subtotalTtc', 'Total articles TTC')
                 ->setCurrency('EUR')
                 ->setStoredAsCents(false)
-                ->formatValue(fn($value) => number_format((float)$value, 2, ',', ' ') . ' €'),
+                ->formatValue(function ($value, $entity) {
+                    $val = $value;
+                    if ($val === null || (float)$val <= 0) {
+                        $val = array_reduce($entity->getOrderDetails()->toArray(), fn($c, $d) => $c + (float)$d->getTotalTtc(), 0.0);
+                    }
+                    return number_format((float)$val, 2, ',', ' ') . ' €';
+                }),
 
             MoneyField::new('totalTtc', 'Total commande TTC')
                 ->setCurrency('EUR')
                 ->setStoredAsCents(false)
-                ->formatValue(fn($value) => number_format((float)$value, 2, ',', ' ') . ' €'),
+                ->formatValue(function ($value, $entity) {
+                    $val = $value;
+                    if ($val === null || (float)$val <= 0) {
+                        $articlesTotal = array_reduce($entity->getOrderDetails()->toArray(), fn($c, $d) => $c + (float)$d->getTotalTtc(), 0.0);
+                        $val = $articlesTotal + (float)$entity->getCarrierPrice();
+                    }
+                    return number_format((float)$val, 2, ',', ' ') . ' €';
+                }),
 
             ChoiceField::new('paymentState', 'Paiement')
                 ->setChoices([
