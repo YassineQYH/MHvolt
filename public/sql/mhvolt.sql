@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : localhost:3306
--- Généré le : mer. 28 oct. 2026 à 17:25
+-- Généré le : jeu. 29 oct. 2026 à 16:31
 -- Version du serveur : 8.4.3
 -- Version de PHP : 8.4.26
 
@@ -353,7 +353,9 @@ CREATE TABLE `promotion` (
 --
 
 INSERT INTO `promotion` (`id`, `category_access_id`, `product_id`, `titre`, `code`, `target_type`, `discount_type`, `discount_amount`, `discount_percent`, `start_date`, `end_date`, `quantity`, `used`, `auto_apply`) VALUES
-(3, NULL, NULL, 'Offre de Bienvenue', 'WELCOME10', 'all', 'PERCENTAGE', NULL, 10, '2026-10-26 15:52:11', NULL, 200, 2, 0);
+(3, NULL, NULL, 'Offre de Bienvenue', 'WELCOME10', 'all', 'PERCENTAGE', NULL, 10, '2026-10-26 15:52:11', NULL, 200, 2, 0),
+(4, NULL, NULL, 'Halloween -15% accessoires', NULL, 'all_accessories', 'PERCENTAGE', NULL, 15, '2026-10-29 14:34:00', '2026-11-01 00:00:00', 100, 0, 1),
+(5, NULL, NULL, 'Halloween -10% Trottinette', NULL, 'all_trottinettes', 'PERCENTAGE', NULL, 10, '2026-10-29 14:35:00', '2026-11-01 00:00:00', 100, 0, 1);
 
 -- --------------------------------------------------------
 
@@ -860,7 +862,7 @@ ALTER TABLE `product_history`
 -- AUTO_INCREMENT pour la table `promotion`
 --
 ALTER TABLE `promotion`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT pour la table `reset_password`
