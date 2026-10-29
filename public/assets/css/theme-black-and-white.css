@@ -1,5 +1,5 @@
 /* ==========================================================================
-   MHVOLT — THÈME MINIMALISTE NOIR & BLANC
+   MHVOLT — THÈME MINIMALISTE NOIR & BLANC (BASE GLOBALE)
    ========================================================================== */
 
 :root {
@@ -16,7 +16,7 @@
 body {
     letter-spacing: -0.01em;
     -webkit-font-smoothing: antialiased;
-    padding-top: 76px; /* Compense la hauteur de la navbar fixed-top */
+    padding-top: 76px; /* Compense la hauteur de la navbar fixe */
 }
 
 /* Typographie */
@@ -45,6 +45,7 @@ h1, h2, h3, h4, h5, h6 {
     border-color: var(--mh-gray-border);
     color: var(--mh-black);
     font-weight: 500;
+    transition: all 0.2s ease;
 }
 
 .btn-outline-dark:hover {
@@ -53,91 +54,11 @@ h1, h2, h3, h4, h5, h6 {
     color: #ffffff;
 }
 
-/* Bannière Promo épurée */
-.promo-banner {
-    background-color: var(--mh-gray-light);
-    border: 1px solid var(--mh-gray-border);
-    border-radius: 9999px;
-    padding: 8px 20px;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: var(--mh-black);
-}
-
-/* Cartes Produits */
-.product-card {
-    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-    border-color: var(--mh-gray-border) !important;
-}
-
-.product-card:hover {
-    transform: translateY(-4px);
-    border-color: var(--mh-black) !important;
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05) !important;
-}
-
-.product-img-zoom {
-    transition: transform 0.3s ease;
-}
-
-.product-card:hover .product-img-zoom {
-    transform: scale(1.04);
-}
-
-/* Tableau Caractéristiques Produits */
-.table-carac {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.table-carac td {
-    padding: 12px 16px;
-    border-bottom: 1px solid var(--mh-gray-border);
-    font-size: 0.925rem;
-}
-
-.table-carac td.carac-name {
+/* Badge de statut logistique sombre contrasté */
+.badge-status-dark {
+    background-color: var(--mh-black) !important;
+    color: #ffffff !important;
+    padding: 6px 14px;
+    font-size: 0.8rem;
     font-weight: 600;
-    color: var(--mh-black);
-    width: 40%;
-}
-
-.table-carac td.carac-value {
-    color: var(--mh-gray-muted);
-}
-
-/* Pages Légales (CGV, Mentions) */
-.legal-page {
-    max-width: 800px;
-    margin: 40px auto;
-}
-
-.legal-page h1 {
-    font-size: 2.25rem;
-    margin-bottom: 2rem;
-}
-
-.legal-page h2 {
-    font-size: 1.25rem;
-    margin-top: 2rem;
-    margin-bottom: 0.75rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 1px solid var(--mh-gray-border);
-}
-
-.legal-page p, .legal-page li {
-    color: #3f3f46;
-    line-height: 1.7;
-    font-size: 0.95rem;
-}
-
-/* Modale Authentification épurée */
-.auth-card {
-    background: #ffffff;
-    border: 1px solid var(--mh-gray-border);
-    border-radius: 1.25rem;
-    box-shadow: 0 20px 40px -15px rgba(0,0,0,0.1);
 }

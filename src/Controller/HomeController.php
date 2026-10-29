@@ -27,6 +27,18 @@ class HomeController extends AbstractController
         private EntityManagerInterface $entityManager
     ) {}
 
+    /**
+     * Rendu autonome des bannières promo pour inclusion globale (base.html.twig)
+     */
+    public function renderPromoBanner(PromotionFinderService $promoFinder): Response
+    {
+        $promotions = $promoFinder->findHomepagePromos();
+
+        return $this->render('partials/promos.html.twig', [
+            'promotions' => $promotions,
+        ]);
+    }
+
     #[Route('/', name: 'app_home')]
     public function index(
         Request $request,
@@ -143,7 +155,6 @@ class HomeController extends AbstractController
             ->getRepository(Trottinette::class)
             ->findAll();
 
-        // ⚡ Nouveautés (limités pour l'accueil, ex: 4 par catégorie)
         $latestTrottinettes = $this->entityManager
             ->getRepository(Trottinette::class)
             ->findBy([], ['id' => 'DESC'], 4);
@@ -151,8 +162,6 @@ class HomeController extends AbstractController
         $latestAccessories = $this->entityManager
             ->getRepository(Accessory::class)
             ->findBy([], ['id' => 'DESC'], 4);
-
-        $homepagePromo = $promoFinder->findHomepagePromo();
 
         return $this->render('home/index.html.twig', [
             'video_header' => $video_header,
@@ -163,7 +172,6 @@ class HomeController extends AbstractController
             'formregister' => $formregister->createView(),
             'last_username' => $lastUsername,
             'error' => $error,
-            'homepagePromo' => $homepagePromo,
             'promoService' => $promotionService,
             'trottinettes_menu' => $trottinettesMenu,
         ]);

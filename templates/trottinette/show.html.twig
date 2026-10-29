@@ -2,8 +2,17 @@
 
 {% block title %}{{ trottinette.name }} — MHvolt{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('assets/css/products.css') }}">
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('assets/js/product-zoom.js') }}" defer></script>
+{% endblock %}
+
 {% block content %}
-    {% include 'partials/promos.html.twig' %}
 
     <div class="container py-5">
         {# Fil d'Ariane #}
@@ -19,15 +28,14 @@
             {# 📷 Colonne Gauche : Galerie Photos avec Zoom Interactif #}
             <div class="col-lg-7">
                 <div class="position-sticky" style="top: 100px;">
-                    <div id="trottZoomContainer" class="bg-body-tertiary border border-light-subtle rounded-4 p-4 text-center mb-3 d-flex align-items-center justify-content-center overflow-hidden position-relative" style="min-height: 420px; max-height: 480px; cursor: zoom-in;">
+                    <div id="trottZoomContainer" class="product-zoom-container">
                         {% set firstImg = illustrations|first %}
                         {% set rawImg = firstImg ? firstImg.image : (trottinette.image ?? 'default.jpg') %}
                         {% set imgPath = rawImg starts with 'http' ? rawImg : '/uploads/trottinettes/' ~ rawImg %}
                         <img id="mainProductImage"
                              src="{{ imgPath }}"
                              alt="{{ trottinette.name }}"
-                             class="img-fluid object-fit-contain w-100 h-100"
-                             style="max-height: 400px; transition: transform 0.2s ease, transform-origin 0.1s ease, opacity 0.2s ease;">
+                             class="img-fluid object-fit-contain w-100 h-100 product-zoom-image">
                     </div>
 
                     {% if illustrations|length > 1 %}
@@ -37,7 +45,7 @@
                                 {% set itemImgPath = rawItemImg starts with 'http' ? rawItemImg : '/uploads/trottinettes/' ~ rawItemImg %}
                                 <button type="button"
                                         class="btn p-1 border rounded-3 bg-white product-thumb-btn {% if loop.first %}border-dark{% else %}border-light-subtle{% endif %}"
-                                        onclick="changeMainImage('{{ itemImgPath }}', this)"
+                                        data-img-src="{{ itemImgPath }}"
                                         style="width: 72px; height: 72px; flex-shrink: 0;">
                                     <img src="{{ itemImgPath }}" alt="Miniature" class="w-100 h-100 object-fit-contain">
                                 </button>
@@ -71,7 +79,6 @@
 
                         <h1 class="display-6 fw-bold text-dark mb-2">{{ trottinette.name }}</h1>
 
-                        {# Courte description nettoyée #}
                         {% if trottinette.descriptionShort %}
                             <div class="text-secondary small mb-0 lh-base">
                                 {{ trottinette.descriptionShort|raw }}
@@ -81,56 +88,43 @@
 
                     {# Prix public TTC direct #}
                     {% set priceTTC = trottinette.price %}
-                    {% set hasPromo = false %}
                     {% set promoPrice = priceTTC %}
 
                     {% if trottinette.promoPrice is defined and trottinette.promoPrice is not null and trottinette.promoPrice > 0 and trottinette.promoPrice < trottinette.price %}
                         {% set promoPrice = trottinette.promoPrice %}
-                        {% set hasPromo = true %}
                     {% elseif promotion and promotion.autoApply %}
                         {% if promotion.targetType == 'all'
                             or (promotion.targetType == 'product' and promotion.product.id == trottinette.id)
                             or (promotion.targetType == 'product_list' and trottinette in promotion.products) %}
                             {% if promotion.discountAmount is not null %}
                                 {% set promoPrice = trottinette.price - promotion.discountAmount %}
-                                {% set hasPromo = true %}
                             {% elseif promotion.discountPercent is not null %}
                                 {% set promoPrice = trottinette.price * (1 - promotion.discountPercent / 100) %}
-                                {% set hasPromo = true %}
                             {% endif %}
                         {% endif %}
                     {% endif %}
 
-                    {# Bloc Prix avec espacements stricts et styles inline garantis #}
                     {% set hasDirectPromo = trottinette.promoPrice is not null and trottinette.promoPrice > 0 and trottinette.promoPrice < trottinette.price %}
                     {% set activePromoPrice = hasDirectPromo ? trottinette.promoPrice : (promoPrice|default(null)) %}
 
                     <div class="bg-body-tertiary border border-light-subtle rounded-4 p-4 mb-4">
                         <div class="d-flex align-items-center flex-wrap mb-2">
                             {% if activePromoPrice and activePromoPrice < trottinette.price %}
-                                {# 1. Prix remisé final #}
-                                <span class="fs-2 fw-bold text-dark" style="margin-right: 18px; display: inline-block;">
+                                <span class="price-promo-main">
                                     {{ activePromoPrice|number_format(2, ',', ' ') }}&nbsp;€
                                 </span>
-
-                                {# 2. Prix de base barré en rouge #}
-                                <del class="fs-5 text-danger fw-semibold" style="text-decoration: line-through !important; margin-right: 18px; display: inline-block;">
+                                <del class="price-del-base">
                                     {{ trottinette.price|number_format(2, ',', ' ') }}&nbsp;€
                                 </del>
-
-                                {# 3. Badge Promo #}
-                                <span class="badge bg-danger rounded-pill px-2.5 py-1 small" style="margin-right: 12px; display: inline-block;">
+                                <span class="badge-promo-pill">
                                     Promo
                                 </span>
                             {% else %}
-                                {# Prix standard #}
-                                <span class="fs-2 fw-bold text-dark" style="margin-right: 12px; display: inline-block;">
+                                <span class="price-single-main">
                                     {{ trottinette.price|number_format(2, ',', ' ') }}&nbsp;€
                                 </span>
                             {% endif %}
-
-                            {# 4. Mention TTC #}
-                            <span class="text-secondary small fw-medium" style="display: inline-block;">
+                            <span class="text-secondary small fw-medium">
                                 TTC
                             </span>
                         </div>
@@ -145,7 +139,6 @@
                                 <i class="bx bx-check-circle me-1 fs-5"></i> Disponible ({{ trottinette.stock }} unités en stock)
                             </div>
 
-                            {# Actions Panier #}
                             {% set product_id = trottinette.id %}
                             {% set cart_data = cart.get() ?? {} %}
                             {% set quantity_in_cart = cart_data['trottinette'][product_id]|default(0) %}
@@ -199,24 +192,24 @@
             </div>
         </div>
 
-        {# 📑 Détails & Caractéristiques (Espacements fidèles à la version d'origine) #}
+        {# 📑 Détails & Caractéristiques #}
         <div class="mt-5 pt-5 border-top border-light-subtle">
 
             {# 1. Description complète #}
             <div class="row justify-content-center mb-5">
                 <div class="col-lg-10">
-                    <h3 class="text-center fw-bold text-dark mb-5" style="font-size: 1.45rem; letter-spacing: -0.02em;">
+                    <h3 class="text-center fw-bold text-dark mb-5 product-detail-heading">
                         Description complète
                     </h3>
 
                     {% if sections is not empty %}
-                        <div class="d-flex flex-column" style="gap: 2.2rem;">
+                        <div class="d-flex flex-column product-sections-stack">
                             {% for section in sections|sort((a,b) => a.sectionOrder <=> b.sectionOrder) %}
                                 <div>
-                                    <h4 class="fw-bold text-dark mb-2" style="font-size: 1.05rem; letter-spacing: -0.01em;">
+                                    <h4 class="fw-bold text-dark mb-2 product-section-heading">
                                         {{ section.title }}
                                     </h4>
-                                    <div class="text-dark small lh-base" style="color: #27272a;">
+                                    <div class="product-detail-body small lh-base">
                                         {{ section.content|raw }}
                                     </div>
                                 </div>
@@ -228,10 +221,10 @@
                 </div>
             </div>
 
-            {# 2. Caractéristiques techniques en tableaux épurés #}
+            {# 2. Caractéristiques techniques #}
             <div class="row justify-content-center pt-4">
                 <div class="col-lg-10">
-                    <h3 class="text-center fw-bold text-dark mb-5" style="font-size: 1.45rem; letter-spacing: -0.02em;">
+                    <h3 class="text-center fw-bold text-dark mb-5 product-detail-heading">
                         Caractéristiques techniques
                     </h3>
 
@@ -247,20 +240,16 @@
                         <div>
                             {% for cat, items in categories %}
                                 <div class="mb-5">
-                                    <h5 class="fw-bold text-dark mb-3" style="font-size: 1.05rem; letter-spacing: -0.01em;">
+                                    <h5 class="fw-bold text-dark mb-3 product-section-heading">
                                         {{ cat }}
                                     </h5>
                                     <div class="table-responsive">
-                                        <table class="table mb-0 bg-white" style="border: 1px solid #d4d4d8; border-collapse: collapse; width: 100%;">
+                                        <table class="table-specifications">
                                             <tbody>
                                                 {% for item in items %}
-                                                    <tr style="border-bottom: 1px solid #e4e4e7;">
-                                                        <th class="align-middle" style="width: 50%; padding: 13px 20px; font-weight: 600; font-size: 0.925rem; color: #18181b; border-right: 1px solid #e4e4e7; border-bottom: 1px solid #e4e4e7;">
-                                                            {{ item.name }}
-                                                        </th>
-                                                        <td class="align-middle" style="width: 50%; padding: 13px 20px; font-size: 0.925rem; color: #27272a; border-bottom: 1px solid #e4e4e7;">
-                                                            {{ item.value }}
-                                                        </td>
+                                                    <tr>
+                                                        <th>{{ item.name }}</th>
+                                                        <td>{{ item.value }}</td>
                                                     </tr>
                                                 {% endfor %}
                                             </tbody>
@@ -276,57 +265,5 @@
             </div>
 
         </div>
-
-    {# Galerie photo avec Zoom Interactif #}
-    <script>
-        const trottZoomContainer = document.getElementById('trottZoomContainer');
-        const trottMainImg = document.getElementById('mainProductImage');
-        let trottIsZoomed = false;
-
-        trottZoomContainer.addEventListener('click', function(e) {
-            const rect = this.getBoundingClientRect();
-            const x = ((e.clientX - rect.left) / rect.width) * 100;
-            const y = ((e.clientY - rect.top) / rect.height) * 100;
-
-            trottIsZoomed = !trottIsZoomed;
-
-            if (trottIsZoomed) {
-                trottMainImg.style.transformOrigin = `${x}% ${y}%`;
-                trottMainImg.style.transform = 'scale(2.3)';
-                this.style.cursor = 'zoom-out';
-            } else {
-                trottMainImg.style.transformOrigin = 'center center';
-                trottMainImg.style.transform = 'scale(1)';
-                this.style.cursor = 'zoom-in';
-            }
-        });
-
-        trottZoomContainer.addEventListener('mousemove', function(e) {
-            if (trottIsZoomed) {
-                const rect = this.getBoundingClientRect();
-                const x = ((e.clientX - rect.left) / rect.width) * 100;
-                const y = ((e.clientY - rect.top) / rect.height) * 100;
-                trottMainImg.style.transformOrigin = `${x}% ${y}%`;
-            }
-        });
-
-        function changeMainImage(src, btn) {
-            trottIsZoomed = false;
-            trottMainImg.style.transform = 'scale(1)';
-            trottZoomContainer.style.cursor = 'zoom-in';
-
-            trottMainImg.style.opacity = '0.3';
-            setTimeout(() => {
-                trottMainImg.src = src;
-                trottMainImg.style.opacity = '1';
-            }, 150);
-
-            document.querySelectorAll('.product-thumb-btn').forEach(el => {
-                el.classList.remove('border-dark');
-                el.classList.add('border-light-subtle');
-            });
-            btn.classList.remove('border-light-subtle');
-            btn.classList.add('border-dark');
-        }
-    </script>
+    </div>
 {% endblock %}

@@ -38,6 +38,8 @@ class PromotionCrudController extends AbstractCrudController
             ChoiceField::new('targetType', 'Type de cible')
                 ->setChoices([
                     'Tout le site' => Promotion::TARGET_ALL,
+                    'Toutes les trottinettes' => Promotion::TARGET_ALL_TROTTINETTES,
+                    'Tous les accessoires' => Promotion::TARGET_ALL_ACCESSORIES,
                     'Catégorie accessoire' => Promotion::TARGET_CATEGORY_ACCESS,
                     'Produit' => Promotion::TARGET_PRODUCT,
                     'Liste de produits' => Promotion::TARGET_PRODUCT_LIST,

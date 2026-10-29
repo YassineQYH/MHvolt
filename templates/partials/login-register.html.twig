@@ -1,98 +1,11 @@
-<style>
-    /* Fenêtre modale translucide & contrastée */
-    .auth-modal-content {
-        background: rgba(30, 36, 44, 0.88) !important;
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        border: 1px solid rgba(255, 255, 255, 0.22) !important;
-        border-radius: 1.5rem !important;
-        color: #ffffff !important;
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
-        position: relative;
-    }
-
-    /* Labels en blanc bien net */
-    .auth-modal-content label,
-    .auth-modal-content .form-label {
-        color: #ffffff !important;
-        font-weight: 500;
-        letter-spacing: 0.01em;
-    }
-
-    /* Champs de saisie */
-    .auth-modal-content .form-control {
-        background-color: rgba(255, 255, 255, 0.14) !important;
-        border: 1px solid rgba(255, 255, 255, 0.3) !important;
-        color: #ffffff !important;
-        border-radius: 0.6rem;
-        font-size: 0.95rem;
-        transition: all 0.2s ease;
-    }
-    .auth-modal-content .form-control:focus {
-        background-color: rgba(255, 255, 255, 0.22) !important;
-        border-color: #ffffff !important;
-        box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.15) !important;
-        color: #ffffff !important;
-    }
-    .auth-modal-content .form-control::placeholder {
-        color: rgba(255, 255, 255, 0.5) !important;
-    }
-
-    /* Bouton d'action principal */
-    .auth-btn-submit {
-        background-color: rgba(255, 255, 255, 0.15) !important;
-        border: 1px solid rgba(255, 255, 255, 0.35) !important;
-        color: #ffffff !important;
-        font-weight: 600;
-        transition: all 0.2s ease;
-    }
-    .auth-btn-submit:hover {
-        background-color: #ffffff !important;
-        color: #09090b !important;
-        border-color: #ffffff !important;
-    }
-
-    /* Liens d'aide et de bascule */
-    .auth-toggle-link {
-        color: #ffffff !important;
-        text-decoration: none;
-        font-size: 0.9rem;
-        font-weight: 500;
-        opacity: 0.9;
-        transition: opacity 0.2s ease;
-    }
-    .auth-toggle-link:hover {
-        opacity: 1;
-        text-decoration: underline !important;
-        color: #ffffff !important;
-    }
-
-    /* Bouton croix calé en haut à droite */
-    .auth-modal-close {
-        position: absolute;
-        top: 18px;
-        right: 22px;
-        color: #ffffff;
-        background: transparent;
-        border: none;
-        font-size: 1.5rem;
-        line-height: 1;
-        cursor: pointer;
-        opacity: 0.8;
-        padding: 4px 8px;
-        z-index: 10;
-        transition: opacity 0.2s ease, transform 0.15s ease;
-    }
-    .auth-modal-close:hover {
-        opacity: 1;
-        color: #ffffff;
-        transform: scale(1.1);
-    }
-</style>
-
 {# Modale Authentification #}
-<div class="modal fade" id="authModal" tabindex="-1" aria-labelledby="authModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
+<div class="modal fade"
+     id="authModal"
+     tabindex="-1"
+     aria-labelledby="authModalLabel"
+     aria-hidden="true"
+     data-has-register-error="{{ app.flashes('register_error') is not empty ? 'true' : 'false' }}">
+    <div class="modal-dialog modal-dialog-centered auth-modal-dialog">
         <div class="modal-content auth-modal-content p-4">
 
             {# Bouton de fermeture positionné en haut à droite #}
@@ -111,7 +24,7 @@
                 {% if app.user %}
                     {# État connecté #}
                     <div class="text-center py-4">
-                        <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3" style="width: 58px; height: 58px; background: rgba(255,255,255,0.15);">
+                        <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3 auth-user-avatar">
                             <i class="fas fa-user-check fs-4 text-white"></i>
                         </div>
                         <p class="text-white small mb-4">Connecté avec <br><strong class="fs-6">{{ app.user.userIdentifier }}</strong></p>
@@ -142,7 +55,7 @@
                             <div class="mb-3">
                                 <div class="d-flex justify-content-between align-items-center mb-1">
                                     <label for="inputPassword" class="form-label small mb-0">Mot De Passe</label>
-                                    <button type="button" class="btn btn-link text-white text-decoration-none p-0 small opacity-75" onclick="togglePasswordVisibility('inputPassword', this)" style="font-size: 0.75rem;">
+                                    <button type="button" class="btn btn-link text-white text-decoration-none p-0 small opacity-75 auth-toggle-pwd-btn" onclick="togglePasswordVisibility('inputPassword', this)">
                                         Afficher
                                     </button>
                                 </div>
@@ -155,14 +68,14 @@
                             <div class="d-flex justify-content-between align-items-center mb-4">
                                 <div class="form-check">
                                     <input class="form-check-input bg-transparent border-light" type="checkbox" name="_remember_me" id="rememberMe">
-                                    <label class="form-check-label small text-white" for="rememberMe" style="font-size: 0.85rem;">
+                                    <label class="form-check-label small text-white auth-checkbox-label" for="rememberMe">
                                         Se souvenir de moi
                                     </label>
                                 </div>
-                                <a href="{{ path('reset_password') }}" class="small text-white opacity-75 text-decoration-none" style="font-size: 0.85rem;">Oublié ?</a>
+                                <a href="{{ path('reset_password') }}" class="small text-white opacity-75 text-decoration-none auth-forgot-link">Oublié ?</a>
                             </div>
 
-                            <button type="submit" class="btn auth-btn-submit rounded-3 py-2 w-100 mb-4">
+                            <button type="submit" class="btn auth-btn-submit rounded-3 py-2 w-100 mb-4 shadow-sm">
                                 Se connecter
                             </button>
 
@@ -183,12 +96,12 @@
                                     <div class="col-6">
                                         <label class="form-label small mb-1">Prénom</label>
                                         {{ form_widget(formregister.firstname, {'attr': {'class': 'form-control py-2 px-3 small', 'placeholder': 'Jean'}}) }}
-                                        <div class="text-danger small" style="font-size: 0.75rem;">{{ form_errors(formregister.firstname) }}</div>
+                                        <div class="text-danger small auth-error-msg">{{ form_errors(formregister.firstname) }}</div>
                                     </div>
                                     <div class="col-6">
                                         <label class="form-label small mb-1">Nom</label>
                                         {{ form_widget(formregister.lastname, {'attr': {'class': 'form-control py-2 px-3 small', 'placeholder': 'Dupont'}}) }}
-                                        <div class="text-danger small" style="font-size: 0.75rem;">{{ form_errors(formregister.lastname) }}</div>
+                                        <div class="text-danger small auth-error-msg">{{ form_errors(formregister.lastname) }}</div>
                                     </div>
                                 </div>
 
@@ -199,30 +112,30 @@
                                         'placeholder': '+33612345678',
                                         'pattern': '^\\+((33[67]\\d{8})|(32[4-7]\\d{8}))$'
                                     }}) }}
-                                    <div class="text-danger small" style="font-size: 0.75rem;">{{ form_errors(formregister.tel) }}</div>
+                                    <div class="text-danger small auth-error-msg">{{ form_errors(formregister.tel) }}</div>
                                 </div>
 
                                 <div class="mb-2">
                                     <label class="form-label small mb-1">E-mail</label>
                                     {{ form_widget(formregister.email, {'attr': {'class': 'form-control py-2 px-3 small', 'placeholder': 'nom@exemple.com'}}) }}
-                                    <div class="text-danger small" style="font-size: 0.75rem;">{{ form_errors(formregister.email) }}</div>
+                                    <div class="text-danger small auth-error-msg">{{ form_errors(formregister.email) }}</div>
                                 </div>
 
                                 <div class="mb-2">
                                     <label class="form-label small mb-1">Mot de passe</label>
                                     {{ form_widget(formregister.password.first, {'attr': {'class': 'form-control py-2 px-3 small', 'placeholder': '10 car. min, 1 maj, 1 chiffre'}}) }}
-                                    <div class="text-danger small" style="font-size: 0.75rem;">{{ form_errors(formregister.password.first) }}</div>
+                                    <div class="text-danger small auth-error-msg">{{ form_errors(formregister.password.first) }}</div>
                                 </div>
 
                                 <div class="mb-3">
                                     <label class="form-label small mb-1">Confirmation</label>
                                     {{ form_widget(formregister.password.second, {'attr': {'class': 'form-control py-2 px-3 small', 'placeholder': 'Répétez le mot de passe'}}) }}
-                                    <div class="text-danger small" style="font-size: 0.75rem;">{{ form_errors(formregister.password.second) }}</div>
+                                    <div class="text-danger small auth-error-msg">{{ form_errors(formregister.password.second) }}</div>
                                 </div>
 
-                                {{ form_widget(formregister.honeypot, {'attr': {'style': 'display:none !important;'}}) }}
+                                {{ form_widget(formregister.honeypot, {'attr': {'class': 'd-none'}}) }}
 
-                                <button type="submit" class="btn auth-btn-submit rounded-3 py-2 w-100 mb-4">
+                                <button type="submit" class="btn auth-btn-submit rounded-3 py-2 w-100 mb-4 shadow-sm">
                                     Créer mon compte
                                 </button>
 
@@ -245,34 +158,3 @@
         </div>
     </div>
 </div>
-
-<script>
-    function showRegisterView() {
-        document.getElementById('loginSection').classList.add('d-none');
-        document.getElementById('registerSection').classList.remove('d-none');
-        document.getElementById('authModalTitle').textContent = "Inscription";
-    }
-
-    function showLoginView() {
-        document.getElementById('registerSection').classList.add('d-none');
-        document.getElementById('loginSection').classList.remove('d-none');
-        document.getElementById('authModalTitle').textContent = "Se connecter";
-    }
-
-    function togglePasswordVisibility(inputId, btn) {
-        const input = document.getElementById(inputId);
-        if (input.type === 'password') {
-            input.type = 'text';
-            btn.textContent = 'Masquer';
-        } else {
-            input.type = 'password';
-            btn.textContent = 'Afficher';
-        }
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-        {% if app.flashes('register_error') is not empty %}
-            showRegisterView();
-        {% endif %}
-    });
-</script>

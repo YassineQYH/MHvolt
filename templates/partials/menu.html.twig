@@ -1,42 +1,4 @@
-<style>
-    /* Boutons d'action navbar */
-    .nav-action-btn {
-        background-color: transparent;
-        color: #111827;
-        transition: background-color 0.2s ease, transform 0.15s ease;
-    }
-    .nav-action-btn:hover,
-    .nav-action-btn:focus,
-    .nav-action-btn[aria-expanded="true"] {
-        background-color: #f4f4f5 !important;
-        color: #000000 !important;
-    }
-    .nav-action-btn:active {
-        transform: scale(0.95);
-    }
-
-    /* Lignes du dropdown trottinettes */
-    .trott-menu-row {
-        transition: background-color 0.15s ease;
-        border-radius: 10px;
-    }
-    .trott-menu-row:hover {
-        background-color: #f4f4f5;
-    }
-    .trott-badge-access {
-        transition: all 0.2s ease;
-        background-color: #ffffff;
-        color: #52525b;
-        border: 1px solid #e4e4e7;
-    }
-    .trott-badge-access:hover {
-        background-color: #000000;
-        color: #ffffff !important;
-        border-color: #000000;
-    }
-</style>
-
-<nav class="navbar navbar-expand-lg navbar-light bg-white py-3 border-bottom border-light-subtle fixed-top shadow-sm" style="z-index: 1050; top: 0;">
+<nav class="navbar navbar-expand-lg navbar-light bg-white py-3 border-bottom border-light-subtle fixed-top shadow-sm navbar-custom">
     <div class="container">
         {# Logo #}
         <a class="navbar-brand fw-bold text-dark tracking-tight d-flex align-items-center" href="{{ path('app_home') }}">
@@ -51,8 +13,7 @@
                 data-bs-target="#mainNavbar"
                 aria-controls="mainNavbar"
                 aria-expanded="false"
-                aria-label="Afficher le menu"
-                style="width: 42px; height: 42px;">
+                aria-label="Afficher le menu">
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="3" y1="12" x2="21" y2="12"></line>
                 <line x1="3" y1="6" x2="21" y2="6"></line>
@@ -72,16 +33,16 @@
                     <a class="nav-link dropdown-toggle text-dark fw-medium px-2" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         Nos trottinettes
                     </a>
-                    <div class="dropdown-menu border border-light-subtle shadow-lg rounded-4 p-3 mt-2" style="width: 380px;">
+                    <div class="dropdown-menu border border-light-subtle shadow-lg rounded-4 p-3 mt-2 trott-dropdown-menu">
                         <div class="d-flex justify-content-between align-items-center pb-2 mb-2 border-bottom border-light-subtle px-2">
-                            <span class="text-uppercase tracking-wider small fw-bold text-muted" style="font-size: 0.7rem;">Gamme de modèles</span>
-                            <span class="badge bg-light text-secondary border fw-normal" style="font-size: 0.7rem;">
+                            <span class="text-uppercase tracking-wider small fw-bold text-muted trott-dropdown-header-subtitle">Gamme de modèles</span>
+                            <span class="badge bg-light text-secondary border fw-normal trott-dropdown-header-subtitle">
                                 {{ trottinettes_menu|default([])|length }} modèles
                             </span>
                         </div>
 
-                        {# Liste avec défilement discret si longue #}
-                        <div class="d-flex flex-column gap-1 overflow-y-auto pe-1" style="max-height: 320px;">
+                        {# Liste avec défilement #}
+                        <div class="d-flex flex-column gap-1 pe-1 trott-dropdown-list">
                             {% for trottinette in trottinettes_menu|default([]) %}
                                 <div class="trott-menu-row p-2 d-flex justify-content-between align-items-center gap-2">
                                     <a class="text-decoration-none text-dark fw-semibold small d-flex align-items-center gap-2 flex-grow-1 text-truncate"
@@ -105,7 +66,7 @@
                             {% endfor %}
                         </div>
 
-                        {# Pied de menu avec redirection globale #}
+                        {# Pied de menu #}
                         <div class="pt-2 mt-2 border-top border-light-subtle">
                             <a href="{{ path('nos_trottinettes') }}" class="btn btn-outline-dark rounded-pill w-100 btn-sm py-2 fw-medium text-center d-flex align-items-center justify-content-center gap-2">
                                 <span>Voir tout le catalogue</span>
@@ -138,8 +99,7 @@
                             type="button"
                             id="cartDropdown"
                             data-bs-toggle="dropdown"
-                            aria-expanded="false"
-                            style="width: 42px; height: 42px;">
+                            aria-expanded="false">
                         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
                             <path d="M3 6h18"></path>
@@ -147,15 +107,14 @@
                         </svg>
 
                         {% if totalQuantity > 0 %}
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill"
-                                  style="background-color: #000000 !important; color: #ffffff !important; font-size: 0.65rem; min-width: 18px; height: 18px; display: inline-flex; align-items: center; justify-content: center; padding: 0 4px; border: 1.5px solid #ffffff;">
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill cart-badge-count">
                                 {{ totalQuantity }}
                             </span>
                         {% endif %}
                     </button>
 
                     {# Mini-panier déroulant #}
-                    <div class="dropdown-menu dropdown-menu-end shadow-lg border border-light-subtle p-3 rounded-4 mt-2" aria-labelledby="cartDropdown" style="width: 340px;">
+                    <div class="dropdown-menu dropdown-menu-end shadow-lg border border-light-subtle p-3 rounded-4 mt-2 cart-dropdown-menu" aria-labelledby="cartDropdown">
                         {{ include('partials/cart.html.twig', { cart: cart }) }}
                     </div>
                 </div>

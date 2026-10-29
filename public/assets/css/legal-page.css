@@ -1,0 +1,27 @@
+/* ==========================================================================
+   MHVOLT — PAGES LÉGALES & INFORMATIVES (CGV, LIVRAISON, RGPD)
+   ========================================================================== */
+
+.legal-container {
+    max-width: 820px;
+}
+
+.legal-section-title {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--mh-black, #09090b);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+}
+
+.legal-text-block {
+    color: var(--bs-secondary, #6b7280);
+    font-size: 0.875rem;
+    line-height: 1.7;
+}
+
+.legal-divider-list {
+    border-left: 1px solid var(--mh-gray-border, #e4e4e7);
+    padding-left: 1rem;
+}

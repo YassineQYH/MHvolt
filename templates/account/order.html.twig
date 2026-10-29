@@ -2,6 +2,11 @@
 
 {% block title %}Mes Commandes — MHvolt{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('assets/css/account.css') }}">
+{% endblock %}
+
 {% block content %}
 <div class="container py-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -37,7 +42,6 @@
                     </thead>
                     <tbody>
                         {% for order in orders %}
-                            {# Somme exacte des lignes TTC réelles stockées en base #}
                             {% set totalLignesTTC = 0 %}
                             {% for item in order.orderDetails %}
                                 {% set lineTotal = item.totalTtc > 0 ? item.totalTtc : (item.priceTtc * item.quantity) %}
@@ -53,18 +57,18 @@
                                 </td>
                                 <td class="py-3">
                                     {% if order.paymentState == 0 %}
-                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle fw-normal">Non payée</span>
+                                        <span class="badge badge-order-unpaid rounded-pill">Non payée</span>
                                     {% elseif order.paymentState == 1 %}
                                         {% if order.deliveryState == 0 %}
-                                            <span class="badge bg-light text-secondary border fw-normal">En attente</span>
+                                            <span class="badge badge-order-waiting rounded-pill">En attente</span>
                                         {% elseif order.deliveryState == 1 %}
-                                            <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle fw-normal">Préparation</span>
+                                            <span class="badge badge-order-prep rounded-pill">Préparation</span>
                                         {% elseif order.deliveryState == 2 %}
-                                            <span class="badge bg-info-subtle text-info-emphasis border border-info-subtle fw-normal">En livraison</span>
+                                            <span class="badge badge-order-shipping rounded-pill">En livraison</span>
                                         {% elseif order.deliveryState == 3 %}
-                                            <span class="badge bg-success-subtle text-success border border-success-subtle fw-normal">Livrée</span>
+                                            <span class="badge badge-order-delivered rounded-pill">Livrée</span>
                                         {% elseif order.deliveryState == 4 %}
-                                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle fw-normal">Annulée</span>
+                                            <span class="badge badge-order-canceled rounded-pill">Annulée</span>
                                         {% endif %}
                                     {% endif %}
                                 </td>
@@ -72,7 +76,7 @@
                                 <td class="py-3 text-secondary small">{{ order.carrierPrice|number_format(2, ',', ' ') }}&nbsp;€</td>
                                 <td class="py-3 text-secondary small">
                                     {% if promo > 0 %}
-                                        <span class="text-success">-{{ promo|number_format(2, ',', ' ') }}&nbsp;€</span>
+                                        <span class="text-success fw-medium">-{{ promo|number_format(2, ',', ' ') }}&nbsp;€</span>
                                     {% else %}
                                         —
                                     {% endif %}

@@ -3,117 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <title>Facture {{ order.reference }}</title>
-    <style>
-        @page {
-            margin: 15mm;
-            size: A4 portrait;
-        }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "DejaVu Sans", Arial, sans-serif;
-            font-size: 11px;
-            color: #111827;
-            line-height: 1.5;
-            margin: 0;
-            padding: 0;
-        }
-        .header {
-            width: 100%;
-            border-bottom: 2px solid #e5e7eb;
-            padding-bottom: 20px;
-            margin-bottom: 25px;
-        }
-        .header-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        .brand {
-            font-size: 22px;
-            font-weight: bold;
-            color: #000000;
-            letter-spacing: -0.5px;
-        }
-        .doc-title {
-            text-align: right;
-        }
-        .doc-title h1 {
-            font-size: 18px;
-            margin: 0 0 4px 0;
-            color: #111827;
-        }
-        .addresses {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 30px;
-        }
-        .addresses td {
-            width: 50%;
-            vertical-align: top;
-        }
-        .section-label {
-            font-size: 9px;
-            text-transform: uppercase;
-            font-weight: bold;
-            color: #6b7280;
-            margin-bottom: 6px;
-        }
-        .items-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 25px;
-        }
-        .items-table th {
-            background-color: #f9fafb;
-            border-bottom: 1px solid #e5e7eb;
-            text-align: left;
-            padding: 8px 10px;
-            font-size: 9px;
-            text-transform: uppercase;
-            color: #4b5563;
-        }
-        .items-table td {
-            padding: 10px;
-            border-bottom: 1px solid #f3f4f6;
-        }
-        .totals-table {
-            width: 48%;
-            margin-left: auto;
-            border-collapse: collapse;
-            margin-bottom: 40px;
-        }
-        .totals-table td {
-            padding: 5px 8px;
-        }
-        .totals-table .total-line {
-            border-top: 1px solid #111827;
-            font-weight: bold;
-            font-size: 13px;
-        }
-        .text-right { text-align: right; }
-        .text-center { text-align: center; }
-        .footer {
-            border-top: 1px solid #e5e7eb;
-            padding-top: 15px;
-            text-align: center;
-            font-size: 9px;
-            color: #9ca3af;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ app.project_dir ~ '/public/assets/css/invoice.css' }}">
 </head>
-<body>
+<body class="invoice-pdf">
 
     {# En-tête #}
-    <div class="header">
-        <table class="header-table">
+    <div class="invoice-header">
+        <table class="invoice-header-table">
             <tr>
                 <td>
-                    <div class="brand">MHVOLT</div>
+                    <div class="invoice-brand">MHVOLT</div>
                     <div style="color: #4b5563;">
                         51 Boulevard Vincent Auriol<br>
                         4031 Angleur, BE<br>
                         contact@mhvolt.com
                     </div>
                 </td>
-                <td class="doc-title">
+                <td class="invoice-doc-title">
                     <h1>FACTURE</h1>
                     <div><strong>Réf :</strong> {{ order.reference }}</div>
                     <div><strong>Date :</strong> {{ order.createdAt|date('d/m/Y') }}</div>
@@ -124,15 +30,15 @@
     </div>
 
     {# Coordonnées client #}
-    <table class="addresses">
+    <table class="invoice-addresses">
         <tr>
             <td>
-                <div class="section-label">Émetteur</div>
+                <div class="invoice-section-label">Émetteur</div>
                 <strong>MHvolt Mobilité Électrique</strong><br>
                 Service Ventes & Expéditions
             </td>
             <td>
-                <div class="section-label">Facturé à</div>
+                <div class="invoice-section-label">Facturé à</div>
                 <strong>{{ order.user.firstName }} {{ order.user.lastName }}</strong><br>
                 {{ order.delivery|raw }}
             </td>
@@ -140,7 +46,7 @@
     </table>
 
     {# Tableau des lignes de commande #}
-    <table class="items-table">
+    <table class="invoice-items-table">
         <thead>
             <tr>
                 <th>Désignation</th>
@@ -180,15 +86,15 @@
     {% set totalTVA = totalProduitsTTC - totalHT %}
     {% set totalCommande = totalProduitsTTC + order.carrierPrice %}
 
-    <table class="totals-table">
+    <table class="invoice-totals-table">
         {% if promo > 0 %}
         <tr>
             <td>Sous-total articles :</td>
             <td class="text-right">{{ totalBrutTTC|number_format(2, ',', ' ') }} €</td>
         </tr>
         <tr>
-            <td style="color:#047857;">Réduction ({{ order.promoTitre ?? order.promoCode }}) :</td>
-            <td class="text-right" style="color:#047857;">-{{ promo|number_format(2, ',', ' ') }} €</td>
+            <td class="invoice-discount-text">Réduction ({{ order.promoTitre ?? order.promoCode }}) :</td>
+            <td class="text-right invoice-discount-text">-{{ promo|number_format(2, ',', ' ') }} €</td>
         </tr>
         {% endif %}
         <tr>
@@ -214,7 +120,7 @@
     </table>
 
     {# Pied de page légal #}
-    <div class="footer">
+    <div class="invoice-footer">
         MHvolt — Numéro d'entreprise & TVA intracommunautaire : BE 0000.000.000 &bull; Facture acquittée électroniquement.
     </div>
 

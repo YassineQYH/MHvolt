@@ -1,10 +1,10 @@
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", () => {
     const targetField = document.querySelector("[name='Promotion[targetType]']");
     if (!targetField) return;
 
     const getFieldRow = (fieldName) => {
-        const input = document.querySelector(`[name='Promotion[${fieldName}]']`);
-        return input ? input.closest('.form-group, .field') : null;
+        const input = document.querySelector(`[name^='Promotion[${fieldName}]']`);
+        return input ? input.closest('.form-group, .field, .form-row') : null;
     };
 
     const fields = {
@@ -15,65 +15,57 @@ document.addEventListener("DOMContentLoaded", function() {
 
     const allRows = Object.values(fields).filter(Boolean);
 
-    // Initial setup: hide all
+    // Prépare les styles de transition
     allRows.forEach(row => {
-        row.style.transition = "max-height 0.3s ease, opacity 0.3s ease";
+        row.style.transition = "max-height 0.25s ease, opacity 0.2s ease";
         row.style.overflow = "hidden";
-        row.style.opacity = "0";
-        row.style.maxHeight = "0";
-        row.style.display = "none";
     });
 
     let animationTimeouts = [];
 
-    const showRows = (rowsToShow) => {
-        // Clear previous animations
-        animationTimeouts.forEach(t => clearTimeout(t));
-        animationTimeouts = [];
-
-        let delay = 0;
-        rowsToShow.forEach(row => {
-            if (!row) return;
-            const t = setTimeout(() => {
-                row.style.display = "block";
-                row.style.maxHeight = row.scrollHeight + "px";
-                row.style.opacity = "1";
-            }, delay);
-            animationTimeouts.push(t);
-            delay += 100; // cascade delay
-        });
+    const showRow = (row) => {
+        if (!row) return;
+        row.style.display = "";
+        // Force reflow pour garantir la prise en compte du scrollHeight
+        const height = row.scrollHeight;
+        row.style.maxHeight = height + "px";
+        row.style.opacity = "1";
     };
 
-    const hideRows = (rowsToHide) => {
-        let delay = 0;
-        rowsToHide.forEach(row => {
-            if (!row) return;
-            const t = setTimeout(() => {
-                row.style.maxHeight = "0";
-                row.style.opacity = "0";
-                setTimeout(() => { row.style.display = "none"; }, 300); // hide after animation
-            }, delay);
-            animationTimeouts.push(t);
-            delay += 50; // smaller cascade for hiding
-        });
+    const hideRow = (row) => {
+        if (!row) return;
+        row.style.maxHeight = "0";
+        row.style.opacity = "0";
+        setTimeout(() => {
+            if (row.style.opacity === "0") {
+                row.style.display = "none";
+            }
+        }, 250);
     };
 
     const updateFields = () => {
+        animationTimeouts.forEach(t => clearTimeout(t));
+        animationTimeouts = [];
+
         const type = targetField.value;
 
-        // Determine which fields to show
         const toShow = [];
         if (type === "category_access") toShow.push(fields.category_access);
         if (type === "product") toShow.push(fields.product);
         if (type === "product_list") toShow.push(fields.product_list);
 
-        // Fields not to show
-        const toHide = allRows.filter(r => !toShow.includes(r));
-
-        hideRows(toHide);
-        showRows(toShow);
+        allRows.forEach(row => {
+            if (toShow.includes(row)) {
+                showRow(row);
+            } else {
+                hideRow(row);
+            }
+        });
     };
 
     targetField.addEventListener("change", updateFields);
-    updateFields(); // initial
+    targetField.addEventListener("input", updateFields);
+
+    // Initialisation immédiate sans clignotement
+    updateFields();
 });

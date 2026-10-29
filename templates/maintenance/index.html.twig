@@ -1,13 +1,35 @@
-{# templates/maintenance/index.html.twig #}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maintenance en cours — MHvolt</title>
 
-{% include 'maintenance/_assets.html.twig' %}
-{% include 'maintenance/_style.html.twig' %}
+    {# CSS de base & maintenance #}
+    <link rel="stylesheet" href="{{ asset('assets/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/theme-black-and-white.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/login-register.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/maintenance.css') }}">
+</head>
+<body class="maintenance-body">
 
-<div class="maintenance-wrapper">
-    <div style="font-size: 6rem; margin-bottom: 20px;">🚧</div>
-    <h1>Le site est en maintenance</h1>
-    <p>Seul un administrateur peut se connecter pour gérer le site.</p>
-    <a class="button" id="open-login-popup">Connexion admin</a>
+    <div class="maintenance-wrapper">
+        <div class="maintenance-icon">🚧</div>
+        <h1 class="maintenance-title">Le site est en maintenance</h1>
+        <p class="maintenance-desc">
+            Nous effectuons actuellement une mise à jour technique. L'accès boutique sera rétabli sous peu. Seuls les administrateurs peuvent se connecter.
+        </p>
 
-    {{ include('partials/login-register.html.twig') }}
-</div>
+        <a href="#" class="btn btn-dark rounded-pill px-4 py-2.5 fw-semibold shadow-sm" id="open-login-popup">
+            Accès Administration
+        </a>
+
+        {# Formulaire d'authentification inclus #}
+        {{ include('partials/login-register.html.twig') }}
+    </div>
+
+    {# Scripts #}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ asset('assets/js/maintenance.js') }}" defer></script>
+</body>
+</html>

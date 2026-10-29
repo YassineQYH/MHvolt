@@ -2,6 +2,11 @@
 
 {% block title %}Mon Panier — MHvolt{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('assets/css/cart.css') }}">
+{% endblock %}
+
 {% block javascripts %}
     {{ parent() }}
     <script src="{{ asset('assets/js/code-promo.js') }}"></script>
@@ -55,11 +60,11 @@
                             <tr>
                                 <td class="ps-4 py-3">
                                     <div class="d-flex align-items-center gap-3">
-                                        <div class="bg-body-tertiary border rounded-3 p-1 d-flex align-items-center justify-content-center" style="width: 56px; height: 56px; flex-shrink: 0;">
+                                        <div class="cart-product-thumb">
                                             <a href="{{ path(showRoute, { slug: item.product.slug }) }}">
                                                 <img src="/uploads/{{ item.product.uploadDirectory }}/{{ illustration ? illustration.image : 'default.jpg' }}"
                                                      alt="{{ item.product.name }}"
-                                                     class="img-fluid object-fit-contain" style="max-height: 48px;">
+                                                     class="img-fluid">
                                             </a>
                                         </div>
                                         <div>
@@ -112,15 +117,15 @@
                 <div class="card border border-light-subtle rounded-4 p-3 shadow-sm bg-white">
                     <form id="promoForm" action="{{ path('cart_apply_promo') }}" method="POST">
                         <label for="promoCode" class="form-label small fw-semibold text-dark mb-2">Code promotionnel</label>
-                        <div class="input-group">
+                        <div class="input-group promo-input-group">
                             <input type="text"
                                    name="promo_code"
                                    id="promoCode"
-                                   class="form-control rounded-start-pill py-2 px-3 small"
+                                   class="form-control small"
                                    placeholder="Ex : PROMO10"
                                    value="{{ promoCode ?? '' }}">
                             <input type="hidden" id="promoCodeValid" value="{{ promoCode ? 1 : 0 }}">
-                            <button class="btn btn-dark rounded-end-pill px-3" type="submit">Appliquer</button>
+                            <button class="btn btn-dark" type="submit">Appliquer</button>
                         </div>
                         <small id="promoMessage" class="text-danger d-block mt-1 small"></small>
                     </form>
@@ -148,7 +153,7 @@
                         <div class="row g-3">
                             {% for child in form_order.addresses %}
                                 <div class="col-md-6">
-                                    <div class="p-3 border rounded-3 h-100 bg-light-subtle position-relative">
+                                    <div class="delivery-address-card">
                                         <div class="form-check">
                                             {{ form_widget(child, {'attr': {'class': 'form-check-input', 'id': child.vars.id}}) }}
                                             <label class="form-check-label fw-semibold text-dark small stretched-link cursor-pointer" for="{{ child.vars.id }}">

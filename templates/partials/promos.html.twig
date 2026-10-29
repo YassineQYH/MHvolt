@@ -1,10 +1,15 @@
-{% if homepagePromo %}
-<section class="top-space">
-    <div class="promo-banner" data-aos="fade-down" data-aos-duration="1200">
-        <div class="promo-title">
-            🔥 {{ homepagePromo.titre }}
-        </div>
-        {# On supprime la partie promo-details, donc plus de -15% ou montant #}
+{% set activePromos = promotions|default([]) %}
+
+{% if activePromos is not empty %}
+<section class="top-space text-center">
+    <div class="d-flex flex-wrap justify-content-center align-items-center gap-2">
+        {% for promo in activePromos %}
+            <div class="promo-banner" data-aos="fade-down" data-aos-duration="1000">
+                <span class="promo-title">
+                    🔥 {{ promo.titre }}
+                </span>
+            </div>
+        {% endfor %}
     </div>
 </section>
 {% endif %}

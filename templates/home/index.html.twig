@@ -2,6 +2,12 @@
 
 {% block title %}MHvolt — Mobilité Électrique & Performance Urbaine{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('assets/css/products.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/section.css') }}">
+{% endblock %}
+
 {% block content %}
     {# 1. BANDEAU PROMOTIONNEL #}
     {% if homepagePromo is defined and homepagePromo %}
@@ -17,15 +23,15 @@
     {# 2. HERO SECTION : VIDÉO MODERNE #}
     {% if video_header is defined and video_header|length > 0 %}
         {% set heroVideo = video_header|first %}
-        <section class="position-relative overflow-hidden bg-black text-white d-flex align-items-center" style="min-height: 72vh;">
-            <video autoplay muted loop playsinline class="position-absolute top-50 start-50 translate-middle w-100 h-100 object-fit-cover" style="opacity: 0.45; filter: contrast(1.05) grayscale(20%); pointer-events: none; z-index: 1;">
+        <section class="position-relative overflow-hidden text-white d-flex align-items-center hero-video-section">
+            <video autoplay muted loop playsinline class="position-absolute top-50 start-50 translate-middle w-100 h-100 object-fit-cover hero-video-bg">
                 {% set videoFile = heroVideo.videoName|default(heroVideo.video|default(heroVideo.url|default(heroVideo.name|default('videoplayback2-696118d22a825.mp4')))) %}
                 <source src="/uploads/home_videos/{{ videoFile }}" type="video/mp4">
             </video>
 
-            <div class="position-absolute top-0 start-0 w-100 h-100" style="background: linear-gradient(180deg, rgba(9,9,11,0.5) 0%, rgba(9,9,11,0.85) 100%); z-index: 2;"></div>
+            <div class="position-absolute top-0 start-0 w-100 h-100 hero-overlay"></div>
 
-            <div class="container position-relative py-5" style="z-index: 3;">
+            <div class="container position-relative py-5 hero-content">
                 <div class="row">
                     <div class="col-lg-8" data-aos="fade-up" data-aos-duration="800">
                         <span class="badge bg-white text-dark rounded-pill px-3 py-2 small fw-semibold text-uppercase tracking-wider mb-3 shadow-sm">
@@ -34,7 +40,7 @@
                         <h1 class="display-3 fw-bold tracking-tight text-white mb-3">
                             L'ingénierie urbaine sans compromis.
                         </h1>
-                        <p class="fs-5 text-white-50 mb-4 leading-relaxed" style="max-width: 580px;">
+                        <p class="fs-5 text-white-50 mb-4 leading-relaxed hero-desc">
                             Design minimaliste, puissance instantanée et sécurité certifiée pour redéfinir chacun de vos trajets quotidiens.
                         </p>
                         <div class="d-flex flex-wrap gap-3">
@@ -57,7 +63,7 @@
             <div class="row g-4 text-center">
                 <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
                     <div class="p-4 rounded-4 border border-light-subtle h-100 bg-body-tertiary">
-                        <div class="d-inline-flex align-items-center justify-content-center bg-black text-white rounded-circle mb-3" style="width: 48px; height: 48px;">
+                        <div class="engagement-icon-circle">
                             <i class="fas fa-bolt fs-5"></i>
                         </div>
                         <h2 class="fs-5 fw-bold text-dark mb-2">Performance & Autonomie</h2>
@@ -67,7 +73,7 @@
 
                 <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
                     <div class="p-4 rounded-4 border border-light-subtle h-100 bg-body-tertiary">
-                        <div class="d-inline-flex align-items-center justify-content-center bg-black text-white rounded-circle mb-3" style="width: 48px; height: 48px;">
+                        <div class="engagement-icon-circle">
                             <i class="fas fa-shield-alt fs-5"></i>
                         </div>
                         <h2 class="fs-5 fw-bold text-dark mb-2">Normes & Sécurité Strictes</h2>
@@ -77,7 +83,7 @@
 
                 <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
                     <div class="p-4 rounded-4 border border-light-subtle h-100 bg-body-tertiary">
-                        <div class="d-inline-flex align-items-center justify-content-center bg-black text-white rounded-circle mb-3" style="width: 48px; height: 48px;">
+                        <div class="engagement-icon-circle">
                             <i class="fas fa-tools fs-5"></i>
                         </div>
                         <h2 class="fs-5 fw-bold text-dark mb-2">Garanties & Support Réactif</h2>
@@ -121,7 +127,7 @@
                                 <div class="card h-100 border border-light-subtle rounded-4 p-3 bg-white product-card shadow-sm">
                                     <div class="d-flex justify-content-between align-items-center mb-2">
                                         <div class="d-flex align-items-center gap-1">
-                                            <span class="badge rounded-pill px-2.5 py-1 fw-semibold border" style="background-color: #000000; color: #ffffff !important; font-size: 0.7rem;">Nouveau</span>
+                                            <span class="badge rounded-pill badge-new-product">Nouveau</span>
                                             {% if promoTTC %}
                                                 <span class="badge bg-danger rounded-pill px-2 py-1 fw-semibold" style="font-size: 0.65rem;">Promo</span>
                                             {% endif %}
@@ -138,7 +144,6 @@
                                     </a>
 
                                     <div class="card-body p-0 pt-2 d-flex flex-column justify-content-end">
-                                        {# Nom court prioritaire et taille harmonisée #}
                                         <h3 class="fs-6 fw-bold text-dark mb-1 text-truncate" title="{{ trott.name }}">
                                             <a href="{{ path('trottinette_show', {'slug': trott.slug}) }}" class="text-dark text-decoration-none">
                                                 {{ trott.nameShort|default(trott.name) }}
@@ -148,10 +153,10 @@
                                         <div class="d-flex justify-content-between align-items-baseline mb-3">
                                             <div class="d-flex align-items-baseline gap-2">
                                                 {% if promoTTC %}
-                                                    <span class="fs-5 fw-bold text-danger">{{ promoTTC|number_format(2, ',', ' ') }} €</span>
-                                                    <span class="text-muted text-decoration-line-through small">{{ priceTTC|number_format(2, ',', ' ') }} €</span>
+                                                    <span class="fs-5 fw-bold text-danger">{{ promoTTC|number_format(2, ',', ' ') }}&nbsp;€</span>
+                                                    <span class="text-muted text-decoration-line-through small">{{ priceTTC|number_format(2, ',', ' ') }}&nbsp;€</span>
                                                 {% else %}
-                                                    <span class="fs-5 fw-bold text-dark">{{ priceTTC|number_format(2, ',', ' ') }} €</span>
+                                                    <span class="fs-5 fw-bold text-dark">{{ priceTTC|number_format(2, ',', ' ') }}&nbsp;€</span>
                                                 {% endif %}
                                             </div>
                                             <span class="text-secondary small fw-medium">TTC</span>
@@ -175,7 +180,7 @@
                                 <div class="card h-100 border border-light-subtle rounded-4 p-3 bg-white product-card shadow-sm">
                                     <div class="d-flex justify-content-between align-items-center mb-2">
                                         <div class="d-flex align-items-center gap-1">
-                                            <span class="badge rounded-pill px-2.5 py-1 fw-semibold border" style="background-color: #000000; color: #ffffff !important; font-size: 0.7rem;">Nouveau</span>
+                                            <span class="badge rounded-pill badge-new-product">Nouveau</span>
                                             {% if promoTTCAcc %}
                                                 <span class="badge bg-danger rounded-pill px-2 py-1 fw-semibold" style="font-size: 0.65rem;">Promo</span>
                                             {% endif %}
@@ -201,10 +206,10 @@
                                         <div class="d-flex justify-content-between align-items-baseline mb-3">
                                             <div class="d-flex align-items-baseline gap-2">
                                                 {% if promoTTCAcc %}
-                                                    <span class="fs-5 fw-bold text-danger">{{ promoTTCAcc|number_format(2, ',', ' ') }} €</span>
-                                                    <span class="text-muted text-decoration-line-through small">{{ priceTTCAcc|number_format(2, ',', ' ') }} €</span>
+                                                    <span class="fs-5 fw-bold text-danger">{{ promoTTCAcc|number_format(2, ',', ' ') }}&nbsp;€</span>
+                                                    <span class="text-muted text-decoration-line-through small">{{ priceTTCAcc|number_format(2, ',', ' ') }}&nbsp;€</span>
                                                 {% else %}
-                                                    <span class="fs-5 fw-bold text-dark">{{ priceTTCAcc|number_format(2, ',', ' ') }} €</span>
+                                                    <span class="fs-5 fw-bold text-dark">{{ priceTTCAcc|number_format(2, ',', ' ') }}&nbsp;€</span>
                                                 {% endif %}
                                             </div>
                                             <span class="text-secondary small fw-medium">TTC</span>
@@ -232,7 +237,7 @@
                                 <div class="card h-100 border border-light-subtle rounded-4 p-3 bg-white product-card shadow-sm">
                                     <div class="d-flex justify-content-between align-items-center mb-2">
                                         <div class="d-flex align-items-center gap-1">
-                                            <span class="badge rounded-pill px-2.5 py-1 fw-semibold border" style="background-color: #000000; color: #ffffff !important; font-size: 0.7rem;">Nouveau</span>
+                                            <span class="badge rounded-pill badge-new-product">Nouveau</span>
                                             {% if promoTTC %}
                                                 <span class="badge bg-danger rounded-pill px-2 py-1 fw-semibold" style="font-size: 0.65rem;">Promo</span>
                                             {% endif %}
@@ -258,10 +263,10 @@
                                         <div class="d-flex justify-content-between align-items-baseline mb-3">
                                             <div class="d-flex align-items-baseline gap-2">
                                                 {% if promoTTC %}
-                                                    <span class="fs-5 fw-bold text-danger">{{ promoTTC|number_format(2, ',', ' ') }} €</span>
-                                                    <span class="text-muted text-decoration-line-through small">{{ priceTTC|number_format(2, ',', ' ') }} €</span>
+                                                    <span class="fs-5 fw-bold text-danger">{{ promoTTC|number_format(2, ',', ' ') }}&nbsp;€</span>
+                                                    <span class="text-muted text-decoration-line-through small">{{ priceTTC|number_format(2, ',', ' ') }}&nbsp;€</span>
                                                 {% else %}
-                                                    <span class="fs-5 fw-bold text-dark">{{ priceTTC|number_format(2, ',', ' ') }} €</span>
+                                                    <span class="fs-5 fw-bold text-dark">{{ priceTTC|number_format(2, ',', ' ') }}&nbsp;€</span>
                                                 {% endif %}
                                             </div>
                                             <span class="text-secondary small fw-medium">TTC</span>
@@ -294,7 +299,7 @@
                                 <div class="card h-100 border border-light-subtle rounded-4 p-3 bg-white product-card shadow-sm">
                                     <div class="d-flex justify-content-between align-items-center mb-2">
                                         <div class="d-flex align-items-center gap-1">
-                                            <span class="badge rounded-pill px-2.5 py-1 fw-semibold border" style="background-color: #000000; color: #ffffff !important; font-size: 0.7rem;">Nouveau</span>
+                                            <span class="badge rounded-pill badge-new-product">Nouveau</span>
                                             {% if promoTTCAcc %}
                                                 <span class="badge bg-danger rounded-pill px-2 py-1 fw-semibold" style="font-size: 0.65rem;">Promo</span>
                                             {% endif %}
@@ -320,10 +325,10 @@
                                         <div class="d-flex justify-content-between align-items-baseline mb-3">
                                             <div class="d-flex align-items-baseline gap-2">
                                                 {% if promoTTCAcc %}
-                                                    <span class="fs-5 fw-bold text-danger">{{ promoTTCAcc|number_format(2, ',', ' ') }} €</span>
-                                                    <span class="text-muted text-decoration-line-through small">{{ priceTTCAcc|number_format(2, ',', ' ') }} €</span>
+                                                    <span class="fs-5 fw-bold text-danger">{{ promoTTCAcc|number_format(2, ',', ' ') }}&nbsp;€</span>
+                                                    <span class="text-muted text-decoration-line-through small">{{ priceTTCAcc|number_format(2, ',', ' ') }}&nbsp;€</span>
                                                 {% else %}
-                                                    <span class="fs-5 fw-bold text-dark">{{ priceTTCAcc|number_format(2, ',', ' ') }} €</span>
+                                                    <span class="fs-5 fw-bold text-dark">{{ priceTTCAcc|number_format(2, ',', ' ') }}&nbsp;€</span>
                                                 {% endif %}
                                             </div>
                                             <span class="text-secondary small fw-medium">TTC</span>

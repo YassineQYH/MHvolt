@@ -2,6 +2,11 @@
 
 {% block title %}Nos Trottinettes Électriques — MHvolt{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('assets/css/products.css') }}">
+{% endblock %}
+
 {% block content %}
     <section class="py-5 bg-white">
         <div class="container py-3">
@@ -37,7 +42,7 @@
                                 {% endif %}
                             </div>
 
-                            <a href="{{ path('trottinette_show', { 'slug': item.slug }) }}" class="d-flex align-items-center justify-content-center my-3 text-decoration-none" style="height: 200px;">
+                            <a href="{{ path('trottinette_show', { 'slug': item.slug }) }}" class="d-flex align-items-center justify-content-center my-3 text-decoration-none trott-card-img-wrap">
                                 <img src="{{ imgPath }}"
                                      alt="{{ item.name }}"
                                      class="img-fluid object-fit-contain h-100 w-100 product-img-zoom">

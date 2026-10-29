@@ -2,8 +2,13 @@
 
 {% block title %}Mes Informations — MHvolt{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('assets/css/account.css') }}">
+{% endblock %}
+
 {% block content %}
-<div class="container py-5" style="max-width: 580px;">
+<div class="container py-5 account-form-container-sm">
     <div class="mb-4">
         <a href="{{ path('account') }}" class="text-secondary text-decoration-none small mb-2 d-inline-block">
             <i class="bx bx-arrow-back me-1"></i>Retour à mon compte
@@ -25,7 +30,7 @@
 
                 <div>
                     {{ form_row(form.email, {'attr': {'class': 'form-control rounded-3 py-2 px-3 small bg-light', 'readonly': true}}) }}
-                    <small class="text-secondary d-block mt-1" style="font-size: 0.75rem;">
+                    <small class="text-secondary d-block mt-1 helper-text-xs">
                         Pour changer votre adresse email, veuillez <a href="{{ path('app_home') }}#contact" class="text-dark fw-semibold">contacter l'assistance</a>.
                     </small>
                 </div>

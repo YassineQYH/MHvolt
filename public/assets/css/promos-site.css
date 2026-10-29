@@ -1,28 +1,47 @@
+/* ==========================================================================
+   PROMOTIONS & BANNIÈRES
+   ========================================================================== */
+
+.promo-banner {
+    background-color: var(--mh-gray-light);
+    border: 1px solid var(--mh-gray-border);
+    border-radius: 9999px;
+    padding: 8px 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--mh-black);
+}
+
+.promo-badge-red {
+    background-color: #dc2626;
+    color: #ffffff;
+    border-radius: 9999px;
+    padding: 2px 8px;
+    font-size: 0.65rem;
+    font-weight: 600;
+}
+
 .top-space {
-    margin-top: 5px;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
 }
 
 .promo-banner {
-    background: #ffefc1;
-    border-left: 6px solid #ff9800;
-    padding: 15px 20px;
-    margin: 0 auto 25px auto;
-    width: 90%;
-    max-width: 900px;
-    text-align: center;
-    border-radius: 10px;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    background-color: var(--mh-gray-light, #f4f4f5);
+    border: 1px solid var(--mh-gray-border, #e4e4e7);
+    border-radius: 9999px;
+    padding: 10px 24px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--mh-black, #09090b);
 }
 
-.promo-banner .promo-title {
-    font-size: 1.6rem;
-    font-weight: bold;
-    color: #c77f00;
-    margin-bottom: 5px;
-}
-
-.promo-banner .promo-details {
-    font-size: 1.4rem;
-    font-weight: bold;
-    color: #b36000;
+.promo-title {
+    color: var(--mh-black, #09090b);
 }

@@ -2,8 +2,13 @@
 
 {% block title %}Définir un nouveau mot de passe — MHvolt{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('assets/css/login-register.css') }}">
+{% endblock %}
+
 {% block content %}
-<div class="container py-5" style="max-width: 520px;">
+<div class="container py-5 auth-container-sm">
     <div class="text-center mb-4">
         <span class="text-uppercase tracking-wider small fw-semibold text-muted">Nouveau mot de passe</span>
         <h1 class="display-6 fw-bold text-dark mt-1">Réinitialisation</h1>
@@ -32,13 +37,12 @@
                             'attr': {'class': 'form-control rounded-3 py-2 px-3 small', 'placeholder': 'Confirmez le nouveau mot de passe'}
                         }) }}
                     </div>
-                    <button class="btn btn-dark rounded-pill py-2 w-100 fw-semibold mt-2" type="submit">
+                    <button class="btn btn-dark rounded-pill py-2.5 w-100 fw-semibold mt-2 shadow-sm" type="submit">
                         Mettre à jour mon mot de passe
                     </button>
                 </div>
             {{ form_end(form) }}
         {% else %}
-            {# Formulaire POST standard si vous n'utilisez pas de FormType dédié #}
             <form method="post">
                 <div class="mb-3">
                     <label for="password" class="form-label small fw-semibold text-dark">Nouveau mot de passe</label>
@@ -60,7 +64,7 @@
                            required>
                 </div>
 
-                <button class="btn btn-dark rounded-pill py-2 w-100 fw-semibold mb-3" type="submit">
+                <button class="btn btn-dark rounded-pill py-2.5 w-100 fw-semibold mb-3 shadow-sm" type="submit">
                     Mettre à jour mon mot de passe
                 </button>
             </form>

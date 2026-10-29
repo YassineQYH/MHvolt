@@ -7,7 +7,7 @@
         <title>{% block title %}MHvolt — Mobilité Électrique{% endblock %}</title>
 
         {% block stylesheets %}
-            {# Polices & Icônes unifiées #}
+            {# Polices & Librairies d'icônes #}
             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
             <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" />
 
@@ -15,16 +15,21 @@
             <link rel="stylesheet" href="{{ asset('assets/css/bootstrap.min.css') }}">
             <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css" />
 
-            {# Styles du site unifiés #}
+            {# Styles modulaires MHvolt #}
             <link rel="stylesheet" href="{{ asset('assets/css/theme-black-and-white.css') }}">
+            <link rel="stylesheet" href="{{ asset('assets/css/nav.css') }}">
+            <link rel="stylesheet" href="{{ asset('assets/css/footer.css') }}">
+            <link rel="stylesheet" href="{{ asset('assets/css/promos-site.css') }}">
             <link rel="stylesheet" href="{{ asset('assets/css/msg-d-alerte.css') }}">
+            <link rel="stylesheet" href="{{ asset('assets/css/contact-form.css') }}">
+            <link rel="stylesheet" href="{{ asset('assets/css/login-register.css') }}">
         {% endblock %}
     </head>
 
     <body class="d-flex flex-column min-vh-100 bg-white text-dark">
-        {# 1. Bannière de maintenance réservée aux administrateurs #}
+        {# 1. Bannière mode maintenance réservée à l'administrateur #}
         {% if app.user and is_granted('ROLE_ADMIN') and site_config is defined and site_config.isMaintenanceEnabled() %}
-            <div class="bg-danger text-white text-center py-2 px-3 small fw-bold fixed-top" style="z-index: 1070;">
+            <div class="bg-danger text-white text-center py-2 px-3 small fw-bold fixed-top admin-maintenance-banner">
                 <i class="fas fa-tools me-2"></i>MODE MAINTENANCE ACTIF — Accès restreint aux visiteurs
             </div>
         {% endif %}
@@ -33,7 +38,7 @@
         <div class="flash-container">
             {% for label, messages in app.flashes %}
                 {% for message in messages %}
-                    <div class="flash {{ label }}" onclick="this.style.opacity='0'; setTimeout(() => this.remove(), 250);" role="alert" style="cursor: pointer;">
+                    <div class="flash {{ label }}" onclick="this.style.opacity='0'; setTimeout(() => this.remove(), 250);" role="alert">
                         <span>{{ message }}</span>
                     </div>
                 {% endfor %}
@@ -45,12 +50,15 @@
             {% block menu %}
                 {{ include('partials/menu.html.twig') }}
             {% endblock %}
-
-            {% block carrousel %}{% endblock %}
         </header>
 
-        {# 4. Contenu principal #}
+        {# 4. Contenu principal des pages #}
         <main class="flex-grow-1">
+            {# Bandeau Promo Global rendu via sous-requête #}
+            {% block promo %}
+                {{ render(controller('App\\Controller\\HomeController::renderPromoBanner')) }}
+            {% endblock %}
+
             {% block content %}{% endblock %}
         </main>
 
@@ -66,57 +74,36 @@
             {{ include('partials/login-register.html.twig') }}
         {% endblock %}
 
-        {# 7. Modales de contact#}
+        {# 7. Modale de contact #}
         {% block contact %}
             {{ include('partials/contact-modal.html.twig') }}
         {% endblock %}
 
-
-        {# 8. Scripts JavaScript #}
+        {# 8. Scripts JavaScript globaux #}
         {% block javascripts %}
             {# jQuery #}
             <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-            {# Bootstrap 5.3 Bundle (contient Popper.js) #}
+            {# Bootstrap 5.3 Bundle (avec Popper.js inclus) #}
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-            {# Animations AOS #}
+            {# Librairie d'animations AOS #}
             <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
             <script>
                 document.addEventListener('DOMContentLoaded', function() {
-                    AOS.init({
-                        once: true,
-                        duration: 600,
-                        offset: 50
-                    });
-
-                    // Ouverture automatique de la modale si ?login=1
-                    const urlParams = new URLSearchParams(window.location.search);
-                    if (urlParams.has('login')) {
-                        const authModalEl = document.getElementById('authModal');
-                        if (authModalEl) {
-                            const authModal = new bootstrap.Modal(authModalEl);
-                            authModal.show();
-                        }
+                    if (typeof AOS !== 'undefined') {
+                        AOS.init({
+                            once: true,
+                            duration: 600,
+                            offset: 50
+                        });
                     }
-
-                    // Bascule automatique sur l'onglet inscription en cas d'erreur
-                    {% if app.flashes('register_error') is not empty %}
-                        const authModalEl = document.getElementById('authModal');
-                        if (authModalEl) {
-                            const authModal = new bootstrap.Modal(authModalEl);
-                            authModal.show();
-                            const registerTab = document.getElementById('register-tab');
-                            if (registerTab) {
-                                bootstrap.Tab.getOrCreateInstance(registerTab).show();
-                            }
-                        }
-                    {% endif %}
                 });
             </script>
 
-            {# Script Panier #}
-            <script src="{{ asset('assets/js/cart.js') }}"></script>
+            {# Scripts modulaires dédiés #}
+            <script src="{{ asset('assets/js/cart.js') }}" defer></script>
+            <script src="{{ asset('assets/js/auth-modal.js') }}" defer></script>
         {% endblock %}
     </body>
 </html>

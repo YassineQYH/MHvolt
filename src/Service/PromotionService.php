@@ -4,6 +4,8 @@ namespace App\Service;
 
 use App\Entity\Promotion;
 use App\Entity\Product;
+use App\Entity\Accessory;
+use App\Entity\Trottinette;
 
 class PromotionService
 {
@@ -34,7 +36,7 @@ class PromotionService
             return 0.0;
         }
 
-        // Cas 2 : Réduction ciblée par produit ou catégorie
+        // Cas 2 : Réduction ciblée par type, catégorie ou produit
         $totalReduction = 0.0;
 
         foreach ($cartFull as $item) {
@@ -44,14 +46,23 @@ class PromotionService
             $unitPrice = (float)$product->getPrice();
 
             $isEligible = match ($promo->getTargetType()) {
+                Promotion::TARGET_ALL_TROTTINETTES =>
+                    $product instanceof Trottinette || $product->getType() === 'trottinette',
+
+                Promotion::TARGET_ALL_ACCESSORIES =>
+                    $product instanceof Accessory || $product->getType() === 'accessoire',
+
                 Promotion::TARGET_CATEGORY_ACCESS =>
-                    $product->getType() === 'accessoire'
+                    ($product instanceof Accessory || $product->getType() === 'accessoire')
                     && method_exists($product, 'getCategory')
                     && $product->getCategory() === $promo->getCategoryAccess(),
+
                 Promotion::TARGET_PRODUCT =>
                     $product === $promo->getProduct(),
+
                 Promotion::TARGET_PRODUCT_LIST =>
                     $promo->getProducts()->contains($product),
+
                 default => false,
             };
 

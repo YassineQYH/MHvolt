@@ -1,19 +1,31 @@
 /* 🔴 Maintenance ON */
 .menu-maintenance-on {
-    color: #dc3545 !important;
-    font-weight: bold;
+    color: #dc2626 !important;
+    font-weight: 600;
 }
 
 .menu-maintenance-on a {
     color: inherit !important;
 }
 
-/* 🟢 Maintenance OFF */
+.menu-maintenance-on::before {
+    content: "●";
+    color: #dc2626;
+    margin-right: 6px;
+}
+
+/* 🟢 Maintenance DÉSACTIVÉE (Boutique ouverte) */
 .menu-maintenance-off {
-    color: #198754 !important;
-    font-weight: bold;
+    color: #16a34a !important;
+    font-weight: 600;
 }
 
 .menu-maintenance-off a {
     color: inherit !important;
+}
+
+.menu-maintenance-off::before {
+    content: "●";
+    color: #16a34a;
+    margin-right: 6px;
 }

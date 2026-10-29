@@ -1,0 +1,94 @@
+/* ==========================================================================
+   MHVOLT — MODALE DE CONTACT
+   ========================================================================== */
+
+/* Fenêtre modale translucide & contrastée */
+.contact-modal-content {
+    background: rgba(30, 36, 44, 0.92) !important;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.22) !important;
+    border-radius: 1.5rem !important;
+    color: #ffffff !important;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
+    position: relative;
+}
+
+/* Labels */
+.contact-modal-content label,
+.contact-modal-content .form-label {
+    color: #ffffff !important;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+}
+
+/* Champs de saisie */
+.contact-modal-content .form-control {
+    background-color: rgba(255, 255, 255, 0.14) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    color: #ffffff !important;
+    border-radius: 0.6rem;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+}
+
+.contact-modal-content .form-control:focus {
+    background-color: rgba(255, 255, 255, 0.22) !important;
+    border-color: #ffffff !important;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.15) !important;
+    color: #ffffff !important;
+}
+
+.contact-modal-content .form-control::placeholder {
+    color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Bouton d'envoi */
+.contact-btn-submit {
+    background-color: rgba(255, 255, 255, 0.15) !important;
+    border: 1px solid rgba(255, 255, 255, 0.35) !important;
+    color: #ffffff !important;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.contact-btn-submit:hover {
+    background-color: #ffffff !important;
+    color: var(--mh-black, #09090b) !important;
+    border-color: #ffffff !important;
+}
+
+/* Bouton de fermeture en haut à droite */
+.contact-modal-close {
+    position: absolute;
+    top: 18px;
+    right: 22px;
+    color: #ffffff;
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+    opacity: 0.8;
+    padding: 4px 8px;
+    z-index: 10;
+    transition: opacity 0.2s ease, transform 0.15s ease;
+}
+
+.contact-modal-close:hover {
+    opacity: 1;
+    color: #ffffff;
+    transform: scale(1.1);
+}
+
+.contact-helper-xs {
+    font-size: 0.75rem;
+}
+
+.contact-header-subtitle {
+    font-size: 0.7rem;
+}
+
+.contact-header-desc {
+    max-width: 500px;
+}

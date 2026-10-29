@@ -1,207 +1,76 @@
-/* @import url('https://fonts.googleapis.com/css?family=Poppins:200,300,400,500,600,700,800,900&display=swap');
-*
-{
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Poppins', sans-serif;
-} */
+/* ==========================================================================
+   MHVOLT — FOOTER & RÉASSURANCE
+   ========================================================================== */
 
-
-/* body footer{
+/* Pastilles du bandeau de réassurance */
+.reassurance-circle {
+    width: 46px;
+    height: 46px;
+    flex-shrink: 0;
     display: flex;
-    justify-content: flex-end;
     align-items: center;
-    min-height: 100vh;
-    flex-direction: column;
-    background: #ede7f6;
-} */
-
-footer {
-    position: relative;
-    width: 100%;
-    height: auto;
-    padding: 50px 100px;
-    background: #111;
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-}
-
-footer .container-footer {
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    flex-direction: row;
-}
-
-footer .container-footer .sec-footer {
-    margin-right: 30px;
-}
-
-footer .container-footer .sec-footer.about-us-footer {
-    width: 40%;
-}
-
-footer .container-footer h2 {
-    position: relative;
-    color: #fff;
-    font-weight: 500;
-    margin-bottom: 15px;
-}
-
-footer .container-footer h2::before {
-    content: '';
-    position: absolute;
-    bottom: -5px;
-    left: 0;
-    width: 50px;
-    height: 2px;
-    background: #f00;
-}
-
-footer p {
-    color: #999;
-}
-
-.sci-footer {
-    margin-top: 20px;
-    display: flex;
-}
-
-.sci-footer li {
-    list-style: none;
-}
-
-.sci-footer li a {
-    display: inline-block;
-    width: 40px;
-    height: 40px;
-    background: #222;
-    display: flex;
     justify-content: center;
+    background-color: #ffffff;
+    border: 1px solid var(--mh-gray-border, #e4e4e7);
+    border-radius: 50%;
+}
+
+.reassurance-subtext {
+    font-size: 0.75rem;
+    color: var(--bs-secondary, #6b7280);
+}
+
+/* Zone principale sombre du footer */
+.footer-main-dark {
+    background-color: var(--mh-black, #09090b) !important;
+    color: #ffffff !important;
+}
+
+.footer-muted-text {
+    color: #a1a1aa !important;
+}
+
+/* Boutons réseaux sociaux circulaires */
+.footer-social-btn {
+    width: 36px;
+    height: 36px;
+    display: inline-flex;
     align-items: center;
-    margin-right: 10px;
+    justify-content: center;
+    border-radius: 50%;
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.3);
+    transition: all 0.2s ease;
+}
+
+.footer-social-btn:hover {
+    background-color: #ffffff;
+    color: var(--mh-black, #09090b);
+    border-color: #ffffff;
+}
+
+/* Liens du footer */
+.footer-link {
+    color: #a1a1aa !important;
     text-decoration: none;
-    border-radius: 4px;
+    transition: color 0.2s ease;
 }
 
-.sci-footer li a:hover {
-    background: #f00;
+.footer-link:hover {
+    color: #ffffff !important;
+    text-decoration: underline !important;
 }
 
-.sci-footer li a.fab {
-    color: #fff;
-    font-size: 20px;
+/* Ligne inférieure de copyright */
+.footer-bottom-bar {
+    border-top: 1px solid #27272a;
+    color: #a1a1aa !important;
 }
 
-a {
-    color: #fff;
-}
-
-a:hover {
-    color: #fff;
-}
-
-.quickLinks-footer {
-    position: relative;
-    width: 25%;
-}
-
-.quickLinks-footer ul li {
-    list-style: none;
-}
-
-.quickLinks-footer ul li a {
-    color: #999;
-    text-decoration: none;
-    margin-bottom: 10px;
-    display: inline-block;
-}
-
-.quickLinks-footer ul li a:hover {
-    color: #fff;
-}
-
-.contact-footer {
-    width: calc(35% - 60px);
-    margin-right: 0 !important;
-    /* border: solid 1px red; */
-}
-
-
-/* .contact-footer h2{
-    margin-right: 0 !important;
-    border: solid 1px green;
-    text-align: right;
-}
-.contact-footer li{
-    margin-right: 0 !important;
-    border: solid 1px yellow;
-    text-align: right;
-} */
-
-.contact-footer .info-footer {
-    position: relative;
-}
-
-.contact-footer .info-footer li {
-    display: flex;
-    margin-bottom: 16px;
-}
-
-.contact-footer .info-footer li span:nth-child(1) {
-    color: #fff;
-    font-size: 20px;
-    margin-right: 10px;
-}
-
-.contact-footer .info-footer li span {
-    color: #999;
-}
-
-
-/* .contact-footer .info-footer li span i{
-    margin-left: -35px;
-}
-.quickLinks-footer .liens-footer li a{
-    margin-left: -35px;
-} */
-
-.contact-footer .info-footer li a {
-    color: #999;
-    text-decoration: none;
-}
-
-.contact-footer .info-footer li a:hover {
-    color: #fff;
-}
-
-.copyrightText {
-    width: 100%;
-    background: #181818;
-    padding: 8px 100px;
-    text-align: center;
-    color: #999;
-}
-
-@media (max-width: 991px) {
-    footer {
-        padding: 40px
-    }
-    footer .container-footer {
-        flex-direction: column;
-    }
-    footer .container-footer .sec-footer {
-        margin-right: 0;
-        margin-bottom: 40px;
-    }
-    footer .container-footer .sec-footer.about-us-footer,
-    .quickLinks-footer,
-    .contact-footer {
-        width: 100%;
-    }
-    .copyrightText {
-        padding: 8px 40px;
-    }
+/* Badges des moyens de paiement */
+.footer-payment-badge {
+    background-color: #18181b;
+    color: #f4f4f5;
+    border: 1px solid #3f3f46 !important;
+    font-weight: 500;
 }

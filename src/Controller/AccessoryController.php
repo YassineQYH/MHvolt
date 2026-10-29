@@ -46,10 +46,9 @@ class AccessoryController extends BaseController
         $illustrations = $accessory->getIllustrations();
         $formregister = $this->createRegisterForm($request, $encoder);
 
-        $promotion = $promoFinder->FindBestForProduct($accessory);
+        $promotion = $promoFinder->findBestForProduct($accessory);
         $originalPrice = $accessory->getPrice();
         $promoPrice = $promotion ? $promoFinder->calculateDiscountedPrice($accessory, $promotion) : null;
-        $homepagePromo = $promoFinder->findHomepagePromo();
 
         return $this->render('accessoires/show.html.twig', [
             'accessory' => $accessory,
@@ -59,7 +58,6 @@ class AccessoryController extends BaseController
             'promotion' => $promotion,
             'originalPrice' => $originalPrice,
             'promoPrice' => $promoPrice,
-            'homepagePromo' => $homepagePromo,
             'promoService' => $promotionService,
         ]);
     }
@@ -74,9 +72,7 @@ class AccessoryController extends BaseController
             throw $this->createNotFoundException('Cet accessoire n’existe pas.');
         }
 
-        // 🔥 Direct via la collection ManyToMany inverse
         $trottinettes = $accessory->getTrottinettes();
-
         $formregister = $this->createRegisterForm($request, $encoder);
 
         return $this->render('accessoires/show-all-trott.html.twig', [

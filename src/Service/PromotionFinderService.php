@@ -2,8 +2,10 @@
 
 namespace App\Service;
 
+use App\Entity\Accessory;
 use App\Entity\Product;
 use App\Entity\Promotion;
+use App\Entity\Trottinette;
 use Doctrine\ORM\EntityManagerInterface;
 
 class PromotionFinderService
@@ -22,24 +24,19 @@ class PromotionFinderService
      */
     public function findBestForProduct(Product $product): ?Promotion
     {
-        // Récupère seulement les promos autoApply
         $promos = $this->em->getRepository(Promotion::class)->findBy(['autoApply' => true]);
 
         $applicable = [];
 
         foreach ($promos as $promo) {
-
-            // Vérifie date début/fin
             if (!$promo->isActive()) {
                 continue;
             }
 
-            // Vérifie si promo applicable selon targetType
             if (!$this->isPromoForProduct($promo, $product)) {
                 continue;
             }
 
-            // On calcule combien elle retirerait sur 1 unité du produit
             $reduction = $this->calculator->calculateReduction([
                 ['product' => $product, 'quantity' => 1]
             ], $promo);
@@ -49,12 +46,10 @@ class PromotionFinderService
             }
         }
 
-        // Rien trouvé ?
         if (empty($applicable)) {
             return null;
         }
 
-        // On retourne celle avec la plus forte réduction
         usort($applicable, fn($a, $b) => $b['reduction'] <=> $a['reduction']);
 
         return $applicable[0]['promo'];
@@ -66,11 +61,17 @@ class PromotionFinderService
     private function isPromoForProduct(Promotion $promo, Product $product): bool
     {
         return match ($promo->getTargetType()) {
-
             Promotion::TARGET_ALL => true,
 
+            Promotion::TARGET_ALL_TROTTINETTES =>
+                $product instanceof Trottinette || $product->getType() === 'trottinette',
+
+            Promotion::TARGET_ALL_ACCESSORIES =>
+                $product instanceof Accessory || $product->getType() === 'accessoire',
+
             Promotion::TARGET_CATEGORY_ACCESS =>
-                $product instanceof \App\Entity\Accessory
+                ($product instanceof Accessory || $product->getType() === 'accessoire')
+                && method_exists($product, 'getCategory')
                 && $product->getCategory() === $promo->getCategoryAccess(),
 
             Promotion::TARGET_PRODUCT =>
@@ -88,15 +89,12 @@ class PromotionFinderService
      */
     public function calculateDiscountedPrice(Product $product, Promotion $promo): float
     {
-        // On calcule la réduction pour 1 unité
         $reduction = $this->calculator->calculateReduction([
             ['product' => $product, 'quantity' => 1]
         ], $promo);
 
-        // Prix final = prix de base - réduction
         $final = $product->getPrice() - $reduction;
 
-        // On évite les prix négatifs
         return max(0, $final);
     }
 
@@ -105,26 +103,20 @@ class PromotionFinderService
      */
     public function findBestAutoPromotion(): ?Promotion
     {
-        // Récupère les promos autoApply + actives
         $promos = $this->em->getRepository(Promotion::class)->findBy(['autoApply' => true]);
 
         $valids = [];
 
         foreach ($promos as $promo) {
-
-            // Vérifie date début/fin
             if (!$promo->isActive()) {
                 continue;
             }
 
-            // Seules les promotions applicables à tous les produits sont universelles
             if ($promo->getTargetType() !== Promotion::TARGET_ALL) {
                 continue;
             }
 
-            // On calcule sa "force" : pourcentage prioritaire, sinon montant
             $force = 0;
-
             if ($promo->getDiscountPercent()) {
                 $force = $promo->getDiscountPercent();
             } elseif ($promo->getDiscountAmount()) {
@@ -141,42 +133,32 @@ class PromotionFinderService
             return null;
         }
 
-        // On trie par la promo la plus forte
         usort($valids, fn($a, $b) => $b['force'] <=> $a['force']);
 
         return $valids[0]['promo'];
     }
 
     /**
-     * Trouve la promo à afficher sur la homepage
-     * Affiche uniquement si au moins une promo est active
+     * Récupère TOUTES les promos actives à afficher en bannière sur le site
+     * @return Promotion[]
      */
-    public function findHomepagePromo(): ?Promotion
+    public function findHomepagePromos(): array
     {
-        // On récupère toutes les promos
         $promos = $this->em->getRepository(Promotion::class)->findAll();
 
-        // On ne garde que les promos :
-        // - actives (dates OK)
-        // - valides (montant ou pourcentage OK)
-        // - autoApply (OBLIGATOIRE pour être affichée)
         $activePromos = array_filter(
             $promos,
             fn(Promotion $p) => $p->isActive() && $p->isDiscountValid() && $p->isAutoApply()
         );
 
-        // Si AUCUNE promo n’est active + autoApply → rien n’affiche
         if (empty($activePromos)) {
-            return null;
+            return [];
         }
 
-        // Tri : priorité aux autoApply (déjà toutes auto) puis date de début la plus récente
         usort($activePromos, function(Promotion $a, Promotion $b) {
             return $b->getStartDate() <=> $a->getStartDate();
         });
 
-        return $activePromos[0];
-}
-
-
+        return array_values($activePromos);
+    }
 }

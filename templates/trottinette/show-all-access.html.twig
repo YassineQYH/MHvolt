@@ -2,8 +2,12 @@
 
 {% block title %}Accessoires compatibles avec {{ trottinette.name }} — MHvolt{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('assets/css/products.css') }}">
+{% endblock %}
+
 {% block content %}
-    {% include 'partials/promos.html.twig' %}
 
     <div class="container py-5">
         {# Fil d'Ariane #}

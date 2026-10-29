@@ -2,6 +2,11 @@
 
 {% block title %}Mon Compte — MHvolt{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('assets/css/account.css') }}">
+{% endblock %}
+
 {% block content %}
 <div class="container py-5">
     {# En-tête de bienvenue #}
@@ -26,7 +31,7 @@
         {# 1. Commandes #}
         <div class="col">
             <a href="{{ path('account_order') }}" class="card h-100 border border-light-subtle rounded-4 p-4 text-decoration-none product-card bg-white">
-                <div class="d-flex align-items-center justify-content-center bg-body-tertiary border rounded-3 mb-3" style="width: 52px; height: 52px;">
+                <div class="account-card-icon">
                     <i class="bx bx-package fs-3 text-dark"></i>
                 </div>
                 <h2 class="fs-6 fw-bold text-dark mb-1">Mes commandes</h2>
@@ -37,7 +42,7 @@
         {# 2. Adresses #}
         <div class="col">
             <a href="{{ path('account_address') }}" class="card h-100 border border-light-subtle rounded-4 p-4 text-decoration-none product-card bg-white">
-                <div class="d-flex align-items-center justify-content-center bg-body-tertiary border rounded-3 mb-3" style="width: 52px; height: 52px;">
+                <div class="account-card-icon">
                     <i class="bx bx-map-pin fs-3 text-dark"></i>
                 </div>
                 <h2 class="fs-6 fw-bold text-dark mb-1">Mes adresses</h2>
@@ -48,7 +53,7 @@
         {# 3. Profil #}
         <div class="col">
             <a href="{{ path('account_profile') }}" class="card h-100 border border-light-subtle rounded-4 p-4 text-decoration-none product-card bg-white">
-                <div class="d-flex align-items-center justify-content-center bg-body-tertiary border rounded-3 mb-3" style="width: 52px; height: 52px;">
+                <div class="account-card-icon">
                     <i class="bx bx-user fs-3 text-dark"></i>
                 </div>
                 <h2 class="fs-6 fw-bold text-dark mb-1">Informations</h2>
@@ -56,10 +61,10 @@
             </a>
         </div>
 
-        {# 4. Sécurité / Mot de passe #}
+        {# 4. Sécurité #}
         <div class="col">
             <a href="{{ path('account_password') }}" class="card h-100 border border-light-subtle rounded-4 p-4 text-decoration-none product-card bg-white">
-                <div class="d-flex align-items-center justify-content-center bg-body-tertiary border rounded-3 mb-3" style="width: 52px; height: 52px;">
+                <div class="account-card-icon">
                     <i class="bx bx-lock-alt fs-3 text-dark"></i>
                 </div>
                 <h2 class="fs-6 fw-bold text-dark mb-1">Sécurité</h2>

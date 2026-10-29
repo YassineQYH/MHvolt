@@ -2,13 +2,18 @@
 
 {% block title %}Mot de passe oublié — MHvolt{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('assets/css/login-register.css') }}">
+{% endblock %}
+
 {% block content %}
-<div class="container py-5" style="max-width: 520px;">
+<div class="container py-5 auth-container-sm">
     <div class="text-center mb-4">
-        <span class="text-uppercase tracking-wider small fw-semibold text-muted">Sécurité</span>
+        <span class="text-uppercase tracking-wider small fw-semibold text-muted">Récupération de compte</span>
         <h1 class="display-6 fw-bold text-dark mt-1">Mot de passe oublié</h1>
         <p class="text-secondary small mb-0">
-            Saisissez votre adresse e-mail pour recevoir un lien de réinitialisation sécurisé.
+            Saisissez votre adresse e-mail pour recevoir les instructions de réinitialisation.
         </p>
     </div>
 
@@ -20,29 +25,28 @@
 
     <div class="card border border-light-subtle rounded-4 p-4 p-md-5 shadow-sm bg-white">
         <form method="post">
-            <div class="mb-3">
-                <label for="inputEmail" class="form-label small fw-semibold text-dark">Adresse E-mail</label>
+            <div class="mb-4">
+                <label for="email" class="form-label small fw-semibold text-dark">Votre adresse e-mail</label>
                 <input type="email"
                        name="email"
-                       id="inputEmail"
+                       id="email"
                        class="form-control rounded-3 py-2 px-3 small"
-                       placeholder="nom@exemple.com"
+                       placeholder="exemple@domaine.com"
+                       autocomplete="email"
                        required
                        autofocus>
             </div>
 
-            <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-
-            <button class="btn btn-dark rounded-pill py-2 w-100 fw-semibold mt-2 mb-3" type="submit">
+            <button class="btn btn-dark rounded-pill py-2.5 w-100 fw-semibold mb-3 shadow-sm" type="submit">
                 Envoyer le lien de réinitialisation
             </button>
-
-            <div class="text-center pt-3 border-top border-light-subtle">
-                <a href="{{ path('app_home') }}" class="text-secondary text-decoration-none small">
-                    <i class="fas fa-arrow-left me-1"></i>Retourner à l'accueil
-                </a>
-            </div>
         </form>
+
+        <div class="text-center pt-3 border-top border-light-subtle">
+            <a href="{{ path('app_login') }}" class="text-secondary text-decoration-none small">
+                <i class="bx bx-arrow-back me-1"></i>Retour à la connexion
+            </a>
+        </div>
     </div>
 </div>
 {% endblock %}

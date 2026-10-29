@@ -2,62 +2,67 @@
 
 {% block title %}Conditions Générales de Vente — MHvolt{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('assets/css/legal-page.css') }}">
+{% endblock %}
+
 {% block content %}
-<div class="container py-5" style="max-width: 820px;">
+<div class="container py-5 legal-container">
     <div class="mb-5 pb-3 border-bottom border-light-subtle">
         <span class="text-uppercase tracking-wider small fw-semibold text-muted">Informations contractuelles</span>
         <h1 class="display-6 fw-bold text-dark mt-1">Conditions générales de vente</h1>
         <p class="text-secondary small mb-0">Dernière mise à jour : 22 octobre 2026</p>
     </div>
 
-    <div class="d-flex flex-column gap-4 text-secondary small leading-relaxed">
+    <div class="d-flex flex-column gap-4 legal-text-block">
         <section>
-            <h2 class="fs-6 fw-bold text-dark text-uppercase tracking-wider mb-2">1. Objet</h2>
+            <h2 class="legal-section-title">1. Objet</h2>
             <p class="mb-0">Les présentes conditions générales de vente régissent l'ensemble des relations contractuelles entre la boutique <strong>MHvolt</strong> et toute personne physique ou morale effectuant un achat sur le site.</p>
         </section>
 
         <section>
-            <h2 class="fs-6 fw-bold text-dark text-uppercase tracking-wider mb-2">2. Produits</h2>
+            <h2 class="legal-section-title">2. Produits</h2>
             <p class="mb-0">Les trottinettes électriques et accessoires proposés sont décrits et présentés avec la plus grande exactitude possible. Les photographies et caractéristiques techniques sont conformes aux spécifications transmises par les constructeurs homologués.</p>
         </section>
 
         <section>
-            <h2 class="fs-6 fw-bold text-dark text-uppercase tracking-wider mb-2">3. Tarifs & TVA</h2>
+            <h2 class="legal-section-title">3. Tarifs & TVA</h2>
             <p class="mb-0">Les prix sont mentionnés en euros toutes taxes comprises (TTC) selon le taux de TVA légal en vigueur au moment de la passation de commande. Les frais d'expédition sont calculés au niveau du panier en fonction du poids total des équipements commandés.</p>
         </section>
 
         <section>
-            <h2 class="fs-6 fw-bold text-dark text-uppercase tracking-wider mb-2">4. Commande</h2>
+            <h2 class="legal-section-title">4. Commande</h2>
             <p class="mb-0">La confirmation de commande intervient dès validation du récapitulatif du panier et acceptation formelle des présentes conditions. MHvolt accuse réception de chaque commande par l'envoi d'un e-mail récapitulatif automatisé.</p>
         </section>
 
         <section>
-            <h2 class="fs-6 fw-bold text-dark text-uppercase tracking-wider mb-2">5. Modalités de paiement</h2>
+            <h2 class="legal-section-title">5. Modalités de paiement</h2>
             <p class="mb-0">Le règlement s'effectue immédiatement à la commande par carte bancaire. Les transactions sont sécurisées via le protocole chiffré TLS de notre prestataire certifié <strong>Stripe</strong>. MHvolt n'a jamais accès aux identifiants bancaires confidentiels du client.</p>
         </section>
 
         <section>
-            <h2 class="fs-6 fw-bold text-dark text-uppercase tracking-wider mb-2">6. Expédition & Livraison</h2>
+            <h2 class="legal-section-title">6. Expédition & Livraison</h2>
             <p class="mb-0">Les produits sont expédiés à l'adresse de livraison renseignée dans le compte client. Les délais indicatifs et modalités de prise en charge sont détaillés sur la page dédiée à la livraison.</p>
         </section>
 
         <section>
-            <h2 class="fs-6 fw-bold text-dark text-uppercase tracking-wider mb-2">7. Droit de rétractation</h2>
+            <h2 class="legal-section-title">7. Droit de rétractation</h2>
             <p class="mb-0">Conformément aux articles L221-18 et suivants du Code de la consommation, vous disposez d'un délai légal de <strong>14 jours francs</strong> à compter de la réception du colis pour notifier votre volonté de retour. Le matériel doit être retourné complet, intact, dans son emballage d'origine.</p>
         </section>
 
         <section>
-            <h2 class="fs-6 fw-bold text-dark text-uppercase tracking-wider mb-2">8. Garanties légales</h2>
+            <h2 class="legal-section-title">8. Garanties légales</h2>
             <p class="mb-0">Tous les matériels bénéficient de la garantie légale de conformité (articles L217-3 et suivants du Code de la consommation) et de la garantie contre les vices cachés (articles 1641 et suivants du Code civil).</p>
         </section>
 
         <section>
-            <h2 class="fs-6 fw-bold text-dark text-uppercase tracking-wider mb-2">9. Service après-vente & Contact</h2>
+            <h2 class="legal-section-title">9. Service après-vente & Contact</h2>
             <p class="mb-0">Pour toute demande d'assistance ou réclamation, notre équipe est joignable à l'adresse suivante : <a href="mailto:contact@mhvolt.com" class="text-dark fw-semibold text-decoration-none">contact@mhvolt.com</a>.</p>
         </section>
 
         <section>
-            <h2 class="fs-6 fw-bold text-dark text-uppercase tracking-wider mb-2">10. Juridiction compétente</h2>
+            <h2 class="legal-section-title">10. Juridiction compétente</h2>
             <p class="mb-0">Les présentes CGV sont soumises au droit français. En cas de différend, une tentative de résolution amiable sera systématiquement engagée avant toute procédure judiciaire.</p>
         </section>
     </div>

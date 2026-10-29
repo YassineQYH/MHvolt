@@ -1,0 +1,56 @@
+/* ==========================================================================
+   MHVOLT — PAGE MAINTENANCE
+   ========================================================================== */
+
+body.maintenance-body {
+    margin: 0;
+    padding: 0;
+    font-family: var(--bs-body-font-family, 'Inter', -apple-system, sans-serif);
+    background-color: #fafafa;
+}
+
+.maintenance-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    text-align: center;
+    background: radial-gradient(circle at center, #ffffff 0%, #f4f4f5 100%);
+    padding: 2rem 1rem;
+}
+
+.maintenance-icon {
+    font-size: 5rem;
+    margin-bottom: 1.5rem;
+}
+
+.maintenance-title {
+    font-size: 2.25rem;
+    font-weight: 800;
+    color: var(--mh-black, #09090b);
+    letter-spacing: -0.03em;
+    margin-bottom: 0.75rem;
+}
+
+.maintenance-desc {
+    color: var(--bs-secondary, #71717a);
+    font-size: 1rem;
+    max-width: 480px;
+    margin: 0 auto 2rem auto;
+    line-height: 1.6;
+}
+
+/* Positionnement de la modale / wrapper auth en mode maintenance */
+.maintenance-wrapper .wrapper {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: none;
+    z-index: 1050;
+}
+
+.maintenance-wrapper .wrapper.active-popup {
+    display: block;
+}

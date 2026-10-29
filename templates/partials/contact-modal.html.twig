@@ -1,95 +1,18 @@
-<style>
-    /* Fenêtre modale translucide & contrastée (alignée sur le style login) */
-    .contact-modal-content {
-        background: rgba(30, 36, 44, 0.88) !important;
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        border: 1px solid rgba(255, 255, 255, 0.22) !important;
-        border-radius: 1.5rem !important;
-        color: #ffffff !important;
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
-        position: relative;
-    }
-
-    /* Labels en blanc bien net */
-    .contact-modal-content label,
-    .contact-modal-content .form-label {
-        color: #ffffff !important;
-        font-weight: 500;
-        letter-spacing: 0.01em;
-    }
-
-    /* Champs de saisie */
-    .contact-modal-content .form-control {
-        background-color: rgba(255, 255, 255, 0.14) !important;
-        border: 1px solid rgba(255, 255, 255, 0.3) !important;
-        color: #ffffff !important;
-        border-radius: 0.6rem;
-        font-size: 0.95rem;
-        transition: all 0.2s ease;
-    }
-    .contact-modal-content .form-control:focus {
-        background-color: rgba(255, 255, 255, 0.22) !important;
-        border-color: #ffffff !important;
-        box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.15) !important;
-        color: #ffffff !important;
-    }
-    .contact-modal-content .form-control::placeholder {
-        color: rgba(255, 255, 255, 0.5) !important;
-    }
-
-    /* Bouton d'action principal */
-    .contact-btn-submit {
-        background-color: rgba(255, 255, 255, 0.15) !important;
-        border: 1px solid rgba(255, 255, 255, 0.35) !important;
-        color: #ffffff !important;
-        font-weight: 600;
-        transition: all 0.2s ease;
-    }
-    .contact-btn-submit:hover {
-        background-color: #ffffff !important;
-        color: #09090b !important;
-        border-color: #ffffff !important;
-    }
-
-    /* Bouton croix calé en haut à droite */
-    .contact-modal-close {
-        position: absolute;
-        top: 18px;
-        right: 22px;
-        color: #ffffff;
-        background: transparent;
-        border: none;
-        font-size: 1.5rem;
-        line-height: 1;
-        cursor: pointer;
-        opacity: 0.8;
-        padding: 4px 8px;
-        z-index: 10;
-        transition: opacity 0.2s ease, transform 0.15s ease;
-    }
-    .contact-modal-close:hover {
-        opacity: 1;
-        color: #ffffff;
-        transform: scale(1.1);
-    }
-</style>
-
 {# Modale Contact #}
 <div class="modal fade" id="contactModal" tabindex="-1" aria-labelledby="contactModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content contact-modal-content p-4 p-md-5">
 
-            {# Bouton de fermeture positionné en haut à droite #}
+            {# Bouton de fermeture #}
             <button type="button" class="contact-modal-close" data-bs-dismiss="modal" aria-label="Fermer">
                 &times;
             </button>
 
             {# En-tête centré #}
             <div class="text-center mb-4">
-                <span class="text-uppercase tracking-wider small fw-semibold text-white-50" style="font-size: 0.7rem;">Assistance MHvolt</span>
+                <span class="text-uppercase tracking-wider small fw-semibold text-white-50 contact-header-subtitle">Assistance MHvolt</span>
                 <h3 class="fw-bold text-white fs-4 mt-1" id="contactModalLabel">Nous contacter</h3>
-                <p class="text-white-50 small mt-2 mb-0" style="max-width: 500px; margin-left: auto; margin-right: auto;">
+                <p class="text-white-50 small mt-2 mb-0 mx-auto contact-header-desc">
                     Une question sur un modèle, un accessoire ou votre commande ? Notre équipe technique vous répond sous 48 heures ouvrées.
                 </p>
             </div>
@@ -102,19 +25,19 @@
                             <div class="col-md-6">
                                 <label class="form-label small mb-1">Nom & Prénom <span class="text-danger">*</span></label>
                                 {{ form_widget(formcontact.name, {'attr': {'class': 'form-control py-2 px-3 small', 'placeholder': 'Jean Dupont'}}) }}
-                                <div class="text-danger small mt-1" style="font-size: 0.75rem;">{{ form_errors(formcontact.name) }}</div>
+                                <div class="text-danger small mt-1 contact-helper-xs">{{ form_errors(formcontact.name) }}</div>
                             </div>
 
                             <div class="col-md-6">
                                 <label class="form-label small mb-1">N° de téléphone <span class="text-danger">*</span></label>
                                 {{ form_widget(formcontact.tel, {'attr': {'class': 'form-control py-2 px-3 small', 'placeholder': '+33 6 12 34 56 78'}}) }}
-                                <div class="text-danger small mt-1" style="font-size: 0.75rem;">{{ form_errors(formcontact.tel) }}</div>
+                                <div class="text-danger small mt-1 contact-helper-xs">{{ form_errors(formcontact.tel) }}</div>
                             </div>
 
                             <div class="col-md-6">
                                 <label class="form-label small mb-1">Adresse e-mail <span class="text-danger">*</span></label>
                                 {{ form_widget(formcontact.email, {'attr': {'class': 'form-control py-2 px-3 small', 'placeholder': 'nom@exemple.com'}}) }}
-                                <div class="text-danger small mt-1" style="font-size: 0.75rem;">{{ form_errors(formcontact.email) }}</div>
+                                <div class="text-danger small mt-1 contact-helper-xs">{{ form_errors(formcontact.email) }}</div>
                             </div>
 
                             {% if formcontact.company is defined %}
@@ -127,7 +50,7 @@
                             <div class="col-12">
                                 <label class="form-label small mb-1">Votre message <span class="text-danger">*</span></label>
                                 {{ form_widget(formcontact.message, {'attr': {'class': 'form-control py-2 px-3 small', 'rows': 4, 'placeholder': 'Détaillez votre question ou besoin...'}}) }}
-                                <div class="text-danger small mt-1" style="font-size: 0.75rem;">{{ form_errors(formcontact.message) }}</div>
+                                <div class="text-danger small mt-1 contact-helper-xs">{{ form_errors(formcontact.message) }}</div>
                             </div>
 
                             {% if formcontact.honeypot is defined %}

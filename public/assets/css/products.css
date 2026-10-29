@@ -1,0 +1,181 @@
+/* ==========================================================================
+   PRODUITS : CARTES CATALOGUE & FICHES DÉTAILLÉES
+   ========================================================================== */
+
+/* Cartes catalogue */
+.product-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    border-color: var(--mh-gray-border) !important;
+}
+
+.product-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--mh-black) !important;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05) !important;
+}
+
+.product-img-zoom {
+    transition: transform 0.3s ease;
+}
+
+.product-card:hover .product-img-zoom {
+    transform: scale(1.04);
+}
+
+/* Fiche détaillée : conteneur de zoom photo */
+.product-zoom-container {
+    background-color: var(--mh-gray-light);
+    border: 1px solid var(--mh-gray-border);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    text-align: center;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+    min-height: 400px;
+    max-height: 480px;
+    cursor: zoom-in;
+}
+
+.product-zoom-image {
+    max-height: 400px;
+    transition: transform 0.2s ease, transform-origin 0.1s ease, opacity 0.2s ease;
+}
+
+/* Boutons miniatures de galerie */
+.product-thumb-btn {
+    width: 72px;
+    height: 72px;
+    flex-shrink: 0;
+    padding: 4px;
+    border-radius: 0.5rem;
+    background: #ffffff;
+    transition: border-color 0.15s ease;
+}
+
+/* Tableau Caractéristiques Produits */
+.table-carac {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #ffffff;
+    border: 1px solid var(--mh-gray-border);
+}
+
+.table-carac th,
+.table-carac td {
+    padding: 13px 20px;
+    border-bottom: 1px solid var(--mh-gray-border);
+    font-size: 0.925rem;
+}
+
+.table-carac th {
+    font-weight: 600;
+    color: var(--mh-black);
+    width: 50%;
+    border-right: 1px solid var(--mh-gray-border);
+}
+
+.table-carac td {
+    color: var(--mh-gray-muted);
+    width: 50%;
+}
+
+/* Prix barré et badges promo */
+.price-promo-main {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--bs-dark);
+    margin-right: 18px;
+    display: inline-block;
+}
+
+.price-del-base {
+    font-size: 1.25rem;
+    color: var(--bs-danger);
+    font-weight: 600;
+    text-decoration: line-through !important;
+    margin-right: 18px;
+    display: inline-block;
+}
+
+.badge-promo-pill {
+    background-color: var(--bs-danger);
+    color: #fff;
+    border-radius: 50rem;
+    padding: 0.25rem 0.65rem;
+    font-size: 0.75rem;
+    margin-right: 12px;
+    display: inline-block;
+}
+
+.price-single-main {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--bs-dark);
+    margin-right: 12px;
+    display: inline-block;
+}
+
+/* ==========================================================================
+   FICHES DÉTAILLÉES : SPÉCIFICATIONS & TITRES
+   ========================================================================== */
+
+/* Titres des blocs détaillés */
+.product-detail-heading {
+    font-size: 1.45rem;
+    letter-spacing: -0.02em;
+}
+
+.product-section-heading {
+    font-size: 1.05rem;
+    letter-spacing: -0.01em;
+}
+
+.product-detail-body {
+    color: #27272a;
+}
+
+/* Espacement des sections descriptives */
+.product-sections-stack {
+    gap: 2.2rem;
+}
+
+/* Tableaux de caractéristiques techniques */
+.table-specifications {
+    border: 1px solid var(--mh-gray-border, #e4e4e7);
+    border-collapse: collapse;
+    width: 100%;
+    background-color: #ffffff;
+}
+
+.table-specifications tr {
+    border-bottom: 1px solid var(--mh-gray-border, #e4e4e7);
+}
+
+.table-specifications th {
+    width: 50%;
+    padding: 13px 20px;
+    font-weight: 600;
+    font-size: 0.925rem;
+    color: var(--mh-gray-dark, #18181b);
+    border-right: 1px solid var(--mh-gray-border, #e4e4e7);
+    border-bottom: 1px solid var(--mh-gray-border, #e4e4e7);
+    vertical-align: middle;
+}
+
+.table-specifications td {
+    width: 50%;
+    padding: 13px 20px;
+    font-size: 0.925rem;
+    color: #27272a;
+    border-bottom: 1px solid var(--mh-gray-border, #e4e4e7);
+    vertical-align: middle;
+}
+
+/* Hauteur d'image des cartes catalogue trottinettes */
+.trott-card-img-wrap {
+    height: 200px;
+}

@@ -56,7 +56,6 @@ class TrottinetteController extends BaseController
             throw $this->createNotFoundException('Cette trottinette n’existe pas.');
         }
 
-        // Collections directes
         $accessoires = $trottinette->getAccessories();
         $illustrations = $trottinette->getIllustrations();
         $sections = $trottinette->getDescriptionSections();
@@ -67,8 +66,6 @@ class TrottinetteController extends BaseController
         $promotion = $promoFinder->findBestForProduct($trottinette);
         $originalPrice = $trottinette->getPrice();
         $promoPrice = $promotion ? $promoFinder->calculateDiscountedPrice($trottinette, $promotion) : null;
-
-        $homepagePromo = $promoFinder->findHomepagePromo();
 
         return $this->render('trottinette/show.html.twig', [
             'trottinette' => $trottinette,
@@ -81,7 +78,6 @@ class TrottinetteController extends BaseController
             'promotion' => $promotion,
             'originalPrice' => $originalPrice,
             'promoPrice' => $promoPrice,
-            'homepagePromo' => $homepagePromo,
             'promoService' => $promotionService,
         ]);
     }
@@ -91,7 +87,6 @@ class TrottinetteController extends BaseController
         string $slug,
         Request $request,
         UserPasswordHasherInterface $encoder,
-        PromotionFinderService $promoFinder,
         PromotionService $promotionService
     ): Response {
         $trottinette = $this->entityManager->getRepository(Trottinette::class)
@@ -103,13 +98,11 @@ class TrottinetteController extends BaseController
 
         $accessoires = $trottinette->getAccessories();
         $formregister = $this->createRegisterForm($request, $encoder);
-        $homepagePromo = $promoFinder->findHomepagePromo();
 
         return $this->render('trottinette/show-all-access.html.twig', [
             'trottinette' => $trottinette,
             'accessoires' => $accessoires,
             'formregister' => $formregister->createView(),
-            'homepagePromo' => $homepagePromo,
             'promoService' => $promotionService,
         ]);
     }

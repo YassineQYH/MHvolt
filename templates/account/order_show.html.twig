@@ -2,6 +2,11 @@
 
 {% block title %}Commande {{ order.reference }} — MHvolt{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('assets/css/account.css') }}">
+{% endblock %}
+
 {% block content %}
 <div class="container py-5">
     {# En-tête commande #}
@@ -32,19 +37,19 @@
         <div class="d-flex align-items-center gap-2">
             <span class="small fw-semibold text-secondary">Statut de la livraison :</span>
             {% if order.deliveryState == 4 %}
-                <span class="badge bg-danger-subtle text-danger border border-danger-subtle fw-normal">Annulée</span>
+                <span class="badge badge-order-canceled rounded-pill">Annulée</span>
             {% elseif order.paymentState == 0 %}
-                <span class="badge bg-danger-subtle text-danger border border-danger-subtle fw-normal">Paiement non confirmé</span>
+                <span class="badge badge-order-unpaid rounded-pill">Paiement non confirmé</span>
             {% elseif order.deliveryState == 0 %}
-                <span class="badge bg-light text-secondary border fw-normal">Commande validée</span>
+                <span class="badge badge-order-waiting rounded-pill">Commande validée</span>
             {% elseif order.deliveryState == 1 %}
-                <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle fw-normal">Préparation logistique en cours</span>
+                <span class="badge badge-order-prep rounded-pill">Préparation logistique en cours</span>
             {% elseif order.deliveryState == 2 %}
-                <span class="badge bg-info-subtle text-info-emphasis border border-info-subtle fw-normal">Colis expédié</span>
+                <span class="badge badge-order-shipping rounded-pill">Colis expédié</span>
             {% elseif order.deliveryState == 3 %}
-                <span class="badge bg-success-subtle text-success border border-success-subtle fw-normal">Livraison effectuée</span>
+                <span class="badge badge-order-delivered rounded-pill">Livraison effectuée</span>
             {% else %}
-                <span class="badge bg-light text-secondary border fw-normal">En attente</span>
+                <span class="badge badge-order-waiting rounded-pill">En attente</span>
             {% endif %}
         </div>
     </div>
@@ -67,12 +72,10 @@
                     {% set promo = order.promoReduction ?? 0 %}
 
                     {% for item in order.orderDetails %}
-                        {# Prix TTC unitaire payé et total de la ligne stockés en base #}
                         {% set unitTTC = item.priceTtc > 0 ? item.priceTtc : item.price %}
                         {% set totalItemTTC = item.totalTtc > 0 ? item.totalTtc : (unitTTC * item.quantity) %}
                         {% set totalLignesTTC = totalLignesTTC + totalItemTTC %}
 
-                        {# Prix de base catalogue pour affichage barré si promo #}
                         {% set basePriceTTC = item.productEntity ? item.productEntity.price : (item.price * (1 + (item.tva / 100))) %}
                         {% set hasRemise = (basePriceTTC - unitTTC) > 0.05 %}
 
@@ -82,11 +85,11 @@
                         <tr>
                             <td class="ps-4 py-3">
                                 <div class="d-flex align-items-center gap-3">
-                                    <div class="bg-body-tertiary border rounded-3 p-1 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; flex-shrink: 0;">
+                                    <div class="order-product-thumb">
                                         {% if item.productEntity %}
                                             <img src="/uploads/{{ item.productEntity.uploadDirectory }}/{{ illustration ? illustration.image : 'default.jpg' }}"
                                                  alt="{{ item.product }}"
-                                                 class="img-fluid object-fit-contain" style="max-height: 40px;">
+                                                 class="img-fluid">
                                         {% else %}
                                             <i class="bx bx-package fs-4 text-secondary"></i>
                                         {% endif %}

@@ -2,8 +2,17 @@
 
 {% block title %}{{ accessory.name }} — MHvolt{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('assets/css/products.css') }}">
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('assets/js/product-zoom.js') }}" defer></script>
+{% endblock %}
+
 {% block content %}
-    {% include 'partials/promos.html.twig' %}
 
     <div class="container py-5">
         {# Fil d'Ariane #}
@@ -19,15 +28,14 @@
             {# 📷 Colonne Gauche : Galerie Photos avec Zoom Interactif #}
             <div class="col-lg-7">
                 <div class="position-sticky" style="top: 100px;">
-                    <div id="accessoryZoomContainer" class="bg-body-tertiary border border-light-subtle rounded-4 p-4 text-center mb-3 d-flex align-items-center justify-content-center overflow-hidden position-relative" style="min-height: 380px; max-height: 440px; cursor: zoom-in;">
+                    <div id="accessoryZoomContainer" class="product-zoom-container">
                         {% set firstImg = illustrations|first %}
                         {% set rawImg = firstImg ? firstImg.image : (accessory.image ?? 'default.jpg') %}
                         {% set imgPath = rawImg starts with 'http' ? rawImg : '/uploads/accessoires/' ~ rawImg %}
                         <img id="mainAccessoryImage"
                              src="{{ imgPath }}"
                              alt="{{ accessory.name }}"
-                             class="img-fluid object-fit-contain w-100 h-100"
-                             style="max-height: 360px; transition: transform 0.2s ease, transform-origin 0.1s ease, opacity 0.2s ease;">
+                             class="img-fluid object-fit-contain w-100 h-100 product-zoom-image">
                     </div>
 
                     {% if illustrations|length > 1 %}
@@ -37,7 +45,7 @@
                                 {% set itemImgPath = rawItemImg starts with 'http' ? rawItemImg : '/uploads/accessoires/' ~ rawItemImg %}
                                 <button type="button"
                                         class="btn p-1 border rounded-3 bg-white accessory-thumb-btn {% if loop.first %}border-dark{% else %}border-light-subtle{% endif %}"
-                                        onclick="changeAccessoryImage('{{ itemImgPath }}', this)"
+                                        data-img-src="{{ itemImgPath }}"
                                         style="width: 72px; height: 72px; flex-shrink: 0;">
                                     <img src="{{ itemImgPath }}" alt="Miniature" class="w-100 h-100 object-fit-contain">
                                 </button>
@@ -72,22 +80,18 @@
 
                     {# Prix public TTC direct #}
                     {% set priceTTC = accessory.price %}
-                    {% set hasPromo = false %}
                     {% set promoPrice = priceTTC %}
 
                     {% if accessory.promoPrice is defined and accessory.promoPrice is not null and accessory.promoPrice > 0 and accessory.promoPrice < accessory.price %}
                         {% set promoPrice = accessory.promoPrice %}
-                        {% set hasPromo = true %}
                     {% elseif promotion and promotion.autoApply %}
                         {% if promotion.targetType == 'all'
                             or (promotion.targetType == 'product' and promotion.product.id == accessory.id)
                             or (promotion.targetType == 'product_list' and accessory in promotion.products) %}
                             {% if promotion.discountAmount is not null %}
                                 {% set promoPrice = accessory.price - promotion.discountAmount %}
-                                {% set hasPromo = true %}
                             {% elseif promotion.discountPercent is not null %}
                                 {% set promoPrice = accessory.price * (1 - promotion.discountPercent / 100) %}
-                                {% set hasPromo = true %}
                             {% endif %}
                         {% endif %}
                     {% endif %}
@@ -95,25 +99,25 @@
                     {% set hasDirectPromo = accessory.promoPrice is not null and accessory.promoPrice > 0 and accessory.promoPrice < accessory.price %}
                     {% set activePromoPrice = hasDirectPromo ? accessory.promoPrice : (promoPrice|default(null)) %}
 
-                    {# Bloc Prix avec espacements stricts #}
+                    {# Bloc Prix avec classes CSS dédiées #}
                     <div class="bg-body-tertiary border border-light-subtle rounded-4 p-4 mb-4">
                         <div class="d-flex align-items-center flex-wrap mb-2">
                             {% if activePromoPrice and activePromoPrice < accessory.price %}
-                                <span class="fs-2 fw-bold text-dark" style="margin-right: 18px; display: inline-block;">
+                                <span class="price-promo-main">
                                     {{ activePromoPrice|number_format(2, ',', ' ') }}&nbsp;€
                                 </span>
-                                <del class="fs-5 text-danger fw-semibold" style="text-decoration: line-through !important; margin-right: 18px; display: inline-block;">
+                                <del class="price-del-base">
                                     {{ accessory.price|number_format(2, ',', ' ') }}&nbsp;€
                                 </del>
-                                <span class="badge bg-danger rounded-pill px-2.5 py-1 small" style="margin-right: 12px; display: inline-block;">
+                                <span class="badge-promo-pill">
                                     Promo
                                 </span>
                             {% else %}
-                                <span class="fs-2 fw-bold text-dark" style="margin-right: 12px; display: inline-block;">
+                                <span class="price-single-main">
                                     {{ accessory.price|number_format(2, ',', ' ') }}&nbsp;€
                                 </span>
                             {% endif %}
-                            <span class="text-secondary small fw-medium" style="display: inline-block;">
+                            <span class="text-secondary small fw-medium">
                                 TTC
                             </span>
                         </div>
@@ -174,56 +178,4 @@
             </div>
         </div>
     </div>
-
-    <script>
-        const accZoomContainer = document.getElementById('accessoryZoomContainer');
-        const accMainImg = document.getElementById('mainAccessoryImage');
-        let accIsZoomed = false;
-
-        accZoomContainer.addEventListener('click', function(e) {
-            const rect = this.getBoundingClientRect();
-            const x = ((e.clientX - rect.left) / rect.width) * 100;
-            const y = ((e.clientY - rect.top) / rect.height) * 100;
-
-            accIsZoomed = !accIsZoomed;
-
-            if (accIsZoomed) {
-                accMainImg.style.transformOrigin = `${x}% ${y}%`;
-                accMainImg.style.transform = 'scale(2.3)';
-                this.style.cursor = 'zoom-out';
-            } else {
-                accMainImg.style.transformOrigin = 'center center';
-                accMainImg.style.transform = 'scale(1)';
-                this.style.cursor = 'zoom-in';
-            }
-        });
-
-        accZoomContainer.addEventListener('mousemove', function(e) {
-            if (accIsZoomed) {
-                const rect = this.getBoundingClientRect();
-                const x = ((e.clientX - rect.left) / rect.width) * 100;
-                const y = ((e.clientY - rect.top) / rect.height) * 100;
-                accMainImg.style.transformOrigin = `${x}% ${y}%`;
-            }
-        });
-
-        function changeAccessoryImage(src, btn) {
-            accIsZoomed = false;
-            accMainImg.style.transform = 'scale(1)';
-            accZoomContainer.style.cursor = 'zoom-in';
-
-            accMainImg.style.opacity = '0.3';
-            setTimeout(() => {
-                accMainImg.src = src;
-                accMainImg.style.opacity = '1';
-            }, 150);
-
-            document.querySelectorAll('.accessory-thumb-btn').forEach(el => {
-                el.classList.remove('border-dark');
-                el.classList.add('border-light-subtle');
-            });
-            btn.classList.remove('border-light-subtle');
-            btn.classList.add('border-dark');
-        }
-    </script>
 {% endblock %}

@@ -1,7 +1,7 @@
 {% set activeVideo = video_header|first %}
 
 {% if activeVideo %}
-<div class="position-relative w-100 bg-black overflow-hidden" style="height: 75vh; min-height: 480px;">
+<div class="position-relative w-100 bg-black overflow-hidden home-video-banner">
     <video class="w-100 h-100 object-fit-cover opacity-75" autoplay muted loop playsinline poster="{{ asset('/img/video-poster.jpg') }}">
         {% if activeVideo.videoFile %}
             <source src="{{ asset('/uploads/home_videos/' ~ activeVideo.videoFile) }}" type="video/mp4">
@@ -12,12 +12,12 @@
     <div class="position-absolute top-0 start-0 w-100 h-100 bg-black opacity-25 pointer-events-none"></div>
 
     {% if activeVideo.headline or activeVideo.subtitle %}
-    <div class="position-absolute top-50 start-50 translate-middle text-center text-white px-3 w-100" style="max-width: 900px;">
+    <div class="position-absolute top-50 start-50 translate-middle text-center text-white px-3 w-100 home-video-text-box">
         {% if activeVideo.headline %}
             <h1 class="display-3 fw-bold tracking-tight mb-3">{{ activeVideo.headline }}</h1>
         {% endif %}
         {% if activeVideo.subtitle %}
-            <p class="fs-5 text-white-50 fw-normal mx-auto" style="max-width: 650px;">{{ activeVideo.subtitle }}</p>
+            <p class="fs-5 text-white-50 fw-normal mx-auto home-video-subtitle">{{ activeVideo.subtitle }}</p>
         {% endif %}
     </div>
     {% endif %}

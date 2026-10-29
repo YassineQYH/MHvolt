@@ -12,6 +12,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 class Promotion
 {
     public const TARGET_ALL = 'all';
+    public const TARGET_ALL_TROTTINETTES = 'all_trottinettes';
+    public const TARGET_ALL_ACCESSORIES = 'all_accessories';
     public const TARGET_CATEGORY_ACCESS = 'category_access';
     public const TARGET_PRODUCT = 'product';
     public const TARGET_PRODUCT_LIST = 'product_list';

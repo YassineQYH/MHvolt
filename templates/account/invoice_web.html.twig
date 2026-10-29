@@ -2,8 +2,13 @@
 
 {% block title %}Facture {{ order.reference }} — MHvolt{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('assets/css/invoice.css') }}">
+{% endblock %}
+
 {% block content %}
-<div class="container py-5" style="max-width: 850px;">
+<div class="container py-5 invoice-wrapper">
     {# Barre d'action supérieure #}
     <div class="d-flex justify-content-between align-items-center mb-4 d-print-none">
         <a href="{{ path('account_order_show', { reference: order.reference }) }}" class="btn btn-outline-dark btn-sm rounded-pill px-3">
@@ -24,7 +29,7 @@
         {# En-tête société & facture #}
         <div class="d-flex justify-content-between align-items-start border-bottom border-light-subtle pb-4 mb-4">
             <div>
-                <h2 class="fs-4 fw-bold text-dark tracking-tight mb-1">MHVOLT</h2>
+                <h2 class="invoice-brand mb-1">MHVOLT</h2>
                 <p class="text-secondary small mb-0">
                     51 Boulevard Vincent Auriol<br>
                     4031 Angleur, BE<br>
@@ -71,12 +76,9 @@
                     {% set totalHT = 0 %}
 
                     {% for item in order.orderDetails %}
-                        {# Prix TTC unitaire payé et Total TTC de la ligne enregistrés en base #}
                         {% set unitTTC = item.priceTtc > 0 ? item.priceTtc : (item.price * (1 + item.tva / 100)) %}
                         {% set lineTotalTTC = item.totalTtc > 0 ? item.totalTtc : (unitTTC * item.quantity) %}
                         {% set tvaRate = item.tva|default(21) %}
-
-                        {# Ligne HT comptable #}
                         {% set lineHT = lineTotalTTC / (1 + (tvaRate / 100)) %}
 
                         {% set totalProduitsTTC = totalProduitsTTC + lineTotalTTC %}
@@ -138,7 +140,7 @@
         </div>
 
         {# Mentions bas de page #}
-        <div class="text-center text-secondary small border-top border-light-subtle pt-4 mt-5" style="font-size: 0.75rem;">
+        <div class="invoice-footer mt-5">
             <p class="mb-1">MHvolt — Mobilité Électrique &bull; TVA intracommunautaire : BE 0000.000.000</p>
             <p class="mb-0">Facture générée automatiquement et acquittée par voie électronique.</p>
         </div>

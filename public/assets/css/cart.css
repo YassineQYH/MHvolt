@@ -1,0 +1,116 @@
+/* ==========================================================================
+   MHVOLT — PANIER & TUNNEL DE COMMANDE
+   ========================================================================== */
+
+/* Vignette produit dans la table du panier */
+.cart-product-thumb {
+    width: 56px;
+    height: 56px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--mh-gray-light, #f4f4f5);
+    border: 1px solid var(--mh-gray-border, #e4e4e7);
+    border-radius: 0.5rem;
+    padding: 0.25rem;
+}
+
+.cart-product-thumb img {
+    max-height: 48px;
+    object-fit: contain;
+}
+
+/* Zone récapitulative et bouton code promo */
+.promo-input-group .form-control {
+    border-top-left-radius: 50rem;
+    border-bottom-left-radius: 50rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+}
+
+.promo-input-group .btn {
+    border-top-right-radius: 50rem;
+    border-bottom-right-radius: 50rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+/* Carte de choix d'adresse cliquable */
+.delivery-address-card {
+    padding: 1rem;
+    border: 1px solid var(--mh-gray-border, #e4e4e7);
+    border-radius: 0.5rem;
+    height: 100%;
+    background-color: var(--mh-gray-light, #f4f4f5);
+    position: relative;
+    transition: border-color 0.15s ease;
+}
+
+.delivery-address-card:has(.form-check-input:checked) {
+    border-color: var(--mh-black, #09090b);
+    background-color: #ffffff;
+}
+
+/* Vignette d'article pour le récapitulatif de commande */
+.order-recap-thumb {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #ffffff;
+    border: 1px solid var(--mh-gray-border, #e4e4e7);
+    border-radius: 0.5rem;
+    padding: 0.25rem;
+}
+
+.order-recap-thumb img {
+    max-height: 40px;
+    object-fit: contain;
+}
+
+/* Texte d'annotation discret (ex: TVA incluse, prix barré réduit) */
+.order-annotation-text {
+    font-size: 0.75rem;
+}
+
+/* ==========================================================================
+   PAGES RETOUR COMMANDE (SUCCÈS & ANNULATION)
+   ========================================================================== */
+
+.order-result-container {
+    max-width: 620px;
+}
+
+.order-result-icon {
+    width: 64px;
+    height: 64px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 1rem;
+}
+
+.order-result-icon.icon-success {
+    background-color: var(--mh-black, #09090b);
+    color: #ffffff;
+}
+
+.order-result-icon.icon-cancel {
+    background-color: #fee2e2;
+    border: 1px solid #fecaca;
+    color: #dc2626;
+}
+
+.order-result-badge-status {
+    background-color: var(--mh-black, #09090b) !important;
+    color: #ffffff !important;
+    padding: 6px 14px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
