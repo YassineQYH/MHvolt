@@ -3,8 +3,6 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Accessory;
-use App\Entity\Caracteristique;
-use App\Entity\CategorieCaracteristique;
 use App\Entity\CategoryAccessory;
 use App\Entity\HomeVideo;
 use App\Entity\Illustration;
@@ -15,7 +13,6 @@ use App\Entity\ProductHistory;
 use App\Entity\Promotion;
 use App\Entity\SiteConfig;
 use App\Entity\Trottinette;
-use App\Entity\TrottinetteCaracteristique;
 use App\Entity\TrottinetteDescriptionSection;
 use App\Entity\Tva;
 use App\Entity\User;
